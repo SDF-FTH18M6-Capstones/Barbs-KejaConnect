@@ -10,6 +10,9 @@ flask-cors = "*"
 marshmallow = "*"
 flask-migrate = "*"
 flask-jwt-extended = "*"
+python-dotenv = "*"
+psycopg2-binary = "*"
+flask-restful = "*"
 
 [dev-packages]
 
