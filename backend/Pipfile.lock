@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "85107b4673f8ab9979092c27f35524e635464f3f686b1c450321933d2e13391e"
+            "sha256": "5fe79bccb33beda37cda790f5f2d3b0e976f060d01215716a3985d32add80004"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -282,6 +282,15 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==2.15.1"
+        },
+        "python-dotenv": {
+            "hashes": [
+                "sha256:42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc",
+                "sha256:f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.10'",
+            "version": "==1.2.4"
         },
         "sqlalchemy": {
             "hashes": [
