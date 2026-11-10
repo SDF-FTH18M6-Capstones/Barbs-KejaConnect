@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from app.blueprints import v1
 
 
 def create_app():
@@ -9,8 +10,6 @@ def create_app():
     config = os.getenv("APP_SETTINGS", "config.flaskconfig.Development")
     app.config.from_object(config)
 
-    @app.route("/health")
-    def health_check():
-        return {"message": "The website is live"}, 200
+    app.register_blueprint(v1, url_prefix="/api/v1")
 
     return app
