@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Field from "./Field";
 import PasswordRules from "./PasswordRules";
-import { ROLES, AREAS } from "../../data/signupRoles";
-import { validateSignup } from "../../data/signupValidation";
-import { registerUser } from "../../data/signupApi";
+import { ROLES, AREAS } from "../../components/Signup/data/signupRoles";
+import { validateSignup } from "../../components/Signup/data/signupValidation";
+import { registerUser } from "../../components/Signup/data/signupApi";
 
 const EMPTY = {
   fullName: "",

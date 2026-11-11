@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { ROLES } from "../../data/signupRoles";
+import { ROLES } from "../../components/Signup/data/signupRoles";
 
 export default function RoleTabs() {
   return (
