@@ -8,6 +8,9 @@ export default function Header() {
           to="/"
           className="flex items-center gap-2 text-xl font-bold text-text"
         >
+          <span className="grid size-8 place-items-center rounded-lg bg-primary text-text-on-primary">
+            K
+          </span>
           KejaConnect
         </Link>
       </div>
