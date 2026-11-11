@@ -15,5 +15,7 @@ export default function App() {
       })
       .catch((err) => console.error(err));
   }, []);
-  return <h1>{`Api status: ${health.message}`}</h1>;
+  return (
+    <h1 className="bg-primary text-text-on-primary px-4 py-2">{`Api status: ${health.message}`}</h1>
+  );
 }

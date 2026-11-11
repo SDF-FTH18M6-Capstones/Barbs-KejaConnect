@@ -1,1 +1,29 @@
 @import "tailwindcss";
+@import "./theme.css";
+
+@theme inline {
+  --color-primary: var(
+    --color-primary
+  ); /* deep green: buttons, links, navbar */
+  --color-primary-dark: var(--color-primary-dark); /* hover states, footer */
+  --color-accent: var(--color-accent); /* warm amber: key CTAs, highlights */
+
+  /* Surfaces */
+  --color-bg: var(--color-bg); /* page background (off-white) */
+  --color-surface: var(--color-surface); /* cards, modals, inputs */
+  --color-border: var(--color-border); /* dividers, input borders */
+
+  /* Text */
+  --color-text: var(--color-text); /* main text (slate) */
+  --color-text-muted: var(--color-text-muted); /* secondary text */
+  --color-text-on-primary: var(
+    --color-text-on-primary
+  ); /* text on green backgrounds */
+  --color-text-on-accent: var(
+    --color-text-on-accent
+  ); /* text on amber (dark, NOT white: white fails contrast) */
+
+  /* Status */
+  --color-success: var(--color-success); /* verified badge, success messages */
+  --color-error: var(--color-error);
+}
