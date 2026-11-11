@@ -1,3 +1,11 @@
+export function passwordChecks(password) {
+  return [
+    { label: "8 or more characters", ok: password.length >= 8 },
+    { label: "a letter", ok: /[A-Za-z]/.test(password) },
+    { label: "a number", ok: /\d/.test(password) },
+  ];
+}
+
 export function validateSignup(form, role) {
   const errors = {};
 
@@ -13,15 +21,12 @@ export function validateSignup(form, role) {
 
   if (role.areaLabel && !form.area) errors.area = "Choose an area.";
 
-  if (
-    form.password.length < 8 ||
-    !/[A-Za-z]/.test(form.password) ||
-    !/\d/.test(form.password)
-  ) {
+  if (passwordChecks(form.password).some((rule) => !rule.ok)) {
     errors.password = "Use at least 8 characters with a letter and a number.";
   }
 
-  if (form.confirm !== form.password)
+  if (!form.confirm) errors.confirm = "Confirm your password.";
+  else if (form.confirm !== form.password)
     errors.confirm = "Passwords do not match.";
 
   if (!form.agree) errors.agree = "You need to agree before signing up.";
