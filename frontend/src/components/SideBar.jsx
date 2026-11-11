@@ -1,11 +1,17 @@
 import Brand from "./Brand";
 
 export default function SideBar({ mode, children }) {
+  //todo:use user sessions to check mode
   return (
     <aside
-      className={`flex flex-col px-5 py-5 gap-8 sticky top-0 h-screen  ${mode == "poster" ? "bg-accent" : "none"}`}
+      className={`flex flex-col px-5 py-5 gap-8 sticky top-0 h-screen  ${mode == "admin" ? "bg-accent/20" : "none"}`}
     >
-      <Brand />
+      <div className="flex justify-between items-center">
+        <Brand />
+        <div className="flex text-lg font-semibold text-accent">
+          {mode == "admin" ? "Admin" : ""}
+        </div>
+      </div>
       <div className="side-navlinks flex flex-col flex-1  gap-1 justify-start">
         {children}
       </div>
