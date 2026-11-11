@@ -1,4 +1,4 @@
-import { passwordChecks } from "../../data/signupValidation";
+import { passwordChecks } from "../../components/Signup/data/signupValidation";
 
 export default function PasswordRules({ password }) {
   return (
