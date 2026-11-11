@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function Header() {
   return (
     <header className="border-b border-border bg-surface">
-      <div className="mx-auto max-w-5xl items-center py-4 justify-between py-3">
+      <div className="mx-auto max-w-5xl items-center py-4 flex justify-between py-3">
         <Link
           to="/"
           className="flex items-center gap-2 text-xl font-bold text-text"
@@ -12,6 +12,12 @@ export default function Header() {
             K
           </span>
           KejaConnect
+        </Link>
+        <Link
+          to="/login"
+          className=" font-medium text-primary hover:text-primary-dark"
+        >
+          Log in
         </Link>
       </div>
     </header>
