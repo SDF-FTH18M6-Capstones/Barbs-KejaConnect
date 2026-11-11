@@ -1,6 +1,7 @@
 import { Navigate, useParams } from "react-router-dom";
 import Header from "../../components/Signup/Header";
 import RoleTabs from "../../components/Signup/RoleTabs";
+import SidePanel from "../../components/Signup/SidePanel";
 import { ROLES } from "../../components/Signup/data/signupRoles";
 
 export default function Signup() {
@@ -12,6 +13,9 @@ export default function Signup() {
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-10">
         <h1 className="text-3xl font-semibold">{ROLES[role].title}</h1>
         <RoleTabs />
+        <div className="grid items-start gap-6 lg:grid-cols-[1fr_320px]">
+          <SidePanel role={ROLES[role]} />
+        </div>
       </main>
     </div>
   );
