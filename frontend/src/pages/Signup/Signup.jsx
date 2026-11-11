@@ -2,6 +2,7 @@ import { Navigate, useParams } from "react-router-dom";
 import Header from "../../components/Signup/Header";
 import RoleTabs from "../../components/Signup/RoleTabs";
 import SidePanel from "../../components/Signup/SidePanel";
+import Form from "../../components/Signup/Form";
 import { ROLES } from "../../components/Signup/data/signupRoles";
 
 export default function Signup() {
@@ -14,6 +15,7 @@ export default function Signup() {
         <h1 className="text-3xl font-semibold">{ROLES[role].title}</h1>
         <RoleTabs />
         <div className="grid items-start gap-6 lg:grid-cols-[1fr_320px]">
+          <Form key={role} roleId={role} />
           <SidePanel role={ROLES[role]} />
         </div>
       </main>
