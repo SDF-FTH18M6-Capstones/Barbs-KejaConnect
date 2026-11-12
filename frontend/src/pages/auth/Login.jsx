@@ -27,4 +27,13 @@ export default function Login() {
     email: "",
     password: "",
   });
-  
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
