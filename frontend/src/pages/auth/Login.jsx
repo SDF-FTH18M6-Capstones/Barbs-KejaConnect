@@ -37,3 +37,10 @@ export default function Login() {
       ...formData,
       [name]: value,
     });
+    setErrors({
+      ...errors,
+      [name]: "",
+    });
+
+    setMessage("");
+  }
