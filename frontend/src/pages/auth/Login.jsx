@@ -121,3 +121,13 @@ export default function Login() {
             {message}
           </p>
         )}
+        {/* Signup link */}
+        <p className="text-center text-sm text-text-muted">
+          New to KejaConnect?{" "}
+          <Link
+            to="/signup"
+            className="font-semibold text-primary hover:underline"
+          >
+            Create an account
+          </Link>
+        </p>
