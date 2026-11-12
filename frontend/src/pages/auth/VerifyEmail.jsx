@@ -92,4 +92,16 @@ export default function VerifyEmail() {
             </p>
           </div>
         )}
-        
+        {/* Invalid link */}
+        {status === "invalid" && (
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold">
+              Invalid verification link
+            </h2>
+
+            <p className="text-text-muted">
+              This verification link is invalid. Please check the
+              link or request a new verification email below.
+            </p>
+          </div>
+        )}
