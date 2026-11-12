@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import Header from "../components/nav/Header";
 import Hero from "../components/home/Hero";
 import FilterSidebar from "../components/home/FilterSidebar";
 import ListingGrid from "../components/home/ListingGrid";
@@ -9,6 +8,7 @@ import { PROPERTY_TYPES } from "../utils/labels";
 import useDebounce from "../utils/useDebounce";
 
 const PAGE_SIZE = 9;
+
 const EMPTY = { area: "", property_type: "", min: "", max: "" };
 
 export default function Home() {
@@ -89,7 +89,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-canvas font-sans text-ink">
-      <Header />
       <Hero unitCount={totalAvailable} areaCount={areas.length} />
       <main className="mx-auto flex max-w-[1200px] flex-wrap items-start gap-6 px-6 pb-14 pt-7">
         <FilterSidebar
