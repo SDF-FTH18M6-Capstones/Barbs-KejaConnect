@@ -1,9 +1,17 @@
-import { NavLink } from "react-router-dom";
-import ButtonAlternate from "./ButtonAlternate";
-import ButtonPrimary from "./ButtonPrimary";
-import Brand from "./Brand";
+import { NavLink, useNavigate } from "react-router-dom";
+import ButtonAlternate from "../ButtonAlternate";
+import ButtonPrimary from "../ButtonPrimary";
+import Brand from "../Brand";
 export default function Header() {
   //check if user exists to display varied status bar
+  const navigate = useNavigate();
+  const handleButtonClick = (type) => {
+    if (type == "login") {
+      navigate("/login");
+    } else {
+      navigate("/signup");
+    }
+  };
   return (
     <nav className="logo flex justify-between py-5 px-10 h-20">
       <Brand />
@@ -20,8 +28,11 @@ export default function Header() {
           </NavLink>
         </div>
         <div className="auth flex items-center gap-3">
-          <ButtonAlternate onclick={() => {}} text="Log in" />
-          <ButtonPrimary onclick={() => {}} text="Sign Up" />
+          <ButtonAlternate
+            onclick={() => handleButtonClick("login")}
+            text="Log in"
+          />
+          <ButtonPrimary onclick={() => handleButtonClick("")} text="Sign Up" />
         </div>
       </div>
     </nav>

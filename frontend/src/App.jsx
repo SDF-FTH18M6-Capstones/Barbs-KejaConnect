@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routes";
 
 export default function App() {
   const [health, setHealth] = useState({ waiting: "Preparing" });
@@ -15,7 +17,5 @@ export default function App() {
       })
       .catch((err) => console.error(err));
   }, []);
-  return (
-    <h1 className="bg-primary text-text-on-primary px-4 py-2">{`Api status this has changed: ${health.message}`}</h1>
-  );
+  return <RouterProvider router={router} />;
 }
