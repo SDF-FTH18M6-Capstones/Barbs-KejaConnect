@@ -26,3 +26,6 @@ export default function VerifyEmail() {
       setError("Please enter a valid email address");
       return;
     }
+    setError("");
+    setStatus("sent");
+  }
