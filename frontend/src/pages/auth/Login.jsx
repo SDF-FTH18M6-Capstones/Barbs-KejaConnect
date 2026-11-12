@@ -93,3 +93,15 @@ export default function Login() {
             placeholder="you@example.com"
             error={errors.email}
           />
+          <div>
+            <PasswordInput
+              value={formData.password}
+              onChange={handleChange}
+              error={errors.password}
+            />
+
+            <div className="mt-2 text-right">
+              <span className="text-sm text-text-muted">
+                Forgot password?
+              </span>
+            </div>
