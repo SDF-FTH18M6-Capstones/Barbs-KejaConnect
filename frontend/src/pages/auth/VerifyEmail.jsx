@@ -12,3 +12,11 @@ export default function VerifyEmail() {
   const [status, setStatus] = useState(initialStatus);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+
+   function handleResend(event) {
+    event.preventDefault();
+
+    if (!email.trim()) {
+      setError("Email address is required");
+      return;
+    }
