@@ -131,4 +131,19 @@ export default function VerifyEmail() {
             </button>
           </div>
         )}
-        
+        {/* Resend form */}
+        {["pending", "expired", "invalid"].includes(status) && (
+          <form onSubmit={handleResend} className="space-y-5">
+
+            <FormInput
+              label="Email address"
+              type="email"
+              name="email"
+              value={email}
+              onChange={(event) => {
+                setEmail(event.target.value);
+                setError("");
+              }}
+              placeholder="you@example.com"
+              error={error}
+            />
