@@ -22,3 +22,14 @@ export default function AuthLayout({ children }) {
             </p>
           </div>
         </div>
+        <div className="mt-12 space-y-4">
+          <p className="font-semibold">Your trust matters to us.</p>
+
+          <ul className="space-y-3 text-sm text-white/85">
+            <li>✓ Posters are checked by an admin</li>
+            <li>✓ Duplicate listings are blocked</li>
+            <li>✓ A safer way to find your next home</li>
+          </ul>
+        </div>
+
+      </section>
