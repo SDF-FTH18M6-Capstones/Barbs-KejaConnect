@@ -105,3 +105,13 @@ export default function Login() {
                 Forgot password?
               </span>
             </div>
+            </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
+          >
+            Log in
+          </button>
+
+        </form>
