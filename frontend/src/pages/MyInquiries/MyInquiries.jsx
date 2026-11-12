@@ -12,15 +12,15 @@ export default function MyInquiries() {
   const location = useLocation();
   const isTenant = user?.role === "tenant";
 
-  const [data, setData] = useState(null); // { items, page, per_page, total, pages }
+  const [data, setData] = useState(null);
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState("loading"); // loading | ready | error
+  const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!isTenant) return;
-    let ignore = false; // stops an old request from overwriting a newer one
+    let ignore = false;
     setStatus("loading");
     getMyInquiries(page)
       .then((result) => {
