@@ -115,3 +115,9 @@ export default function Login() {
           </button>
 
         </form>
+        {/* Mock response */}
+        {message && (
+          <p className="rounded-lg bg-green-50 p-3 text-sm text-success">
+            {message}
+          </p>
+        )}
