@@ -78,3 +78,18 @@ export default function VerifyEmail() {
             </Link>
           </div>
         )}
+
+        {/* Expired link */}
+        {status === "expired" && (
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold">
+              Verification link expired
+            </h2>
+
+            <p className="text-text-muted">
+              Your verification link has expired. Enter your email
+              address below to request a new one.
+            </p>
+          </div>
+        )}
+        
