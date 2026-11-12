@@ -66,3 +66,5 @@ export default function Login() {
     if (Object.keys(newErrors).length > 0) {
       return;
     }
+    setMessage("Frontend validation successful! Backend login is not connected yet.");
+  }
