@@ -20,3 +20,9 @@ export default function VerifyEmail() {
       setError("Email address is required");
       return;
     }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
