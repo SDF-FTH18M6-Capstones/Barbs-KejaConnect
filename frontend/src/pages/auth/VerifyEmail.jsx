@@ -6,3 +6,9 @@ import FormInput from "../../components/auth/FormInput";
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
+
+  const initialStatus = searchParams.get("status") || "pending";
+
+  const [status, setStatus] = useState(initialStatus);
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
