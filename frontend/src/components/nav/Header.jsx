@@ -2,16 +2,39 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ButtonAlternate from "../ButtonAlternate";
 import ButtonPrimary from "../ButtonPrimary";
 import Brand from "../Brand";
+import { getCurrentUser } from "../inquiries/data/currentUser";
+
+// "Faith Njeri" -> "FN"
+const initials = (name) =>
+  name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase(); // ← added
+
 export default function Header() {
   //check if user exists to display varied status bar
   const navigate = useNavigate();
+  const user = getCurrentUser(); // ← added: { full_name, role } or null
+  const isPoster = user?.role === "manager" || user?.role === "owner"; // ← added
+
   const handleButtonClick = (type) => {
+    console.log(type);
     if (type == "login") {
       navigate("/login");
     } else {
       navigate("/signup");
     }
   };
+
+  // ← added: clears the saved user and goes to the home page
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("access_token");
+    navigate("/");
+  };
+
   return (
     <nav className="logo flex justify-between py-5 px-10 h-20">
       <Brand />
@@ -20,19 +43,48 @@ export default function Header() {
           <NavLink to="/listings" className="text-text hover:text-primary">
             Browse
           </NavLink>
-          <NavLink to="/listings/new" className="text-text hover:text-primary">
-            New Listing
-          </NavLink>
-          <NavLink to="/listing/new" className="text-text hover:text-primary">
-            My Inquiries
-          </NavLink>
+          {isPoster && ( // ← only posters can create listings
+            <NavLink
+              to="/listings/new"
+              className="text-text hover:text-primary"
+            >
+              New Listing
+            </NavLink>
+          )}
+          {user?.role === "tenant" && ( // ← only tenants send inquiries
+            <NavLink
+              to="/my-inquiries"
+              className="text-text hover:text-primary"
+            >
+              My Inquiries
+            </NavLink>
+          )}
         </div>
         <div className="auth flex items-center gap-3">
-          <ButtonAlternate
-            onclick={() => handleButtonClick("login")}
-            text="Log in"
-          />
-          <ButtonPrimary onclick={() => handleButtonClick("")} text="Sign Up" />
+          {user ? (
+            // ← added: logged in shows initials, name and Log out
+            <>
+              <span className="flex items-center gap-2">
+                <span className="grid size-9 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary-dark">
+                  {initials(user.full_name)}
+                </span>
+                <span className="text-sm text-text">{user.full_name}</span>
+              </span>
+              <ButtonAlternate onClick={handleLogout} text="Log out" />
+            </>
+          ) : (
+            // unchanged: visitors see Log in / Sign Up
+            <>
+              <ButtonAlternate
+                onclick={() => handleButtonClick("login")}
+                text="Log in"
+              />
+              <ButtonPrimary
+                onclick={() => handleButtonClick("")}
+                text="Sign Up"
+              />
+            </>
+          )}
         </div>
       </div>
     </nav>
