@@ -81,3 +81,15 @@ export default function Login() {
             Welcome back. Enter your details to continue.
           </p>
         </div>
+         {/* Login form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          <FormInput
+            label="Email address"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="you@example.com"
+            error={errors.email}
+          />
