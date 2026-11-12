@@ -13,6 +13,8 @@ flask-jwt-extended = "*"
 python-dotenv = "*"
 psycopg2-binary = "*"
 flask-restful = "*"
+flask-bcrypt = "*"
+pycopg = "*"
 
 [dev-packages]
 
