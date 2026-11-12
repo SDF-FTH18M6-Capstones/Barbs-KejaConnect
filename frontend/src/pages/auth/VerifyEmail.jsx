@@ -13,7 +13,7 @@ export default function VerifyEmail() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
-   function handleResend(event) {
+  function handleResend(event) {
     event.preventDefault();
 
     if (!email.trim()) {
@@ -33,7 +33,6 @@ export default function VerifyEmail() {
   return (
     <AuthLayout>
       <div className="space-y-6">
-
         {/* Pending verification */}
         {status === "pending" && (
           <div className="space-y-5 text-center">
@@ -42,14 +41,11 @@ export default function VerifyEmail() {
             </div>
 
             <div>
-              <h2 className="text-3xl font-bold">
-                Verify your email address
-              </h2>
+              <h2 className="text-3xl font-bold">Verify your email address</h2>
 
               <p className="mt-3 leading-relaxed text-text-muted">
-                We've sent a verification link to your email address.
-                Please check your inbox and click the link to verify
-                your account.
+                We've sent a verification link to your email address. Please
+                check your inbox and click the link to verify your account.
               </p>
             </div>
           </div>
@@ -60,14 +56,12 @@ export default function VerifyEmail() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-3xl">
               ✓
             </div>
-           <div>
-              <h2 className="text-3xl font-bold">
-                Email verified!
-              </h2>
+            <div>
+              <h2 className="text-3xl font-bold">Email verified!</h2>
 
               <p className="mt-3 text-text-muted">
-                Your email address has been successfully verified.
-                You can now log in to your KejaConnect account.
+                Your email address has been successfully verified. You can now
+                log in to your KejaConnect account.
               </p>
             </div>
             <Link
@@ -82,26 +76,22 @@ export default function VerifyEmail() {
         {/* Expired link */}
         {status === "expired" && (
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold">
-              Verification link expired
-            </h2>
+            <h2 className="text-3xl font-bold">Verification link expired</h2>
 
             <p className="text-text-muted">
-              Your verification link has expired. Enter your email
-              address below to request a new one.
+              Your verification link has expired. Enter your email address below
+              to request a new one.
             </p>
           </div>
         )}
         {/* Invalid link */}
         {status === "invalid" && (
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold">
-              Invalid verification link
-            </h2>
+            <h2 className="text-3xl font-bold">Invalid verification link</h2>
 
             <p className="text-text-muted">
-              This verification link is invalid. Please check the
-              link or request a new verification email below.
+              This verification link is invalid. Please check the link or
+              request a new verification email below.
             </p>
           </div>
         )}
@@ -113,13 +103,11 @@ export default function VerifyEmail() {
               ✓
             </div>
 
-            <h2 className="text-3xl font-bold">
-              Check your inbox
-            </h2>
+            <h2 className="text-3xl font-bold">Check your inbox</h2>
 
             <p className="text-text-muted">
-              If an account exists for {email}, a new verification
-              link will be sent to that address.
+              If an account exists for {email}, a new verification link will be
+              sent to that address.
             </p>
 
             <button
@@ -134,7 +122,6 @@ export default function VerifyEmail() {
         {/* Resend form */}
         {["pending", "expired", "invalid"].includes(status) && (
           <form onSubmit={handleResend} className="space-y-5">
-
             <FormInput
               label="Email address"
               type="email"
@@ -153,6 +140,21 @@ export default function VerifyEmail() {
             >
               Resend verification email
             </button>
-
           </form>
         )}
+        {/* Login navigation */}
+        {status !== "success" && (
+          <p className="text-center text-sm text-text-muted">
+            Already verified?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-primary hover:underline"
+            >
+              Log in
+            </Link>
+          </p>
+        )}
+      </div>
+    </AuthLayout>
+  );
+}
