@@ -6,12 +6,9 @@ export default function PasswordInput({
 })
 {
   const [showPassword, setShowPassword] = useState(false);
-  
-  <div className="space-y-2">
-      <label
-        htmlFor="password"
-        className="block text-sm font-medium text-text"
-      >
+  return (
+    <div className="space-y-2">
+      <label htmlFor="password" className="block text-sm font-medium text-text">
         Password
       </label>
 
@@ -25,7 +22,13 @@ export default function PasswordInput({
           placeholder="Enter your password"
           className="w-full rounded-lg border border-border bg-surface px-4 py-3 pr-20 text-text outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
-        </div>
-
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-primary"
+        >
+          {showPassword ? "Hide" : "Show"}
+        </button>
+      </div>
     </div>
-  return ();}
+  );}
