@@ -26,4 +26,15 @@
   /* Status */
   --color-success: var(--color-success); /* verified badge, success messages */
   --color-error: var(--color-error);
+
+  --color-brand: #0E6B4E;
+  --color-brand-dark: #0A5039;
+  --color-brand-tint: #D6EDE3;
+  --color-canvas: #F4F5F2;
+  --color-ink: #16211C;
+  --color-muted: #56625B;
+  --color-line: #E1E5E0;
+  --color-line-strong: #CBD2CC;
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-display: "Space Grotesk", Inter, sans-serif;
 }

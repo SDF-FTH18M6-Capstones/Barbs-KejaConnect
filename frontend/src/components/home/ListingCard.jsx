@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ROUTES } from "../../routes";
+import { ROUTES } from "../../paths";
 import { formatKES, timeAgo } from "../../utils/format";
 import { roomsLabel } from "../../utils/labels";
 
