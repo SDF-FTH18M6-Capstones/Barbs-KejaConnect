@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ButtonAlternate from "../ButtonAlternate";
 import ButtonPrimary from "../ButtonPrimary";
 import Brand from "../Brand";
-import { getCurrentUser } from "../../data/currentUser"; // ← added
+import { getCurrentUser } from "../inquiries/data/currentUser";
 
 // "Faith Njeri" -> "FN"
 const initials = (name) =>
