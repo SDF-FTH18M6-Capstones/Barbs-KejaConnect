@@ -147,3 +147,12 @@ export default function VerifyEmail() {
               placeholder="you@example.com"
               error={error}
             />
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
+            >
+              Resend verification email
+            </button>
+
+          </form>
+        )}
