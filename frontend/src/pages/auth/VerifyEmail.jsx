@@ -105,3 +105,30 @@ export default function VerifyEmail() {
             </p>
           </div>
         )}
+
+        {/* Resend confirmation */}
+        {status === "sent" && (
+          <div className="space-y-4 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-3xl">
+              ✓
+            </div>
+
+            <h2 className="text-3xl font-bold">
+              Check your inbox
+            </h2>
+
+            <p className="text-text-muted">
+              If an account exists for {email}, a new verification
+              link will be sent to that address.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setStatus("pending")}
+              className="font-semibold text-primary hover:underline"
+            >
+              Back to verification
+            </button>
+          </div>
+        )}
+        
