@@ -22,3 +22,9 @@ import AuthLayout from "../../components/auth/AuthLayout";
 import FormInput from "../../components/auth/FormInput";
 import PasswordInput from "../../components/auth/PasswordInput";
 
+export default function Login() {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  
