@@ -60,3 +60,13 @@ export default function VerifyEmail() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-3xl">
               ✓
             </div>
+           <div>
+              <h2 className="text-3xl font-bold">
+                Email verified!
+              </h2>
+
+              <p className="mt-3 text-text-muted">
+                Your email address has been successfully verified.
+                You can now log in to your KejaConnect account.
+              </p>
+            </div>
