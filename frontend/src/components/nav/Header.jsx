@@ -20,6 +20,7 @@ export default function Header() {
   const isPoster = user?.role === "manager" || user?.role === "owner"; // ← added
 
   const handleButtonClick = (type) => {
+    console.log(type);
     if (type == "login") {
       navigate("/login");
     } else {
@@ -75,11 +76,11 @@ export default function Header() {
             // unchanged: visitors see Log in / Sign Up
             <>
               <ButtonAlternate
-                onClick={() => handleButtonClick("login")}
+                onclick={() => handleButtonClick("login")}
                 text="Log in"
               />
               <ButtonPrimary
-                onClick={() => handleButtonClick("")}
+                onclick={() => handleButtonClick("")}
                 text="Sign Up"
               />
             </>
