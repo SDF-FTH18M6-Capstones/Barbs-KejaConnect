@@ -1,6 +1,6 @@
 import { SAMPLE_INQUIRIES } from "./sampleInquiries";
 
-const USE_SAMPLE = import.meta.env.VITE_USE_SAMPLE === "true";
+const USE_SAMPLE = true;
 export const PER_PAGE = 10;
 
 export async function getMyInquiries(page = 1) {
