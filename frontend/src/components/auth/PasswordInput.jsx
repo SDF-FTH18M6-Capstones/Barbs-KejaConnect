@@ -30,5 +30,6 @@ export default function PasswordInput({
           {showPassword ? "Hide" : "Show"}
         </button>
       </div>
+      {error && <p className="text-sm text-error">{error}</p>}
     </div>
   );}
