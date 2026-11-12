@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import InquiryCard from "../components/inquiries/InquiryCard";
-import EmptyInquiries from "../components/inquiries/EmptyInquiries";
-import Pager from "../components/inquiries/Pager";
-import { getMyInquiries } from "../data/inquiryApi";
-import { getCurrentUser } from "../data/currentUser";
+import InquiryCard from "../../components/inquiries/InquiryCard";
+import EmptyInquiries from "../../components/inquiries/EmptyInquiries";
+import Pager from "../../components/inquiries/Pager";
+import { getMyInquiries } from "../../components/inquiries/data/inquiryApi";
+import { getCurrentUser } from "../../components/inquiries/data/currentUser";
 import Header from "../../components/nav/Header";
 
 export default function MyInquiries() {

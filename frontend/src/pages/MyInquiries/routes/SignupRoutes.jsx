@@ -6,12 +6,10 @@
 //     ...listingRoutes,
 //     ...inquiryRoutes,
 //   ]);
-import ListingDetail from "../pages/ListingDetail";
-import MyInquiries from "../pages/MyInquiries";
+//import ListingDetail from "../pages/ListingDetail";
+import MyInquiries from "../MyInquiries";
 
-export const listingRoutes = [
-  { path: "/listings/:id", element: <ListingDetail /> },
-];
+//export const listingRoutes = [{ path: "/listings/:id", element: <ListingDetail /> },];
 
 export const inquiryRoutes = [
   { path: "/my-inquiries", element: <MyInquiries /> },
