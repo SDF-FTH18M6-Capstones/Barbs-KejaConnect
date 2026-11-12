@@ -54,3 +54,9 @@ export default function VerifyEmail() {
             </div>
           </div>
         )}
+        {/* Successful verification */}
+        {status === "success" && (
+          <div className="space-y-5 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-3xl">
+              ✓
+            </div>
