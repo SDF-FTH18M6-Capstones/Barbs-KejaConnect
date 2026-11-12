@@ -70,3 +70,11 @@ export default function VerifyEmail() {
                 You can now log in to your KejaConnect account.
               </p>
             </div>
+            <Link
+              to="/login"
+              className="inline-block w-full rounded-lg bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
+            >
+              Continue to login
+            </Link>
+          </div>
+        )}
