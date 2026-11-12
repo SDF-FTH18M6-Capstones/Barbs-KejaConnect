@@ -10,7 +10,7 @@ env/
 bin/
 lib/
 include/
-
+migrations/
 __pycache__/
 *.pyc
 *.pyo
