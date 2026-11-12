@@ -1,4 +1,4 @@
-import Brand from "./Brand";
+import Brand from "../Brand";
 
 export default function SideBar({ mode, children }) {
   //todo:use user sessions to check mode
