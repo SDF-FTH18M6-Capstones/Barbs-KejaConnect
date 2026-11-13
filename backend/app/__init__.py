@@ -19,7 +19,4 @@ def create_app():
 
     app.register_blueprint(v1, url_prefix="/api/v1")
 
-    db.init_app(app)
-    bcrypt.init_app(app)
-
     return app
