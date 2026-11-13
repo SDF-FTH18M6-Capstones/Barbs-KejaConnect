@@ -3,6 +3,7 @@ import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/auth/Login";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 
 export const router = createBrowserRouter([
   {
