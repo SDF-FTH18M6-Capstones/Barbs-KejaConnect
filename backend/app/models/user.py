@@ -21,6 +21,10 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     _password_hash = db.Column(db.String)
 
+    email_verification_token = db.relationship(
+        "EmailVerificationToken", back_populates="user", cascade="all,delete"
+    )
+
     @hybrid_property
     def password_hash(self):
         raise AttributeError("Can not view password.")
@@ -43,3 +47,11 @@ class User(db.Model):
                 f"Invalid approval status {value}. Must be one of: {APPROVAL_STATUS} "
             )
         return value
+
+    def authenticate(self, password):
+        return bcrypt.check_password_hash(
+            self._password_hash, password=password.encode("utf-8")
+        )
+
+    def __repr__(self):
+        return f"<User {self.full_name} {self.email} {self.created_at}"
