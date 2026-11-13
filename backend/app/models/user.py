@@ -24,6 +24,9 @@ class User(db.Model):
     email_verification_token = db.relationship(
         "EmailVerificationToken", back_populates="user", cascade="all,delete"
     )
+    verification_documents = db.relationship(
+        "VerificationDocument", back_populates="user", cascade="all,delete"
+    )
 
     @hybrid_property
     def password_hash(self):
