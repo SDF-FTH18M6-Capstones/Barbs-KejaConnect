@@ -2,9 +2,7 @@ from ..config import db, bcrypt
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 from datetime import datetime, timezone
-
-ALLOWED_ROLES = ["admin", "owner", "manager", "tenant"]
-APPROVAL_STATUS = ["not_required", "pending", "approved", "rejected"]
+from ..utils import ALLOWED_ROLES, APPROVAL_STATUS
 
 
 class User(db.Model):
