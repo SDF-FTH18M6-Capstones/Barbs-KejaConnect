@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from app.blueprints import v1
 from .config import db, bcrypt
 from .models import *
+from .schemas import *
 
 
 def create_app():

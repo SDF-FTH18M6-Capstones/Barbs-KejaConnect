@@ -20,10 +20,16 @@ class User(db.Model):
     _password_hash = db.Column(db.String)
 
     email_verification_token = db.relationship(
-        "EmailVerificationToken", back_populates="user", cascade="all,delete"
+        "EmailVerificationToken",
+        back_populates="user",
+        uselist=False,
+        cascade="all,delete",
     )
     verification_documents = db.relationship(
-        "VerificationDocument", back_populates="user", cascade="all,delete"
+        "VerificationDocument",
+        foreign_keys="VerificationDocument.user_id",
+        back_populates="user",
+        cascade="all,delete",
     )
 
     @hybrid_property
@@ -55,4 +61,4 @@ class User(db.Model):
         )
 
     def __repr__(self):
-        return f"<User {self.full_name} {self.email} {self.created_at}"
+        return f"<User {self.full_name} {self.email} {self.created_at}>"

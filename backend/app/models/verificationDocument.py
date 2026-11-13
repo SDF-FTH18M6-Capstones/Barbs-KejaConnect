@@ -20,7 +20,9 @@ class VerificationDocument(db.Model):
         db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
-    user = db.relationship("User", back_populates="verification_documents")
+    user = db.relationship(
+        "User", foreign_keys=[user_id], back_populates="verification_documents"
+    )
 
     @validates("doc_type")
     def doc_type_validation(self, key, doctype):
