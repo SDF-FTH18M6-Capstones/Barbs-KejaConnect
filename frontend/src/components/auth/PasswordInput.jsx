@@ -1,10 +1,5 @@
 import { useState } from "react";
-export default function PasswordInput({
-  value,
-  onChange,
-  error,
-})
-{
+export default function PasswordInput({ value, onChange, error }) {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="space-y-2">
@@ -32,4 +27,5 @@ export default function PasswordInput({
       </div>
       {error && <p className="text-sm text-error">{error}</p>}
     </div>
-  );}
+  );
+}

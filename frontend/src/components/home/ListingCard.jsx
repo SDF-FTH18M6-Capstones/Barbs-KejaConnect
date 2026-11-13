@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { ROUTES } from "../../routes";
 import { formatKES, timeAgo } from "../../utils/format";
 import { roomsLabel } from "../../utils/labels";
 
@@ -19,7 +18,7 @@ export default function ListingCard({ listing, index = 0 }) {
 
   return (
     <Link
-      to={ROUTES.listing(id)}
+      to="/"
       className="flex flex-col overflow-hidden rounded-[14px] border border-line bg-white text-ink no-underline transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
     >
       <div

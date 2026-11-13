@@ -3,12 +3,14 @@ import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/auth/Login";
-import VerifyEmail from "./pages/auth/VerifyEmail";
 
 export const router = createBrowserRouter([
   {
     element: <Layout />,
-    children: [{ path: "/", element: <Home /> }],
+    children: [
+      { path: "/", element: <Home /> },
+      { path: "/enquiries", element: <MyInquiries /> },
+    ],
   },
   { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
   { path: "/signup/:role", element: <Signup /> },

@@ -1,7 +1,9 @@
 import os
 from flask import Flask
+from flask_migrate import Migrate
 from app.blueprints import v1
 from .config import db, bcrypt
+from .models import *
 
 
 def create_app():
@@ -11,9 +13,10 @@ def create_app():
     config = os.getenv("APP_SETTINGS", "config.flaskconfig.Development")
     app.config.from_object(config)
 
-    app.register_blueprint(v1, url_prefix="/api/v1")
-
+    migrate = Migrate(app, db)
     db.init_app(app)
     bcrypt.init_app(app)
+
+    app.register_blueprint(v1, url_prefix="/api/v1")
 
     return app
