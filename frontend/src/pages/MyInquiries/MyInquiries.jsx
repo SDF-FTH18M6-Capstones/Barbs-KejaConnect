@@ -45,8 +45,6 @@ export default function MyInquiries() {
 
   return (
     <div className="min-h-screen bg-bg text-text">
-      <Header user={user} />
-
       <main className="mx-auto max-w-3xl space-y-5 px-4 pt-9 pb-14">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1.5">
