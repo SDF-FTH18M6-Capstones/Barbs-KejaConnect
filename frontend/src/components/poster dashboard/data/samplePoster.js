@@ -1,4 +1,4 @@
-import { mockListings } from "./mockListings";
+import { mockListings } from "../../../data/mockListings";
 
 export const SAMPLE_POSTER = {
   id: 11,
