@@ -3,7 +3,7 @@ import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/auth/Login";
-import VerifyEmail from "./pages/auth/VerifyEmail";
+import MyInquiries from "./pages/MyInquiries/MyInquiries";
 
 export const router = createBrowserRouter([
   {
@@ -16,5 +16,5 @@ export const router = createBrowserRouter([
   { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
   { path: "/signup/:role", element: <Signup /> },
   { path: "/login", element: <Login /> },
-  { path: "/verify-email", element: <VerifyEmail /> },
+  
 ]);
