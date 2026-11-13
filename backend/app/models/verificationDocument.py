@@ -1,9 +1,7 @@
 from datetime import datetime, timezone
 from sqlalchemy.orm import validates
 from ..config import db
-
-DOC_TYPE = ["national_id", "title_deed", "management_agreement"]
-APPROVAL_STATUS = ["not_required", "pending", "approved", "rejected"]
+from ..utils import APPROVAL_STATUS, DOC_TYPE
 
 
 class VerificationDocument(db.Model):

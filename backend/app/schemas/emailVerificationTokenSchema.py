@@ -14,5 +14,6 @@ class EmailVerificationTokenSchema(Schema):
 
     user = fields.Nested("UserSchema", exclude=("email_verification_token",))
 
+    @pre_load
     def to_email_verification_token(self, data, **kwargs):
         return EmailVerificationToken(**data)
