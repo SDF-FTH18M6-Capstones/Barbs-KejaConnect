@@ -42,7 +42,9 @@ class Property(db.Model):
     street_address = db.Column(db.String)
     unit_number = db.Column(db.String(30), nullable=False)
     lr_number = db.Column(db.String(60))
-    _dedupe_key = db.Column(db.String(300), default=create_dedupe_key nullable=False)
+    _dedupe_key = db.Column(
+        db.String(300), default=create_dedupe_key, nullable=False, unique=True
+    )
     status = db.Column(db.String, default="available", nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -62,11 +64,12 @@ class Property(db.Model):
                 f"Invalid property status {value} should one of {PROPERTY_STATUS}"
             )
         return value
-    @validates('county')
-    def val_area(self,value):
+
+    @validates("county")
+    def val_area(self, value):
         if value not in COUNTIES:
-            raise ValueError(f'Invalid county: {value}.')
-        
+            raise ValueError(f"Invalid county: {value}.")
+
     @property
     def dedupe_key(self):
         return self._dedupe_key
@@ -75,6 +78,5 @@ class Property(db.Model):
     def dedupe_key(self, value):
         raise AttributeError("Cannot manually set the dedupe key.")
 
-
     def __repr__(self):
-        return f'<Property {self.id} {self.title} {self.property_type} {self.price_monthly} {self.bedrooms} {self.bathrooms} {self.dedupe_key} {self.status} {self.created_at}>'
+        return f"<Property {self.id} {self.title} {self.property_type} {self.price_monthly} {self.bedrooms} {self.bathrooms} {self.dedupe_key} {self.status} {self.created_at}>"
