@@ -142,4 +142,4 @@ export default function InquiryForm({ listing }) {
       </button>
     </form>
   );
-} 
+}

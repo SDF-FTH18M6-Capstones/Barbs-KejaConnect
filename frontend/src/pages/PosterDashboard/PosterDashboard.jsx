@@ -95,7 +95,7 @@ export default function PosterDashboard() {
               : "Log in with a manager or owner account to see it."}
           </p>
           <Link
-            to={user ? "/listings" : "/login"}
+            to={user ? "/" : "/login"}
             className="inline-block rounded-lg bg-primary px-5 py-2.5 font-medium text-text-on-primary hover:bg-primary-dark"
           >
             {user ? "Browse listings" : "Log in"}

@@ -6,8 +6,13 @@ import Login from "./pages/auth/Login";
 import MyInquiries from "./pages/MyInquiries/MyInquiries";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ListingDetail from "./pages/ListingDetail";
+import PosterDashboard from "./pages/PosterDashboard/PosterDashboard";
 
 export const router = createBrowserRouter([
+  { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
+  { path: "/signup/:role", element: <Signup /> },
+  { path: "/login", element: <Login /> },
+  { path: "/verify-email", element: <VerifyEmail /> },
   {
     element: <Layout />,
     children: [
@@ -16,8 +21,5 @@ export const router = createBrowserRouter([
       { path: "/listings/:id", element: <ListingDetail /> },
     ],
   },
-  { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
-  { path: "/signup/:role", element: <Signup /> },
-  { path: "/login", element: <Login /> },
-  { path: "/verify-email", element: <VerifyEmail /> },
+  { path: "/poster_dashboard", element: <PosterDashboard /> },
 ]);
