@@ -25,6 +25,8 @@ class UserSchema(Schema):
 
     inquiries = fields.Nested("InquirySchema", many=True, exclude=("user",))
 
+    saved_listings = fields.Nested("SavedListingSchema", many=True, exclude=("user",))
+
     @pre_load
     def to_user(self, data, **kwargs):
         return User(**data)

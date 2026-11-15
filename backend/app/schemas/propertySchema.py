@@ -28,6 +28,9 @@ class PropertySchema(Schema):
     property_images = fields.Nested(
         "PropertyImageSchema", exclude=("property",), many=True
     )
+    saved_listings = fields.Nested(
+        "SavedListingSchema", many=True, exclude=("property",)
+    )
 
     @pre_load
     def to_property(self, data, **kwargs):
