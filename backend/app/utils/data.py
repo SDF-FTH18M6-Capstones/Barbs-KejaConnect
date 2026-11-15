@@ -1,5 +1,6 @@
 ALLOWED_ROLES = ["admin", "owner", "manager", "tenant"]
 APPROVAL_STATUS = ["not_required", "pending", "approved", "rejected"]
+INQUIRY_STATUS = ["new", "responded", "closed"]
 DOC_TYPE = ["national_id", "title_deed", "management_agreement"]
 PROPERTY_TYPE = [
     "single_room",

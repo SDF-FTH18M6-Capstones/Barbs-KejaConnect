@@ -5,4 +5,5 @@ from .data import (
     PROPERTY_TYPE,
     COUNTIES,
     PROPERTY_STATUS,
+    INQUIRY_STATUS,
 )
