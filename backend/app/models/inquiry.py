@@ -5,7 +5,7 @@ from ..utils import INQUIRY_STATUS
 
 
 class Inquiry(db.Model):
-    __tableName__ = "inquiries"
+    __tablename__ = "inquiries"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     property_id = db.Column(db.Integer, db.ForeignKey("properties.id"), nullable=False)
