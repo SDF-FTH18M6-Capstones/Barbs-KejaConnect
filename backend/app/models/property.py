@@ -52,6 +52,10 @@ class Property(db.Model):
         "Inquiry", back_populates="property", cascade="all,delete"
     )
 
+    property_images = db.relationship(
+        "PropertyImage", back_populates="property", cascade="all,delete"
+    )
+
     @validates("property_type")
     def val_property_type(self, key, value):
         if value not in PROPERTY_TYPE:
