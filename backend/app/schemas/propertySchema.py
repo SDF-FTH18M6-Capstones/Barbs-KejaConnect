@@ -25,6 +25,9 @@ class PropertySchema(Schema):
     updated_at = fields.DateTime(dump_only=True)
 
     inquiries = fields.Nested("InquirySchema", many=True, exclude=("property",))
+    property_images = fields.Nested(
+        "PropertyImageSchema", exclude=("property",), many=True
+    )
 
     @pre_load
     def to_property(self, data, **kwargs):

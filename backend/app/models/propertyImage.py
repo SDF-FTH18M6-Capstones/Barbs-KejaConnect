@@ -6,7 +6,7 @@ class PropertyImage(db.Model):
     __tablename__ = "propertyimages"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    property_id = db.Column(db.Integer, nullable=False)
+    property_id = db.Column(db.Integer, db.ForeignKey("properties.id"), nullable=False)
     url = db.Column(db.String, nullable=False)
     cloudinary_public_id = db.Column(db.String(255), nullable=False)
     is_cover = db.Column(db.Boolean, nullable=False)
