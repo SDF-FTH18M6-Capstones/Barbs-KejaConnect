@@ -32,6 +32,12 @@ class User(db.Model):
         cascade="all,delete",
     )
 
+    inquiries = db.relationship("Inquiry", back_populates="user", cascade="all,delete")
+
+    saved_listings = db.relationship(
+        "SavedListing", back_populates="user", cascade="all,delete"
+    )
+
     @hybrid_property
     def password_hash(self):
         raise AttributeError("Can not view password.")

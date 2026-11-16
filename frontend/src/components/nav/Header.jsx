@@ -40,7 +40,7 @@ export default function Header() {
       <Brand />
       <div className="flex justify-between gap-3">
         <div className="actions flex items-center gap-4">
-          <NavLink to="/listings" className="text-text hover:text-primary">
+          <NavLink to="/" className="text-text hover:text-primary">
             Browse
           </NavLink>
           {isPoster && ( // ← only posters can create listings
