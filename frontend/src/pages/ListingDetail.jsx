@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import Header from "../components/nav/Header";
 import ImageGallery from "../components/listing/ImageGallery";
 import InquiryForm from "../components/listing/InquiryForm";
 import { ROUTES } from "../paths";
@@ -30,7 +29,6 @@ function Fact({ label, value }) {
 function Shell({ children }) {
   return (
     <div className="min-h-screen bg-canvas font-sans text-ink">
-      <Header />
       <main className="mx-auto max-w-[1200px] px-6 pb-14 pt-6">{children}</main>
     </div>
   );
