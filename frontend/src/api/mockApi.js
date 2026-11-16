@@ -33,3 +33,45 @@ export async function getAreas() {
   await delay(100);
   return { items: mockAreas };
 }
+
+function toDetail(l) {
+  return {
+    ...l,
+    description: `${l.title} in ${l.area}. Spacious and well maintained, close to shops and public transport. Water and security are included in the rent.`,
+    county: "Nairobi",
+    unit_number: `B${l.id}`,
+    lr_number: null,
+    images: Array.from({ length: 6 }, (_, i) => ({
+      id: l.id * 100 + i, url: null, is_cover: i === 0, position: i,
+    })),
+    poster: { ...l.poster, role: l.id % 2 ? "manager" : "owner" },
+    updated_at: l.created_at,
+  };
+}
+
+export async function getListing(id) {
+  await delay();
+  const l = mockListings.find((x) => x.id === Number(id) && x.status !== "removed");
+  if (!l) throw new ApiError(404, "NOT_FOUND", "Listing not found");
+  return { listing: toDetail(l) };
+}
+
+export async function createInquiry(listingId, { message }) {
+  await delay(400);
+  const l = mockListings.find((x) => x.id === Number(listingId) && x.status !== "removed");
+  if (!l) throw new ApiError(404, "NOT_FOUND", "Listing not found");
+  if (l.status !== "available") throw new ApiError(403, "FORBIDDEN", "Listing is not available");
+  const len = (message ?? "").trim().length;
+  if (len < 10 || len > 1000) {
+    throw new ApiError(400, "VALIDATION_ERROR", "Invalid message", { message: ["Must be 10 to 1000 characters"] });
+  }
+  return {
+    inquiry: {
+      id: Date.now(),
+      message: message.trim(),
+      status: "new",
+      created_at: new Date().toISOString(),
+      property: { id: l.id, title: l.title },
+    },
+  };
+}
