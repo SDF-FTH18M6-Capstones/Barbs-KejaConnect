@@ -6,4 +6,5 @@ from .data import (
     COUNTIES,
     PROPERTY_STATUS,
     INQUIRY_STATUS,
+    REPORT_STATUS,
 )

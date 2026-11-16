@@ -5,3 +5,4 @@ from .property import Property
 from .inquiry import Inquiry
 from .propertyImage import PropertyImage
 from .savedListing import SavedListing
+from .report import Report
