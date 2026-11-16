@@ -5,3 +5,4 @@ from .inquirySchema import InquirySchema
 from .propertySchema import PropertySchema
 from .propertyImageSchema import PropertyImageSchema
 from .savedListingSchema import SavedListingSchema
+from .reportSchema import ReportSchema
