@@ -45,10 +45,10 @@ export default function Header() {
           </NavLink>
           {isPoster && ( // ← only posters can create listings
             <NavLink
-              to="/listings/new"
+              to="/poster_dashboard"
               className="text-text hover:text-primary"
             >
-              New Listing
+              Dashboard
             </NavLink>
           )}
           {user?.role === "tenant" && ( // ← only tenants send inquiries
