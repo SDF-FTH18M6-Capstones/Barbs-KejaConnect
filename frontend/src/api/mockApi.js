@@ -138,3 +138,62 @@ export async function setListingStatus(id, status) {
   l.status = status;
   return { listing: { ...l } };
 }
+
+const dedupeKey = (area, building, unit) =>
+  [area, building, unit]
+    .map((s) =>
+      String(s ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "_"),
+    )
+    .join("|");
+
+export async function createListing(body) {
+  await delay(500);
+  const user = getCurrentUser();
+  if (user && user.approval_status !== "approved") {
+    throw new ApiError(
+      403,
+      "ACCOUNT_NOT_APPROVED",
+      "Your account has not been approved yet",
+    );
+  }
+  if (!mockAreas.includes(body.area)) {
+    throw new ApiError(400, "VALIDATION_ERROR", "Invalid listing", {
+      area: ["Choose an area from the list"],
+    });
+  }
+  const key = dedupeKey(body.area, body.building_name, body.unit_number);
+  const existing = mockMyListings.find(
+    (l) =>
+      l.status !== "removed" &&
+      dedupeKey(l.area, l.building_name, unitFor(l)) === key,
+  );
+  if (existing) {
+    throw new ApiError(
+      409,
+      "DUPLICATE_LISTING",
+      "This unit is already listed",
+      {
+        existing_listing_id: existing.id,
+        poster_name: existing.poster.full_name,
+      },
+    );
+  }
+  const listing = {
+    ...body,
+    id: Math.max(...mockMyListings.map((l) => l.id)) + 1,
+    county: "Nairobi",
+    status: "available",
+    cover_image_url: null,
+    poster: {
+      id: user?.id ?? 11,
+      full_name: user?.full_name ?? "Wanjiku Mwangi",
+      is_verified: true,
+    },
+    created_at: new Date().toISOString(),
+  };
+  mockMyListings.push(listing);
+  return { listing };
+}
