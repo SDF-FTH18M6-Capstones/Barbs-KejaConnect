@@ -11,12 +11,6 @@ def default_expires_at(context):
     return created_at + timedelta(days=1)
 
 
-def create_token_hash(context):
-    token = context.get_current_parameters().get("token")
-    token_hash = bcrypt.generate_password_hash(token).decode("utf-8")
-    return token_hash
-
-
 class EmailVerificationToken(db.Model):
     __tablename__ = "email_verification_tokens"
 
@@ -24,8 +18,7 @@ class EmailVerificationToken(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    token = db.Column(db.String, default=lambda: secrets.token_urlsafe(32))
-    _token_hash = db.Column(db.String, default=create_token_hash)
+    _token_hash = db.Column(db.String, nullable=False)
     created_at = db.Column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -39,6 +32,12 @@ class EmailVerificationToken(db.Model):
 
     user = db.relationship("User", back_populates="email_verification_token")
 
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+        self.raw_token = secrets.token_urlsafe(32)
+        self._token_hash = bcrypt.generate_password_hash(self.raw_token).decode("utf-8")
+
     @hybrid_property
     def token_hash(self):
         return self._token_hash
@@ -48,6 +47,8 @@ class EmailVerificationToken(db.Model):
         raise PermissionError("Cannot set token_hash")
 
     def validate(self, token):
+        if self.used_at is not None:
+            return False
         if datetime.now(timezone.utc) > self.expires_at.replace(tzinfo=timezone.utc):
             return False
 

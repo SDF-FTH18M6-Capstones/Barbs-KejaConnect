@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class EmailRepoInterface(ABC):
 
     @abstractmethod
-    def get_by_token(self, token):
+    def get_by_id(self, id):
         """get email verification token using user_id
 
         Keyword arguments:

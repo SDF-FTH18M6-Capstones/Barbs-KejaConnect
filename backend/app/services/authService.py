@@ -70,18 +70,16 @@ class AuthService(AuthInterface):
         if not token:
             raise InvalidCredentialsError("Verification token missing.")
 
-        clean_token = token.strip()
-        email_ver_token: EmailVerificationToken = self.email_ver_repo.get_by_token(
-            token=clean_token
+        clean_token, token_id = token.strip().rsplit(".", 1)
+        email_ver_token: EmailVerificationToken = self.email_ver_repo.get_by_id(
+            id=int(token_id)
         )
-        print(email_ver_token)
-        print(clean_token)
 
         if not email_ver_token or not email_ver_token.validate(clean_token):
             raise InvalidCredentialsError("Invalid email token.")
 
         user: User = self.user_repo.update_user(
-            user_id=email_ver_token.user_id, update_data={"is_verified": True}
+            user_id=email_ver_token.user_id, update_data={"email_verified": True}
         )
         user_res = UserSchema().dump(user)
         token = create_access_token(identity=user.id)
@@ -92,7 +90,8 @@ class AuthService(AuthInterface):
         email_ver_token: EmailVerificationToken = self.email_ver_repo.set_token(
             user_id=user.id
         )
-        url = f"{BACKEND_URL}/api/v1/auth/verify-email/{email_ver_token.token}"
+        print(email_ver_token.id)
+        url = f"{BACKEND_URL}/api/v1/auth/verify-email/{email_ver_token.raw_token}.{email_ver_token.id}"
         VERIFICATION_EMAIL = verification_email(verification_url=url)
         message = Mail(
             from_email=FROM_EMAIL,

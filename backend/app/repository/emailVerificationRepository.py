@@ -7,8 +7,8 @@ from ..schemas import EmailVerificationTokenSchema
 
 
 class EmailVerificationRepo(EmailRepoInterface):
-    def get_by_token(self, token):
-        return EmailVerificationToken.query.filter_by(token=token).first()
+    def get_by_id(self, id):
+        return EmailVerificationToken.query.filter_by(id=id).first()
 
     def set_token(self, user_id):
         email_ver_token = EmailVerificationTokenSchema().load({"user_id": user_id})
