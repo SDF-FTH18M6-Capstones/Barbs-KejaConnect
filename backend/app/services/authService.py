@@ -1,4 +1,5 @@
 from flask_jwt_extended import create_access_token, get_jwt_identity
+from datetime import datetime, timezone
 from .interface.authInterface import AuthInterface
 from ..repository import UserRepo, EmailVerificationRepo
 from ..models import User, EmailVerificationToken
@@ -62,6 +63,11 @@ class AuthService(AuthInterface):
 
         if not email_ver_token or not email_ver_token.validate(clean_token):
             raise InvalidCredentialsError("Invalid email token.")
+
+        email_ver: EmailVerificationToken = self.email_ver_repo.update_token(
+            token_id=email_ver_token.id,
+            update_data={"used_at": datetime.now(timezone.utc)},
+        )
 
         user: User = self.user_repo.update_user(
             user_id=email_ver_token.user_id, update_data={"is_verified": True}

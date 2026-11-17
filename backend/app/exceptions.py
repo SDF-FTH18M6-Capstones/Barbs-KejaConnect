@@ -6,6 +6,10 @@ class UserNotFoundError(BaseError):
     pass
 
 
+class ResourceNotFoundError(BaseError):
+    pass
+
+
 class EmailNotVerified(BaseError):
     pass
 
