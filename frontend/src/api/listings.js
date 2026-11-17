@@ -11,3 +11,19 @@ export const getListing = (id) =>
   USE_MOCKS ? mock.getListing(id) : api(`/listings/${id}`);
 
 export const getAreas = () => (USE_MOCKS ? mock.getAreas() : api("/areas"));
+
+// ---------- Poster dashboard ----------
+
+export const getMyListings = (params) =>
+  USE_MOCKS
+    ? mock.getMyListings(params)
+    : api("/listings/mine", { params, auth: true });
+
+export const setListingStatus = (id, status) =>
+  USE_MOCKS
+    ? mock.setListingStatus(id, status)
+    : api(`/listings/${id}/status`, {
+        method: "PATCH",
+        body: { status },
+        auth: true,
+      });
