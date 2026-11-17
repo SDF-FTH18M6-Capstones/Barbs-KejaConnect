@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, pre_load
+from marshmallow import Schema, fields, validate, post_load
 
 from ..models import User
 from ..utils import ALLOWED_ROLES, APPROVAL_STATUS
@@ -27,6 +27,6 @@ class UserSchema(Schema):
 
     saved_listings = fields.Nested("SavedListingSchema", many=True, exclude=("user",))
 
-    @pre_load
+    @post_load
     def to_user(self, data, **kwargs):
         return User(**data)

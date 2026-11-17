@@ -1,7 +1,8 @@
 import os
 from flask import Flask
 from flask_migrate import Migrate
-from app.blueprints import v1
+from flask_jwt_extended import JWTManager
+from app.api import v1
 from .config import db, bcrypt
 from .models import *
 from .schemas import *
@@ -17,6 +18,7 @@ def create_app():
     migrate = Migrate(app, db)
     db.init_app(app)
     bcrypt.init_app(app)
+    JWTManager(app)
 
     app.register_blueprint(v1, url_prefix="/api/v1")
 
