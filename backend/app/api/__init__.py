@@ -22,4 +22,6 @@ api.add_resource(WhoAmI, "/me")
 api.add_resource(
     LoginResource, "/auth/login", resource_class_kwargs={"auth_service": auth_service}
 )
-api.add_resource(SignupResource, "/auth/signup")
+api.add_resource(
+    SignupResource, "/auth/signup", resource_class_kwargs={"auth_service": auth_service}
+)

@@ -11,10 +11,14 @@ class AuthInterface(ABC):
         Return: return user and token or error
         """
 
-    def signup(self, data):
+    def signup(self, email, phone, role, full_name, password):
         """signup
 
         Keyword arguments:
-        data -- dict from client request
-        Return: user or error
+        email  -- email str from client req data
+        password  -- password str from client req data
+        phone -- ***************
+        role -- ****************
+        full_name -- ************
+        Return: return user and token or error
         """

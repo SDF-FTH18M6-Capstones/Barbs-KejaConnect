@@ -2,7 +2,8 @@ from flask_jwt_extended import create_access_token
 from .interface.authInterface import AuthInterface
 from ..repository import UserRepo
 from ..models import User
-from ..exceptions import InvalidCredentialsError, EmailNotVerified
+from ..schemas import UserSchema
+from ..exceptions import InvalidCredentialsError, EmailNotVerified, AlreadyExists
 
 
 class AuthService(AuthInterface):
@@ -25,3 +26,26 @@ class AuthService(AuthInterface):
         token = create_access_token(identity=str(user.id))
 
         return token, user
+
+    def signup(self, email, phone, role, full_name, password):
+        if not email or not phone or not role or not full_name or not password:
+            raise InvalidCredentialsError("Missing credentials.")
+
+        clean_email = email.strip().lower()
+        existing_user = self.user_repo.get_by_email(clean_email)
+        if existing_user:
+            raise AlreadyExists("A user with this email already exists.")
+
+        new_user: User = UserSchema().load(
+            {
+                "email": clean_email,
+                "phone": phone.strip().lower(),
+                "role": role.strip().lower(),
+                "full_name": full_name.strip().lower(),
+            }
+        )
+        new_user.password_hash = password
+
+        saved_user = self.user_repo.create_user(new_user)
+
+        return saved_user

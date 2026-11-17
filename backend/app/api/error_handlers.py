@@ -1,5 +1,11 @@
 from flask import jsonify, make_response
-from app.exceptions import EmailNotVerified, UserNotFoundError, InvalidCredentialsError
+from app.exceptions import (
+    EmailNotVerified,
+    UserNotFoundError,
+    InvalidCredentialsError,
+    AlreadyExists,
+    DatabasePersistenceError,
+)
 
 
 def register_error_handlers(app):
@@ -18,3 +24,11 @@ def register_error_handlers(app):
         return make_response(
             {"error": "Email not verified", "message": str(error)}, 403
         )
+
+    @app.errorhandler(AlreadyExists)
+    def handle_already_exists(error):
+        return make_response({"error": "Already exists", "message": str(error)}, 409)
+
+    @app.errorhandler(DatabasePersistenceError)
+    def handle_persistence_error(error):
+        return make_response({"error": "Peristence Error", "message": str(error)})
