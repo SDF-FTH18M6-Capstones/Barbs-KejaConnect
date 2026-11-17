@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
 
-class AuthInterface(ABC):
+class UserRepoInterface(ABC):
     @abstractmethod
-    def login(self, data):
+    def get_by_email(self, email):
         """Login
 
         Keyword arguments:
@@ -12,7 +12,7 @@ class AuthInterface(ABC):
         """
 
     @abstractmethod
-    def signup(self, data):
+    def create_user(self, data):
         """sign up
 
         Keyword arguments:
