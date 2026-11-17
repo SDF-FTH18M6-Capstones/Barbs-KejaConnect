@@ -1,14 +1,15 @@
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt_identity
 from .interface.authInterface import AuthInterface
-from ..repository import UserRepo
-from ..models import User
+from ..repository import UserRepo, EmailVerificationRepo
+from ..models import User, EmailVerificationToken
 from ..schemas import UserSchema
 from ..exceptions import InvalidCredentialsError, EmailNotVerified, AlreadyExists
 
 
 class AuthService(AuthInterface):
-    def __init__(self, user_repo: UserRepo):
+    def __init__(self, user_repo: UserRepo, email_ver_repo: EmailVerificationRepo):
         self.user_repo = user_repo
+        self.email_ver_repo = email_ver_repo
 
     def login(self, email, password):
         if not email or not password:
@@ -49,3 +50,22 @@ class AuthService(AuthInterface):
         saved_user = self.user_repo.create_user(new_user)
 
         return saved_user
+
+    def verify_email(self, token):
+        if not token:
+            raise InvalidCredentialsError("Verification token missing.")
+
+        clean_token = token.strip()
+        email_ver_token: EmailVerificationToken = self.email_ver_repo.get_by_token(
+            token=clean_token
+        )
+
+        if not email_ver_token or not email_ver_token.validate(clean_token):
+            raise InvalidCredentialsError("Invalid email token.")
+
+        user: User = self.user_repo.update_user(
+            user_id=email_ver_token.user_id, update_data={"is_verified": True}
+        )
+        token = create_access_token(identity=user.id)
+
+        return token, user

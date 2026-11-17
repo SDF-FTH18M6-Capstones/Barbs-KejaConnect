@@ -4,6 +4,7 @@ from .resources.health_check import HealthCheck
 from .resources.who_am_i import WhoAmI
 from .resources.login import LoginResource
 from .resources.signup import SignupResource
+from .resources.verify_email import VerifyEmailResource
 from .error_handlers import register_error_handlers
 from ..repository import UserRepo
 from ..services import AuthService
@@ -25,3 +26,4 @@ api.add_resource(
 api.add_resource(
     SignupResource, "/auth/signup", resource_class_kwargs={"auth_service": auth_service}
 )
+api.add_resource(VerifyEmailResource, "/auth/verify-email/<string:token>")

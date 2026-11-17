@@ -22,3 +22,11 @@ class AuthInterface(ABC):
         full_name -- ************
         Return: return user and token or error
         """
+
+    def verify_email(self, token):
+        """varify user email
+
+        Keyword arguments:
+        token -- url token attached on request
+        Return: return boolean
+        """
