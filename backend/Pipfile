@@ -15,6 +15,7 @@ psycopg2-binary = "*"
 flask-restful = "*"
 flask-bcrypt = "*"
 pycopg = "*"
+sendgrid = "*"
 
 [dev-packages]
 

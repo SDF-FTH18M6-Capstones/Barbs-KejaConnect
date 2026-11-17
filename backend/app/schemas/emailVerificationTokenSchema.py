@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, pre_load
+from marshmallow import Schema, fields, validate, post_load
 
 from ..models import EmailVerificationToken
 
@@ -14,6 +14,6 @@ class EmailVerificationTokenSchema(Schema):
 
     user = fields.Nested("UserSchema", exclude=("email_verification_token",))
 
-    @pre_load
+    @post_load
     def to_email_verification_token(self, data, **kwargs):
         return EmailVerificationToken(**data)

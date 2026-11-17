@@ -5,6 +5,8 @@ from app.exceptions import (
     InvalidCredentialsError,
     AlreadyExists,
     DatabasePersistenceError,
+    ResourceNotFoundError,
+    EmailVerificationNotSentError,
 )
 
 
@@ -19,8 +21,20 @@ def register_error_handlers(app):
     def handle_user_not_found(error):
         return make_response({"error": "User not found", "message": str(error)}, 401)
 
+    @app.errorhandler(ResourceNotFoundError)
+    def handle_resource_not_found(error):
+        return make_response(
+            {"error": "Resource not found", "message": str(error)}, 401
+        )
+
     @app.errorhandler(EmailNotVerified)
     def handle_email_not_verified(error):
+        return make_response(
+            {"error": "Email not verified", "message": str(error)}, 403
+        )
+
+    @app.errorhandler(EmailVerificationNotSentError)
+    def handle_email_verification_not_sent(error):
         return make_response(
             {"error": "Email not verified", "message": str(error)}, 403
         )
