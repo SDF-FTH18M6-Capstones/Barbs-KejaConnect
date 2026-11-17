@@ -12,12 +12,19 @@ export class ApiError extends Error {
   }
 }
 
-export async function api(path, { method = "GET", params = {}, body, auth = false } = {}) {
+export async function api(
+  path,
+  { method = "GET", params = {}, body, auth = false } = {},
+) {
   const clean = Object.entries(params).filter(([, v]) => v !== "" && v != null);
   const qs = new URLSearchParams(clean).toString();
 
+  // FormData (file uploads) is sent as multipart; the browser sets its Content-Type
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
+
   const headers = {};
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  if (body !== undefined && !isForm)
+    headers["Content-Type"] = "application/json";
   if (auth && getToken()) headers.Authorization = `Bearer ${getToken()}`;
 
   let res;
@@ -25,7 +32,8 @@ export async function api(path, { method = "GET", params = {}, body, auth = fals
     res = await fetch(`${BASE}${path}${qs ? `?${qs}` : ""}`, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body:
+        body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     });
   } catch {
     throw new ApiError(0, "NETWORK_ERROR", "Network error");
@@ -38,7 +46,12 @@ export async function api(path, { method = "GET", params = {}, body, auth = fals
     window.location.assign("/login");
   }
   if (!res.ok) {
-    throw new ApiError(res.status, data.code ?? "SERVER_ERROR", data.error ?? "Request failed", data.details);
+    throw new ApiError(
+      res.status,
+      data.code ?? "SERVER_ERROR",
+      data.error ?? "Request failed",
+      data.details,
+    );
   }
   return data;
 }
