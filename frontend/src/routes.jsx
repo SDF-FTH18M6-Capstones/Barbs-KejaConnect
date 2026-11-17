@@ -7,6 +7,10 @@ import MyInquiries from "./pages/MyInquiries/MyInquiries";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ListingDetail from "./pages/ListingDetail";
 import PosterDashboard from "./pages/PosterDashboard/PosterDashboard";
+import MyListings from "./pages/PosterDashboard/MyListings";
+import NewListing from "./pages/PosterDashboard/NewListing";
+import PosterInquiries from "./pages/PosterDashboard/PosterInquiries";
+import Verification from "./pages/PosterDashboard/Verification";
 
 export const router = createBrowserRouter([
   { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
@@ -22,4 +26,9 @@ export const router = createBrowserRouter([
     ],
   },
   { path: "/poster_dashboard", element: <PosterDashboard /> },
+  { path: "/dashboard", element: <PosterDashboard /> },
+  { path: "/dashboard/listings", element: <MyListings /> },
+  { path: "/listings/new", element: <NewListing /> },
+  { path: "/dashboard/inquiries", element: <PosterInquiries /> },
+  { path: "/dashboard/verification", element: <Verification /> },
 ]);
