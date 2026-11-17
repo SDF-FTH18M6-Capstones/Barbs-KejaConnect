@@ -27,3 +27,8 @@ export const setListingStatus = (id, status) =>
         body: { status },
         auth: true,
       });
+
+export const createListing = (body) =>
+  USE_MOCKS
+    ? mock.createListing(body)
+    : api("/listings", { method: "POST", body, auth: true });
