@@ -1,8 +1,8 @@
 from flask_restful import Resource
 from flask import make_response, request
 from flask_jwt_extended import create_access_token
-from ..models import User
-from ..schemas import UserSchema
+from ...models import User
+from ...schemas import UserSchema
 
 
 class LoginResource(Resource):

@@ -1,8 +1,8 @@
 from flask_restful import Resource
 from flask import make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..models import User
-from ..schemas import UserSchema
+from ...models import User
+from ...schemas import UserSchema
 
 
 class WhoAmI(Resource):

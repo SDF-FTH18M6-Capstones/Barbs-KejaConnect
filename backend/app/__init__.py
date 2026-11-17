@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-from app.blueprints import v1
+from app.api import v1
 from .config import db, bcrypt
 from .models import *
 from .schemas import *
