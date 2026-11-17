@@ -2,6 +2,7 @@ import { mockListings, mockAreas } from "../data/mockListings";
 import { ApiError } from "./client";
 import { getCurrentUser } from "../components/inquiries/data/currentUser";
 import {
+  mockDocuments,
   mockMyListings,
   mockReceivedInquiries,
   unitFor,
@@ -218,4 +219,39 @@ export async function getReceivedInquiries({
       return { ...q, property: { id: l.id, title: l.title } };
     });
   return paginate(items, page, per_page);
+}
+
+export async function getMyDocuments({ page = 1, per_page = 20 } = {}) {
+  await delay();
+  const docs = [...(mockDocuments[posterId()] ?? [])].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at),
+  );
+  return paginate(docs, page, per_page);
+}
+
+export async function uploadDocument(formData) {
+  await delay(600);
+  const file = formData.get("file");
+  if (
+    !file ||
+    !/\.(jpe?g|png|pdf)$/i.test(file.name) ||
+    file.size > 5 * 1024 * 1024
+  ) {
+    throw new ApiError(
+      400,
+      "INVALID_FILE",
+      "Upload a JPG, PNG or PDF of 5 MB or less",
+    );
+  }
+  const document = {
+    id: Date.now(),
+    doc_type: formData.get("doc_type"),
+    file_url: null,
+    status: "pending",
+    rejection_reason: null,
+    created_at: new Date().toISOString(),
+    reviewed_at: null,
+  };
+  (mockDocuments[posterId()] ??= []).push(document);
+  return { document };
 }
