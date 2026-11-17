@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import { timeAgo } from "../../utils/format";
 
 const STATUS = {
-  new: { lable: "New", className: "bg-primary/10 text-primary-dark" },
-  responded: { lable: "Responded", className: "bg-success/10 text-success" },
-  closed: { lable: "Closed", className: "bg-border text-text-muted" },
+  new: { label: "New", className: "bg-primary/10 text-primary-dark" },
+  responded: { label: "Responded", className: "bg-success/10 text-success" },
+  closed: { label: "Closed", className: "bg-border text-text-muted" },
 };
 
 const initials = (name = "") =>

@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import PosterLayout from "./PosterLayout";
+import useLoad from "./useLoad";
+import { getReceivedInquiries } from "../../api/inquiries";
 import { getCurrentUser } from "../inquiries/data/currentUser";
 
 const isPoster = (user) => user?.role === "manager" || user?.role === "owner";
@@ -15,12 +17,12 @@ function Notice({ title, children }) {
   );
 }
 
-export default function PosterGate({ needsAproval = false, children }) {
+export default function PosterGate({ needsApproval = false, children }) {
   const user = getCurrentUser();
 
   if (!isPoster(user)) {
     return (
-      <Notice title="This Page is for propoerty Managers and Owners only.">
+      <Notice title="This page is for property managers and owners only.">
         <p className="text-text-muted">
           {user
             ? "Your account is a tenant account."
@@ -39,8 +41,8 @@ export default function PosterGate({ needsAproval = false, children }) {
   const approved = user.approval_status === "approved";
 
   return (
-    <PosterLayout user={user}>
-      {needsAproval && !approved ? (
+    <PosterShell user={user}>
+      {needsApproval && !approved ? (
         <div className="space-y-2 rounded-2xl bg-accent/20 p-5 text-text-on-accent">
           <h1 className="text-xl font-semibold">
             {user.approval_status === "rejected"
@@ -60,6 +62,18 @@ export default function PosterGate({ needsAproval = false, children }) {
       ) : (
         children
       )}
+    </PosterShell>
+  );
+}
+
+const loadInquiries = () => getReceivedInquiries({ per_page: 50 });
+
+function PosterShell({ user, children }) {
+  const { data } = useLoad(loadInquiries);
+  const unread = data?.items.filter((q) => q.status === "new").length ?? 0;
+  return (
+    <PosterLayout user={user} unread={unread}>
+      {children}
     </PosterLayout>
   );
 }
