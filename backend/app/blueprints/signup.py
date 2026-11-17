@@ -8,6 +8,7 @@ from ..config import db
 
 class SignupResource(Resource):
     def post(self):
+        # move this to service
         data = request.get_json(silent=True)
 
         if not isinstance(data, dict) and not data:
@@ -29,11 +30,14 @@ class SignupResource(Resource):
 
         new_user = User(full_name=full_name, email=email, phone=phone, role=role)
         new_user.password_hash = password
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return make_response({"errors": f"{e}"})
 
-        db.session.add(user)
-        db.session.commit()
-
-        user: User = User.query.filter_by(email=email)
+        user: User = User.query.filter_by(email=email).first()
         token = create_access_token(user.id)
 
         return make_response(

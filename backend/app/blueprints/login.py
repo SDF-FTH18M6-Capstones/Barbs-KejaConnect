@@ -13,7 +13,7 @@ class LoginResource(Resource):
             return make_response({"errors": "Invalid request object."}, 400)
 
         email = data.get("email", "")
-        password = data.get("username", "")
+        password = data.get("password", "")
 
         if not email and not password:
             return make_response({"errors": ["INVALID_CREDENTIALS"]}, 401)
