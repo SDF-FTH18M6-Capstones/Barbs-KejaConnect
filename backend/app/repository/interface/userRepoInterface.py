@@ -12,7 +12,7 @@ class UserRepoInterface(ABC):
         """
 
     @abstractmethod
-    def create_user(self, data):
+    def create_user(self, user):
         """sign up
 
         Keyword arguments:
