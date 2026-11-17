@@ -14,6 +14,10 @@ class EmailNotVerified(BaseError):
     pass
 
 
+class EmailVerificationNotSentError(BaseError):
+    pass
+
+
 class AlreadyExists(BaseError):
     pass
 

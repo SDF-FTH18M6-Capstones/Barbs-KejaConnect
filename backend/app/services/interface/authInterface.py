@@ -30,3 +30,11 @@ class AuthInterface(ABC):
         token -- url token attached on request
         Return: return boolean
         """
+
+    def send_verification_email(self):
+        """send verification email after signup or during
+
+        Keyword arguments:
+        argument -- description
+        Return: return_description
+        """

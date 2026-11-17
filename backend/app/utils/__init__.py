@@ -8,3 +8,5 @@ from .data import (
     INQUIRY_STATUS,
     REPORT_STATUS,
 )
+
+from .email_text import verification_email

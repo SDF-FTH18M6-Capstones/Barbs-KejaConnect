@@ -6,6 +6,7 @@ from app.exceptions import (
     AlreadyExists,
     DatabasePersistenceError,
     ResourceNotFoundError,
+    EmailVerificationNotSentError,
 )
 
 
@@ -28,6 +29,12 @@ def register_error_handlers(app):
 
     @app.errorhandler(EmailNotVerified)
     def handle_email_not_verified(error):
+        return make_response(
+            {"error": "Email not verified", "message": str(error)}, 403
+        )
+
+    @app.errorhandler(EmailVerificationNotSentError)
+    def handle_email_verification_not_sent(error):
         return make_response(
             {"error": "Email not verified", "message": str(error)}, 403
         )

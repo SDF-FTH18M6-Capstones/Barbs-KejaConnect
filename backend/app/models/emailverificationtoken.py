@@ -11,12 +11,20 @@ def default_expires_at(context):
     return created_at + timedelta(days=1)
 
 
+def create_token_hash():
+    token = secrets.token_urlsafe(32)
+    token_hash = bcrypt.generate_password_hash(token.encode("utf-8"))
+    return token_hash.decode("utf-8")
+
+
 class EmailVerificationToken(db.Model):
     __tablename__ = "email_verification_tokens"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    _token_hash = db.Column(db.String)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    _token_hash = db.Column(db.String, default=create_token_hash)
     created_at = db.Column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -32,13 +40,11 @@ class EmailVerificationToken(db.Model):
 
     @hybrid_property
     def token_hash(self):
-        raise AttributeError("Can not view token_hash")
+        return self._token_hash
 
     @token_hash.setter
     def token_hash(self):
-        token = secrets.token_urlsafe(32)
-        token_hash = bcrypt.generate_password_hash(token.encode("utf-8"))
-        self._token_hash = token_hash.decode("utf-8")
+        raise PermissionError("Cannot set token_hash")
 
     def validate(self, token):
         if datetime.now(timezone.utc) > self.expires_at.replace(tzinfo=timezone.utc):

@@ -23,7 +23,8 @@ class User(db.Model):
         "EmailVerificationToken",
         back_populates="user",
         uselist=False,
-        cascade="all,delete",
+        cascade="all,delete-orphan",
+        passive_deletes=True,
     )
     verification_documents = db.relationship(
         "VerificationDocument",

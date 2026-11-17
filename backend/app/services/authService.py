@@ -1,10 +1,22 @@
+import os
 from flask_jwt_extended import create_access_token, get_jwt_identity
+from sendgrid.helpers.mail import Mail
 from datetime import datetime, timezone
 from .interface.authInterface import AuthInterface
 from ..repository import UserRepo, EmailVerificationRepo
 from ..models import User, EmailVerificationToken
 from ..schemas import UserSchema
-from ..exceptions import InvalidCredentialsError, EmailNotVerified, AlreadyExists
+from ..exceptions import (
+    InvalidCredentialsError,
+    EmailNotVerified,
+    AlreadyExists,
+    EmailVerificationNotSentError,
+)
+from ..config import sg
+from ..utils import verification_email
+
+BACKEND_URL = os.getenv("BACKEND_URL", "")
+FROM_EMAIL = os.getenv("FROM_EMAIL", "")
 
 
 class AuthService(AuthInterface):
@@ -50,6 +62,8 @@ class AuthService(AuthInterface):
 
         saved_user = self.user_repo.create_user(new_user)
 
+        verification_sent = self.send_verification_email(user=saved_user)
+
         return saved_user
 
     def verify_email(self, token):
@@ -75,3 +89,28 @@ class AuthService(AuthInterface):
         token = create_access_token(identity=user.id)
 
         return token, user
+
+    def send_verification_email(self, user: User):
+        email_ver_token: EmailVerificationToken = self.email_ver_repo.set_token(
+            user_id=user.id
+        )
+        url = f"{BACKEND_URL}/api/v1/verify-email/{email_ver_token.token_hash}"
+        VERIFICATION_EMAIL = verification_email(verification_url=url)
+        message = Mail(
+            from_email=FROM_EMAIL,
+            to_emails=user.email,
+            subject="KejaConnect email verification.",
+            html_content=VERIFICATION_EMAIL,
+        )
+        print(BACKEND_URL, FROM_EMAIL)
+
+        try:
+            res = sg.send(message)
+            if res.status_code not in (200, 201, 202):
+                raise EmailVerificationNotSentError(
+                    "Failed to send email verification."
+                )
+            return True
+        except Exception as e:
+            print("this was triggered:", e)
+            raise EmailVerificationNotSentError(e)
