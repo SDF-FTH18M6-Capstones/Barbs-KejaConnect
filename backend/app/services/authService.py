@@ -74,27 +74,25 @@ class AuthService(AuthInterface):
         email_ver_token: EmailVerificationToken = self.email_ver_repo.get_by_token(
             token=clean_token
         )
+        print(email_ver_token)
+        print(clean_token)
 
         if not email_ver_token or not email_ver_token.validate(clean_token):
             raise InvalidCredentialsError("Invalid email token.")
 
-        email_ver: EmailVerificationToken = self.email_ver_repo.update_token(
-            token_id=email_ver_token.id,
-            update_data={"used_at": datetime.now(timezone.utc)},
-        )
-
         user: User = self.user_repo.update_user(
             user_id=email_ver_token.user_id, update_data={"is_verified": True}
         )
+        user_res = UserSchema().dump(user)
         token = create_access_token(identity=user.id)
 
-        return token, user
+        return token, user_res
 
     def send_verification_email(self, user: User):
         email_ver_token: EmailVerificationToken = self.email_ver_repo.set_token(
             user_id=user.id
         )
-        url = f"{BACKEND_URL}/api/v1/verify-email/{email_ver_token.token_hash}"
+        url = f"{BACKEND_URL}/api/v1/auth/verify-email/{email_ver_token.token}"
         VERIFICATION_EMAIL = verification_email(verification_url=url)
         message = Mail(
             from_email=FROM_EMAIL,
@@ -102,7 +100,6 @@ class AuthService(AuthInterface):
             subject="KejaConnect email verification.",
             html_content=VERIFICATION_EMAIL,
         )
-        print(BACKEND_URL, FROM_EMAIL)
 
         try:
             res = sg.send(message)
@@ -112,5 +109,4 @@ class AuthService(AuthInterface):
                 )
             return True
         except Exception as e:
-            print("this was triggered:", e)
             raise EmailVerificationNotSentError(e)

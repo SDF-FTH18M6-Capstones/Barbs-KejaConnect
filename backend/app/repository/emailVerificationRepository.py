@@ -8,7 +8,7 @@ from ..schemas import EmailVerificationTokenSchema
 
 class EmailVerificationRepo(EmailRepoInterface):
     def get_by_token(self, token):
-        return EmailVerificationToken.query.filter_by(token_hash=token).first()
+        return EmailVerificationToken.query.filter_by(token=token).first()
 
     def set_token(self, user_id):
         email_ver_token = EmailVerificationTokenSchema().load({"user_id": user_id})
@@ -25,7 +25,9 @@ class EmailVerificationRepo(EmailRepoInterface):
             )
         except SQLAlchemyError as e:
             db.session.rollback()
-            raise DatabasePersistenceError("Failed to create email verification token.")
+            raise DatabasePersistenceError(
+                f"Failed to create email verification token: {e}"
+            )
 
     def update_token(self, token_id, update_data: dict):
         email_token: EmailVerificationToken = EmailVerificationToken.query.filter_by(

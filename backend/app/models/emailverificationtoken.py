@@ -11,10 +11,10 @@ def default_expires_at(context):
     return created_at + timedelta(days=1)
 
 
-def create_token_hash():
-    token = secrets.token_urlsafe(32)
-    token_hash = bcrypt.generate_password_hash(token.encode("utf-8"))
-    return token_hash.decode("utf-8")
+def create_token_hash(context):
+    token = context.get_current_parameters().get("token")
+    token_hash = bcrypt.generate_password_hash(token).decode("utf-8")
+    return token_hash
 
 
 class EmailVerificationToken(db.Model):
@@ -24,6 +24,7 @@ class EmailVerificationToken(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
+    token = db.Column(db.String, default=lambda: secrets.token_urlsafe(32))
     _token_hash = db.Column(db.String, default=create_token_hash)
     created_at = db.Column(
         db.DateTime(timezone=True),
@@ -50,13 +51,12 @@ class EmailVerificationToken(db.Model):
         if datetime.now(timezone.utc) > self.expires_at.replace(tzinfo=timezone.utc):
             return False
 
-        validated = bcrypt.check_password_hash(
-            self._token_hash, password=token.decode("utf-8")
-        )
+        validated = bcrypt.check_password_hash(self._token_hash, token)
         if validated:
             self.used_at = datetime.now(timezone.utc)
+            return True
 
-        return self.validate
+        return False
 
     def __repr__(self):
         return f"<EmailVerficationToken {self.created_at} {self.used_at} >"
