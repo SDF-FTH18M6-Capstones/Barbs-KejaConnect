@@ -1,7 +1,11 @@
 import { mockListings, mockAreas } from "../data/mockListings";
 import { ApiError } from "./client";
-import { mockMyListings, unitFor } from "../data/mockPoster";
 import { getCurrentUser } from "../components/inquiries/data/currentUser";
+import {
+  mockMyListings,
+  mockReceivedInquiries,
+  unitFor,
+} from "../data/mockPoster";
 
 const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
 
@@ -196,4 +200,22 @@ export async function createListing(body) {
   };
   mockMyListings.push(listing);
   return { listing };
+}
+
+export async function getReceivedInquiries({
+  listing_id,
+  page = 1,
+  per_page = 10,
+} = {}) {
+  await delay();
+  const mine = mockMyListings.filter((l) => l.poster.id === posterId());
+  const items = mockReceivedInquiries
+    .filter((q) => mine.some((l) => l.id === q.property_id))
+    .filter((q) => !listing_id || q.property_id === Number(listing_id))
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .map(({ property_id, ...q }) => {
+      const l = mine.find((x) => x.id === property_id);
+      return { ...q, property: { id: l.id, title: l.title } };
+    });
+  return paginate(items, page, per_page);
 }
