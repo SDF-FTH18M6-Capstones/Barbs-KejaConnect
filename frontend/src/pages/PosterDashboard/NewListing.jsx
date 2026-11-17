@@ -11,10 +11,7 @@ import {
   toListingBody,
   validateListing,
 } from "../../components/poster dashboard/data/listingForm";
-import {
-  createListing,
-  getAreas,
-} from "../../components/poster dashboard/data/listingForm";
+import { createListing, getAreas } from "../../api/listings";
 import { PROPERTY_TYPES } from "../../utils/labels";
 
 function Section({ title, children }) {
