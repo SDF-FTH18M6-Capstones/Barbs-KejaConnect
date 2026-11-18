@@ -4,6 +4,7 @@ export const ROUTES = {
   listing: (id) => `/listings/${id}`,
   login: "/login",
   register: "/signup",
+  myInquiries: "/my-inquiries",
 };
 
 export const POSTER = {
