@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import ReceivedInquiry from "../ReceivedInquiry";
+import { POSTER } from "../../../paths";
 
 export default function RecentInquiries({ inquiries }) {
   return (
@@ -7,7 +8,7 @@ export default function RecentInquiries({ inquiries }) {
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Recent inquiries</h2>
         <Link
-          to="/dashboard/inquiries"
+          to={POSTER.inquiries}
           className="text-sm font-medium text-primary hover:text-primary-dark"
         >
           View all

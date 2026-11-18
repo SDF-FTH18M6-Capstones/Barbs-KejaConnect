@@ -8,6 +8,7 @@ import LoadError from "../../components/poster dashboard/LoadError";
 import useLoad from "../../components/poster dashboard/useLoad";
 import { getMyListings, setListingStatus } from "../../api/listings";
 import { getReceivedInquiries } from "../../api/inquiries";
+import { POSTER } from "../../paths";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 12) return "Good morning";
@@ -88,7 +89,7 @@ function DashboardHome({ user }) {
           </h1>
         </div>
         <Link
-          to="/listings/new"
+          to={POSTER.newListing}
           className="rounded-lg bg-primary px-5 py-3 font-medium text-text-on-primary hover:bg-primary-dark"
         >
           + New listing
@@ -134,7 +135,7 @@ function DashboardHome({ user }) {
             <div className="flex flex-wrap items-center justify-between gap-3 p-5">
               <h2 className="text-lg font-semibold">My listings</h2>
               <Link
-                to="/dashboard/listings"
+                to={POSTER.listings}
                 className="text-sm font-medium text-primary hover:text-primary-dark"
               >
                 View all {data.listings.total}
