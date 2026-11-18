@@ -15,3 +15,8 @@ export const getReceivedInquiries = (params) =>
   USE_MOCKS
     ? mock.getReceivedInquiries(params)
     : api("/inquiries/received", { params, auth: true });
+
+export const getSentInquiries = (params) =>
+  USE_MOCKS
+    ? mock.getSentInquiries(params)
+    : api("/inquiries/sent", { params, auth: true });
