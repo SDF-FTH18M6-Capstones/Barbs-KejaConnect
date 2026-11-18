@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import InquiryCard from "../../components/inquiries/InquiryCard";
 import EmptyInquiries from "../../components/inquiries/EmptyInquiries";
 import Pager from "../../components/inquiries/Pager";
-import { getMyInquiries } from "../../components/inquiries/data/inquiryApi";
+import { getSentInquiries } from "../../api/inquiries";
 import { getCurrentUser } from "../../components/inquiries/data/currentUser";
 import Header from "../../components/nav/Header";
 
@@ -22,7 +22,7 @@ export default function MyInquiries() {
     if (!isTenant) return;
     let ignore = false;
     setStatus("loading");
-    getMyInquiries(page)
+    getSentInquiries({ page, per_page: 10 })
       .then((result) => {
         if (ignore) return;
         setData(result);
