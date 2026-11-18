@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class VerificationDocsInterface(ABC):
 
     @abstractmethod
-    def get_all(self):
+    def get_all(self, page, per_page):
         """get all verification documents"""
 
     @abstractmethod

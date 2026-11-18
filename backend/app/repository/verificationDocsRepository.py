@@ -7,8 +7,10 @@ from ..schemas import EmailVerificationTokenSchema
 
 
 class VerificationDocumentsRepository(VerificationRepoInterface):
-    def get_all(self):
-        return VerificationDocument.query.all()
+    def get_all(self, page, per_page):
+        pagination = VerificationDocument.query.paginate(page=page, per_page=per_page)
+
+        return pagination
 
     def get_by_id(self, doc_id):
         return VerificationDocument.query.filter_by(id=doc_id).first()

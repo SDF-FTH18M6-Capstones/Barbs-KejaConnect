@@ -16,8 +16,8 @@ class VerificationDocsService(VerificationDocsInterface):
     def __init__(self, ver_doc_repo: VerificationDocumentsRepository):
         self.ver_doc_repo = ver_doc_repo
 
-    def get_all(self):
-        return self.ver_doc_repo.get_all()
+    def get_all(self, page, per_page):
+        return self.ver_doc_repo.get_all(page, per_page)
 
     def get_by_id(self, id):
         return self.ver_doc_repo.get_by_id(doc_id=id)

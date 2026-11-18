@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import make_response, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt
 from ...models import VerificationDocument
 from ...schemas import VerificationDocumentSchema
 from ...config import db
@@ -14,10 +14,27 @@ class VerificationDocumentsResource(Resource):
 
     @jwt_required()
     def get(self):
-        data = self.ver_doc.get_all()
-        ver_docs = VerificationDocumentSchema(many=True).dump(data)
+        claims = get_jwt()
+        if claims.get("role") not in ("admin"):
+            raise make_response(
+                {
+                    "error": "Not allowed.",
+                    "message": f"User of type {claims.get('role')} can not perform that operation.",
+                }
+            )
+        page = request.args.get("page", 1, type=int)
+        per_page = request.args.get("per_page", 5, type=int)
+
+        ver_docs = self.ver_doc.get_all(page=page, per_page=per_page)
         return make_response(
-            {"message": "DOCUMENTS_RETREIVED", "verification_documents": ver_docs}
+            {
+                "items": [VerificationDocumentSchema().dump(v) for v in ver_docs.items],
+                "page": page,
+                "per_page": per_page,
+                "total": ver_docs.total,
+                "pages": ver_docs.pages,
+            },
+            200,
         )
 
     @jwt_required()
