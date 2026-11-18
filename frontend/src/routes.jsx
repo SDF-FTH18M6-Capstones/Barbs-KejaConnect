@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminApprovalQueue from "./pages/admin/AdminApprovalQueue";
 import PosterReview from "./pages/admin/PosterReview";
 import { POSTER } from "./paths";
+import EditListing from "./pages/PosterDashboard/EditListing";
 
 export const router = createBrowserRouter([
   { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
   { path: POSTER.home, element: <PosterDashboard /> },
   { path: POSTER.listings, element: <MyListings /> },
   { path: POSTER.newListing, element: <NewListing /> },
+  { path: POSTER.editListing(":id"), element: <EditListing /> },
   { path: POSTER.inquiries, element: <PosterInquiries /> },
   { path: POSTER.verification, element: <Verification /> },
   // "Browse listings" buttons link here; the listings are on the home page

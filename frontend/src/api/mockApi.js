@@ -287,6 +287,49 @@ export async function createListing(body) {
   return { listing };
 }
 
+export async function updateListing(id, body) {
+  await delay(500);
+  const user = getCurrentUser();
+  if (user && user.approval_status !== "approved") {
+    throw new ApiError(
+      403,
+      "ACCOUNT_NOT_APPROVED",
+      "Your account has not been approved yet",
+    );
+  }
+  const l = findListing(id);
+  if (!l) throw new ApiError(404, "NOT_FOUND", "Listing not found");
+  if (l.poster.id !== posterId()) {
+    throw new ApiError(403, "FORBIDDEN", "You can only edit your own listings");
+  }
+  if (!mockAreas.includes(body.area)) {
+    throw new ApiError(400, "VALIDATION_ERROR", "Invalid listing", {
+      area: ["Choose an area from the list"],
+    });
+  }
+  const key = dedupeKey(body.area, body.building_name, body.unit_number);
+  const existing = mockMyListings.find(
+    (x) =>
+      x.id !== l.id &&
+      x.status !== "removed" &&
+      dedupeKey(x.area, x.building_name, unitFor(x)) === key,
+  );
+  if (existing) {
+    throw new ApiError(
+      409,
+      "DUPLICATE_LISTING",
+      "This unit is already listed",
+      {
+        existing_listing_id: existing.id,
+        poster_name: existing.poster.full_name,
+      },
+    );
+  }
+  Object.assign(l, body);
+  save();
+  return { listing: { ...l } };
+}
+
 export async function getReceivedInquiries({
   listing_id,
   page = 1,
