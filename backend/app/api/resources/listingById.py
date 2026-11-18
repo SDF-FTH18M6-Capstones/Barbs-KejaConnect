@@ -29,7 +29,7 @@ class ListingByIdResource(Resource):
             "owner",
             "manager",
         ):
-            raise make_response(
+            return make_response(
                 {
                     "error": "Not allowed.",
                     "message": f"You either not approved or allowed to perform that operation.",
@@ -41,10 +41,38 @@ class ListingByIdResource(Resource):
 
         return make_response(
             {"message": "LISTING_UPDATED", "listing": PropertySchema().dump(listing)},
-            201,
+            200,
         )
 
+    @jwt_required()
     def patch(self, id):
         user_id = get_jwt_identity()
-        claims = get_jwt()
-        pass
+        l: Property = self.listing_service.get_by_id(listing_id=id)
+        data = request.get_json(silent=True)
+        status = data.get("status", "")
+
+        if not status or not isinstance(status, str):
+            return make_response(
+                {
+                    "error": "Bad request",
+                    "message": "Invalid request object.",
+                },
+                403,
+            )
+
+        if l.poster_id != user_id:
+            return make_response(
+                {
+                    "error": "Not allowed.",
+                    "message": f"You either not approved or allowed to perform that operation.",
+                },
+                403,
+            )
+
+        listing = self.listing_service.update_listing(
+            listing_id=id, update_data={"status": status}
+        )
+        return make_response(
+            {"message": "LISTING_UPDATED", "listing": PropertySchema().dump(listing)},
+            200,
+        )
