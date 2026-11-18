@@ -1,57 +1,53 @@
+import { useState } from "react";
 import AdminHeader from "../../components/admin/AdminHeader";
 import ApprovalTable from "../../components/admin/ApprovalTable";
 import { mockAdminApplications } from "../../data/mockAdminData";
 
 function AdminApprovalQueue() {
-  const pendingCount = mockAdminApplications.filter(
+  const [applications, setApplications] = useState(mockAdminApplications);
+
+  const pendingCount = applications.filter(
     (poster) => poster.status === "pending",
   ).length;
 
-  const approvedCount = mockAdminApplications.filter(
+  const approvedCount = applications.filter(
     (poster) => poster.status === "approved",
   ).length;
 
-  const rejectedCount = mockAdminApplications.filter(
+  const rejectedCount = applications.filter(
     (poster) => poster.status === "rejected",
   ).length;
 
   return (
     <div className="space-y-6">
-      {/* Page heading */}
       <AdminHeader
         title="Approval queue"
         description="Review and manage poster verification applications."
       />
 
-      {/* Application summary */}
+      {/* Application status summary */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-surface p-5">
           <p className="text-sm text-text-muted">Pending</p>
-          <h2 className="mt-2 text-2xl font-semibold text-amber-600">
-            {pendingCount}
-          </h2>
-          <p className="mt-1 text-xs text-text-muted">Awaiting review</p>
+          <h2 className="mt-2 text-2xl font-semibold">{pendingCount}</h2>
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-5">
           <p className="text-sm text-text-muted">Approved</p>
-          <h2 className="mt-2 text-2xl font-semibold text-green-700">
-            {approvedCount}
-          </h2>
-          <p className="mt-1 text-xs text-text-muted">Successfully verified</p>
+          <h2 className="mt-2 text-2xl font-semibold">{approvedCount}</h2>
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-5">
           <p className="text-sm text-text-muted">Rejected</p>
-          <h2 className="mt-2 text-2xl font-semibold text-red-600">
-            {rejectedCount}
-          </h2>
-          <p className="mt-1 text-xs text-text-muted">Applications declined</p>
+          <h2 className="mt-2 text-2xl font-semibold">{rejectedCount}</h2>
         </div>
       </div>
 
-      {/* Applications and filters */}
-      <ApprovalTable />
+      {/* Applications table */}
+      <ApprovalTable
+        applications={applications}
+        setApplications={setApplications}
+      />
     </div>
   );
 }
