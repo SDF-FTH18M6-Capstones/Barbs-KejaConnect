@@ -27,7 +27,7 @@ function AdminApprovalQueue() {
 
     return matchesTab && matchesSearch && matchesRole;
   });
-  
+
 return (
     <div className="space-y-6">
 
@@ -36,4 +36,20 @@ return (
         <p className="text-text-muted mt-1">
           Review proof from managers and owners.
         </p>
+      </div>
+      {/* Status tabs */}
+      <div className="flex flex-wrap gap-2">
+        {["pending", "approved", "rejected", "all"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 rounded-lg capitalize ${
+              activeTab === tab
+                ? "bg-primary text-white"
+                : "bg-surface border border-border"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
