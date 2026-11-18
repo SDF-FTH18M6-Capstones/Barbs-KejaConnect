@@ -75,3 +75,47 @@ return (
         </select>
 
       </div>
+      {/* Application results */}
+      <div className="bg-surface border border-border rounded-xl overflow-x-auto">
+
+        <table className="w-full text-sm text-left">
+          <thead>
+            <tr>
+              <th className="p-4">Poster</th>
+              <th className="p-4">Role</th>
+              <th className="p-4">Documents</th>
+              <th className="p-4">Submitted</th>
+              <th className="p-4">Status</th>
+              <th className="p-4">Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredApplications.map((poster) => (
+              <tr key={poster.id} className="border-t border-border">
+                <td className="p-4">
+                  <div className="font-medium">{poster.name}</div>
+                  <div className="text-text-muted">
+                    {poster.email}
+                  </div>
+                </td>
+
+                <td className="p-4">{poster.role}</td>
+
+                <td className="p-4">
+                  {poster.documents.join(", ")}
+                </td>
+
+                <td className="p-4">{poster.submittedAt}</td>
+
+                <td className="p-4 capitalize">
+                  {poster.status}
+                </td>
+
+                <td className="p-4">
+                  <button className="text-primary font-medium">
+                    Review
+                  </button>
+                </td>
+              </tr>
+            ))}
