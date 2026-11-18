@@ -16,7 +16,7 @@ class VerificationDocumentsResource(Resource):
     def get(self):
         claims = get_jwt()
         if claims.get("role") not in ("manager", "owner"):
-            raise make_response(
+            return make_response(
                 {
                     "error": "Not allowed.",
                     "message": f"User of type {claims.get('role')} can not perform that operation.",

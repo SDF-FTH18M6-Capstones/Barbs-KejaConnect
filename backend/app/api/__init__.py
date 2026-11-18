@@ -7,13 +7,21 @@ from .resources.signup import SignupResource
 from .resources.verify_email import VerifyEmailResource
 from .resources.verification_documents import VerificationDocumentsResource
 from .resources.verifications import Verifications
+from .resources.listings import ListingsResource
+from .resources.listingById import ListingByIdResource
 from .error_handlers import register_error_handlers
 from ..repository import (
     UserRepo,
     EmailVerificationRepo,
     VerificationDocumentsRepository,
+    ListingsRepository,
 )
-from ..services import AuthService, UploadFilesService, VerificationDocsService
+from ..services import (
+    AuthService,
+    UploadFilesService,
+    VerificationDocsService,
+    ListingsService,
+)
 
 v1 = Blueprint("v1", __name__)
 
@@ -24,10 +32,12 @@ register_error_handlers(v1)
 user_repo = UserRepo()
 email_ver_repo = EmailVerificationRepo()
 ver_docs_repo = VerificationDocumentsRepository()
+listing_repo = ListingsRepository()
 
 auth_service = AuthService(user_repo=user_repo, email_ver_repo=email_ver_repo)
 upload_service = UploadFilesService(ver_repo=ver_docs_repo)
 ver_docs_service = VerificationDocsService(ver_doc_repo=ver_docs_repo)
+listing_service = ListingsService(listing_repo=listing_repo, user_repo=user_repo)
 
 api.add_resource(HealthCheck, "/health")
 api.add_resource(WhoAmI, "/me")
@@ -54,4 +64,17 @@ api.add_resource(
     "/admin/verifications",
     "/admin/verifications/<int:id>",
     resource_class_kwargs={"ver_doc": ver_docs_service},
+)
+
+# listings
+api.add_resource(
+    ListingsResource,
+    "/listings",
+    resource_class_kwargs={"listing_service": listing_service},
+)
+api.add_resource(
+    ListingByIdResource,
+    "/listings/<int:id>",
+    "/listings/<int:id>/status",
+    resource_class_kwargs={"listing_service": listing_service},
 )
