@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 import cloudinary
 from app.api import v1
 from .config import db, bcrypt
@@ -21,6 +22,8 @@ def create_app():
     # load config
     config = os.getenv("APP_SETTINGS", "config.flaskconfig.Development")
     app.config.from_object(config)
+
+    CORS(app=app)
 
     migrate = Migrate(app, db)
     db.init_app(app)

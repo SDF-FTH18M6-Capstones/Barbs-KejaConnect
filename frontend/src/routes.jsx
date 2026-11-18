@@ -16,32 +16,41 @@ import AdminApprovalQueue from "./pages/admin/AdminApprovalQueue";
 import PosterReview from "./pages/admin/PosterReview";
 import { POSTER } from "./paths";
 import EditListing from "./pages/PosterDashboard/EditListing";
+import RootLayout from "./layouts/RootLayout";
 
 export const router = createBrowserRouter([
-  { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
-  { path: "/signup/:role", element: <Signup /> },
-  { path: "/login", element: <Login /> },
-  { path: "/verify-email", element: <VerifyEmail /> },
   {
-    element: <Layout />,
+    element: <RootLayout />,
     children: [
-      { path: "/", element: <Home /> },
-      { path: "/my-inquiries", element: <MyInquiries /> },
-      { path: "/listings/:id", element: <ListingDetail /> },
+      { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
+      { path: "/signup/:role", element: <Signup /> },
+      { path: "/login", element: <Login /> },
+      { path: "/verify-email", element: <VerifyEmail /> },
+      {
+        element: <Layout />,
+        children: [
+          { path: "/", element: <Home /> },
+          { path: "/my-inquiries", element: <MyInquiries /> },
+          { path: "/listings/:id", element: <ListingDetail /> },
+        ],
+      },
+      //poster dashboard
+      { path: POSTER.home, element: <PosterDashboard /> },
+      { path: POSTER.listings, element: <MyListings /> },
+      { path: POSTER.newListing, element: <NewListing /> },
+      { path: POSTER.editListing(":id"), element: <EditListing /> },
+      { path: POSTER.inquiries, element: <PosterInquiries /> },
+      { path: POSTER.verification, element: <Verification /> },
+      // "Browse listings" buttons link here; the listings are on the home page
+      { path: "/listings", element: <Navigate to="/" replace /> },
+
+      //admin
+      { path: "/admin_dashboard", element: <AdminDashboard /> },
+      {
+        path: "/admin_dashboard/approval_queue",
+        element: <AdminApprovalQueue />,
+      },
+      { path: "/admin_dashboard/poster_review", element: <PosterReview /> },
     ],
   },
-  //poster dashboard
-  { path: POSTER.home, element: <PosterDashboard /> },
-  { path: POSTER.listings, element: <MyListings /> },
-  { path: POSTER.newListing, element: <NewListing /> },
-  { path: POSTER.editListing(":id"), element: <EditListing /> },
-  { path: POSTER.inquiries, element: <PosterInquiries /> },
-  { path: POSTER.verification, element: <Verification /> },
-  // "Browse listings" buttons link here; the listings are on the home page
-  { path: "/listings", element: <Navigate to="/" replace /> },
-
-  //admin
-  { path: "/admin_dashboard", element: <AdminDashboard /> },
-  { path: "/admin_dashboard/approval_queue", element: <AdminApprovalQueue /> },
-  { path: "/admin_dashboard/poster_review", element: <PosterReview /> },
 ]);
