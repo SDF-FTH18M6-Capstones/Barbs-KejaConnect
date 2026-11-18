@@ -14,3 +14,7 @@ class VerificationDocsInterface(ABC):
     @abstractmethod
     def get_by_id(self, id):
         """get specific doc by id"""
+
+    @abstractmethod
+    def update(self, doc_id, action, reason):
+        """Update document entity"""

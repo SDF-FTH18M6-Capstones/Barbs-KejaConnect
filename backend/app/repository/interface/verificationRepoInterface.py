@@ -20,5 +20,9 @@ class VerificationRepoInterface(ABC):
         """create new verificatio docs"""
 
     @abstractmethod
+    def update(self, doc_id, update_data: dict):
+        """update verification document entity"""
+
+    @abstractmethod
     def delete(self, doc_id):
         """delete document"""
