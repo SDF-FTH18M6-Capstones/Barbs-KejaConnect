@@ -6,7 +6,7 @@ const LINKS = [
   { to: POSTER.home, label: "Dashboard", end: true },
   { to: POSTER.listings, label: "My Listings" },
   { to: POSTER.newListing, label: "New listing" },
-  { to: POSTER.inquiries, label: "Inquiries", badge: true },
+  { to: POSTER.inquiries, label: "Inquiries" },
   { to: POSTER.verification, label: "Verification" },
 ];
 
