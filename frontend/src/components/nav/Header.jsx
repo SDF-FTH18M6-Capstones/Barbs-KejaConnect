@@ -5,20 +5,17 @@ import Brand from "../Brand";
 import { getCurrentUser } from "../inquiries/data/currentUser";
 import { POSTER, ROUTES } from "../../paths";
 
-// "Faith Njeri" -> "FN"
 const initials = (name) =>
   name
     .split(" ")
     .map((w) => w[0])
     .slice(0, 2)
-    .join("")
-    .toUpperCase(); // ← added
+    .join("");
 
 export default function Header() {
-  //check if user exists to display varied status bar
   const navigate = useNavigate();
-  const user = getCurrentUser(); // ← added: { full_name, role } or null
-  const isPoster = user?.role === "manager" || user?.role === "owner"; // ← added
+  const user = getCurrentUser();
+  const isPoster = user?.role === "manager" || user?.role === "owner";
 
   const handleButtonClick = (type) => {
     console.log(type);
@@ -29,7 +26,6 @@ export default function Header() {
     }
   };
 
-  // ← added: clears the saved user and goes to the home page
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("access_token");
@@ -44,12 +40,12 @@ export default function Header() {
           <NavLink to="/" className="text-text hover:text-primary">
             Browse
           </NavLink>
-          {isPoster && ( // ← only posters can create listings
+          {isPoster && (
             <NavLink to={POSTER.home} className="text-text hover:text-primary">
               Dashboard
             </NavLink>
           )}
-          {user?.role === "tenant" && ( // ← only tenants send inquiries
+          {user?.role === "tenant" && (
             <NavLink
               to={ROUTES.myInquiries}
               className="text-text hover:text-primary"
@@ -60,7 +56,6 @@ export default function Header() {
         </div>
         <div className="auth flex items-center gap-3">
           {user ? (
-            // ← added: logged in shows initials, name and Log out
             <>
               <span className="flex items-center gap-2">
                 <span className="grid size-9 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary-dark">
@@ -71,7 +66,6 @@ export default function Header() {
               <ButtonAlternate onClick={handleLogout} text="Log out" />
             </>
           ) : (
-            // unchanged: visitors see Log in / Sign Up
             <>
               <ButtonAlternate
                 onclick={() => handleButtonClick("login")}
