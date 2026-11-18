@@ -2,19 +2,24 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ButtonAlternate from "../ButtonAlternate";
 import ButtonPrimary from "../ButtonPrimary";
 import Brand from "../Brand";
-import { getCurrentUser } from "../inquiries/data/currentUser";
 import { POSTER, ROUTES } from "../../paths";
+import { useAuth } from "../../providers/AuthProvider";
 
-const initials = (name) =>
+const initials = (name = "") =>
   name
-    .split(" ")
-    .map((w) => w[0])
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0]?.toUpperCase())
     .slice(0, 2)
     .join("");
 
 export default function Header() {
+  const { userData } = useAuth();
+  const { data, loading, error } = userData;
+  const user = data?.user || null;
+
   const navigate = useNavigate();
-  const user = getCurrentUser();
   const isPoster = user?.role === "manager" || user?.role === "owner";
 
   const handleButtonClick = (type) => {

@@ -5,6 +5,7 @@ import {
   useEffect,
   useContext,
 } from "react";
+import { data } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
@@ -23,7 +24,7 @@ function handleAuth(state, action) {
   }
 }
 function AuthProvider({ children }) {
-  const [user, userDispatch] = useReducer(handleAuth, {
+  const [userData, userDispatch] = useReducer(handleAuth, {
     error: null,
     loading: false,
     data: null,
@@ -51,7 +52,29 @@ function AuthProvider({ children }) {
       .finally(() => userDispatch({ type: "INIT" }));
   }
 
-  const value = { user };
+  function login(login) {
+    userDispatch({ type: "LOADING" });
+    fetch("/api/v1/auth/login", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify(login),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to login: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        userDispatch({ type: "SUCCESS", payload: data });
+      })
+      .catch((error) => {
+        userDispatch({ type: "ERROR", payload: error.message });
+      })
+      .finally(() => userDispatch({ type: "INIT" }));
+  }
+
+  const value = { userData, login };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
