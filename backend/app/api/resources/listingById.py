@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import make_response, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from ...models import VerificationDocument
+from ...models import Property
 from ...schemas import PropertySchema
 from ...config import db
 from ...services import ListingsService, VerificationDocsService
@@ -22,9 +22,10 @@ class ListingByIdResource(Resource):
     @jwt_required()
     def put(self, id):
         data = request.get_json(silent=True)
+        l: Property = self.listing_service.get_by_id(listing_id=id)
         user_id = get_jwt_identity()
         claims = get_jwt()
-        if id != user_id or claims.get("role") not in (
+        if l.poster_id != user_id or claims.get("role") not in (
             "owner",
             "manager",
         ):
@@ -42,3 +43,8 @@ class ListingByIdResource(Resource):
             {"message": "LISTING_UPDATED", "listing": PropertySchema().dump(listing)},
             201,
         )
+
+    def patch(self, id):
+        user_id = get_jwt_identity()
+        claims = get_jwt()
+        pass
