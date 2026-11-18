@@ -18,10 +18,12 @@ class LoginResource(Resource):
                 {"error": "Bad request", "message": "Invalid request object."}, 400
             )
 
-        token, user = self.auth_service.login(
+        token, user, verification_sent = self.auth_service.login(
             email=data.get("email", ""), password=data.get("password", "")
         )
 
         res_user = UserSchema().dump(user)
 
-        return make_response({"token": token, "user": res_user}, 200)
+        return make_response(
+            {"token": token, "user": res_user, "email_sent": verification_sent}, 200
+        )

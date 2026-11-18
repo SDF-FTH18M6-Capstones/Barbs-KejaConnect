@@ -35,6 +35,8 @@ class AuthService(AuthInterface):
             raise InvalidCredentialsError("Invalid email or password.")
 
         if not user.email_verified:
+            verification_sent = self.send_verification_email(user=user)
+
             raise EmailNotVerified("Please verify your email before login.")
 
         token = create_access_token(
@@ -45,7 +47,7 @@ class AuthService(AuthInterface):
             },
         )
 
-        return token, user
+        return token, user, verification_sent
 
     def signup(self, email, phone, role, full_name, password):
         if not email or not phone or not role or not full_name or not password:
@@ -70,7 +72,7 @@ class AuthService(AuthInterface):
 
         verification_sent = self.send_verification_email(user=saved_user)
 
-        return saved_user
+        return saved_user, verification_sent
 
     def verify_email(self, token):
         if not token:
