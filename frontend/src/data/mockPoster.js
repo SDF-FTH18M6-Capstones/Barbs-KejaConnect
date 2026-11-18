@@ -15,6 +15,22 @@ const tenant = (id, full_name, email, phone) => ({
 
 export const mockReceivedInquiries = [
   {
+    id: 106,
+    property_id: 2,
+    status: "responded",
+    created_at: "2026-11-11T07:00:00Z",
+    message: "Hi, is the rent negotiable for a 12-month lease?",
+    tenant: tenant(31, "Faith Njeri", "faith.njeri@example.com", "0710445566"),
+  },
+  {
+    id: 107,
+    property_id: 5,
+    status: "new",
+    created_at: "2026-11-09T10:00:00Z",
+    message: "Is the water supply reliable? I would like to book a viewing.",
+    tenant: tenant(31, "Faith Njeri", "faith.njeri@example.com", "0710445566"),
+  },
+  {
     id: 101,
     property_id: 1,
     status: "new",
@@ -78,7 +94,6 @@ export const mockReceivedInquiries = [
   },
 ];
 
-// Uploaded documents per poster id (the pending manager has one waiting)
 export const mockDocuments = {
   19: [
     {
