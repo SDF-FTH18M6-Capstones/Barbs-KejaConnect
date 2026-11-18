@@ -15,8 +15,11 @@ class VerificationDocumentsRepository(VerificationRepoInterface):
     def get_by_id(self, doc_id):
         return VerificationDocument.query.filter_by(id=doc_id).first()
 
-    def get_by_user(self, user_id):
-        return VerificationDocument.query.filter_by(user_id=user_id).all()
+    def get_by_user(self, user_id, page, per_page):
+        pagination = VerificationDocument.query.filter_by(user_id=user_id).paginate(
+            page=page, per_page=per_page
+        )
+        return pagination
 
     def add_document(self, ver_doc):
         try:

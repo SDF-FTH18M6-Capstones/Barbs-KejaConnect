@@ -22,5 +22,7 @@ class VerificationDocsService(VerificationDocsInterface):
     def get_by_id(self, id):
         return self.ver_doc_repo.get_by_id(doc_id=id)
 
-    def get_user_docs(self, user_id):
-        return self.ver_doc_repo.get_by_user(user_id=user_id)
+    def get_user_docs(self, user_id, page, per_page):
+        return self.ver_doc_repo.get_by_user(
+            user_id=user_id, page=page, per_page=per_page
+        )

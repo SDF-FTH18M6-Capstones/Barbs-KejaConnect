@@ -8,7 +8,7 @@ class VerificationDocsInterface(ABC):
         """get all verification documents"""
 
     @abstractmethod
-    def get_user_docs(self, user_id):
+    def get_user_docs(self, user_id, page, per_page):
         """get current or specific users documents"""
 
     @abstractmethod

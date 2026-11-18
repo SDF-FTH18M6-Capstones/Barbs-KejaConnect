@@ -12,7 +12,7 @@ class VerificationRepoInterface(ABC):
         """get document by id"""
 
     @abstractmethod
-    def get_by_user(self, user_id):
+    def get_by_user(self, user_id, page, per_page):
         """get all verification docs belonging to user"""
 
     @abstractmethod
