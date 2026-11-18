@@ -19,7 +19,7 @@ class UploadFilesService(UploadFilesInterface):
     def upload_file(self, file, type):
         if not file or type not in ("property", "verification"):
             raise InvalidCredentialsError(
-                'Check your file has data or your input type is "property" or "verification". '
+                'Check your file has data or your input type is "property" or "verification".'
             )
         try:
             result = cloudinary.uploader.upload(file, folder=type)

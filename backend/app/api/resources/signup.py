@@ -15,7 +15,7 @@ class SignupResource(Resource):
         # move this to service
         data = request.get_json(silent=True)
 
-        if not isinstance(data, dict) and not data:
+        if not isinstance(data, dict) or not data:
             return make_response(
                 {"error": "Bad request", "message": "Invalid request object."}, 400
             )

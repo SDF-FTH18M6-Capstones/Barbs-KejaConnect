@@ -4,16 +4,21 @@ from flask_jwt_extended import jwt_required
 from ...models import VerificationDocument
 from ...schemas import VerificationDocumentSchema
 from ...config import db
-from ...services import UploadFilesService
+from ...services import UploadFilesService, VerificationDocsService
 
 
 class VerificationDocumentsResource(Resource):
-    def __init__(self, upload: UploadFilesService):
+    def __init__(self, upload: UploadFilesService, ver_doc: VerificationDocsService):
         self.upload = upload
+        self.ver_doc = ver_doc
 
     @jwt_required()
     def get(self):
-        pass
+        data = self.ver_doc.get_all()
+        ver_docs = VerificationDocumentSchema(many=True).dump(data)
+        return make_response(
+            {"message": "DOCUMENTS_RETREIVED", "verification_documents": ver_docs}
+        )
 
     @jwt_required()
     def post(self):
