@@ -53,3 +53,25 @@ return (
           </button>
         ))}
       </div>
+      {/* Search and role filter */}
+      <div className="flex flex-wrap gap-3">
+
+        <input
+          type="search"
+          placeholder="Name, email or company"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border border-border rounded-lg p-3 flex-1"
+        />
+
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="border border-border rounded-lg p-3"
+        >
+          <option value="all">All roles</option>
+          <option value="manager">Manager</option>
+          <option value="owner">Owner</option>
+        </select>
+
+      </div>
