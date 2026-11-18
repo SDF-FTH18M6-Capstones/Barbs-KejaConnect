@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { formatDate } from "../inquiries/data/formart";
+import { POSTER } from "../../paths";
 
 export default function ListingsTable({ listings, onToggle, busyId }) {
   const button =
@@ -25,7 +26,7 @@ export default function ListingsTable({ listings, onToggle, busyId }) {
               <tr key={l.id} className="border-b border-border/60 text-sm">
                 <td className="px-4 py-3">
                   <Link
-                    to={`/listings/${l.id}`}
+                    to={POSTER.editListing(l.id)}
                     className="font-medium text-text hover:text-primary"
                   >
                     {l.title}
