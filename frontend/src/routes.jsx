@@ -14,6 +14,7 @@ import Verification from "./pages/PosterDashboard/Verification";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminApprovalQueue from "./pages/admin/AdminApprovalQueue";
 import PosterReview from "./pages/admin/PosterReview";
+import { POSTER } from "./paths";
 
 export const router = createBrowserRouter([
   { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
@@ -29,11 +30,14 @@ export const router = createBrowserRouter([
     ],
   },
   //poster dashboard
-  { path: "/poster_dashboard", element: <PosterDashboard /> },
-  { path: "/poster_dashboard/listings", element: <MyListings /> },
-  { path: "/poster_dashboard/listings/new", element: <NewListing /> },
-  { path: "/poster_dashboard/inquiries", element: <PosterInquiries /> },
-  { path: "/poster_dashboard/verification", element: <Verification /> },
+  { path: POSTER.home, element: <PosterDashboard /> },
+  { path: POSTER.listings, element: <MyListings /> },
+  { path: POSTER.newListing, element: <NewListing /> },
+  { path: POSTER.inquiries, element: <PosterInquiries /> },
+  { path: POSTER.verification, element: <Verification /> },
+  // "Browse listings" buttons link here; the listings are on the home page
+  { path: "/listings", element: <Navigate to="/" replace /> },
+
   //admin
   { path: "/admin_dashboard", element: <AdminDashboard /> },
   { path: "/admin_dashboard/approval_queue", element: <AdminApprovalQueue /> },
