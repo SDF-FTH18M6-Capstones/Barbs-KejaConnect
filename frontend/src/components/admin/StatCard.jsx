@@ -1,14 +1,20 @@
 function StatCard({ title, value, description, icon }) {
   return (
-    <div className="bg-surface border border-border rounded-xl p-5">
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-text-muted">{title}</p>
-        {icon}
+    <div className="rounded-xl border border-[#E1E5E0] bg-white p-5 shadow-sm">
+      {/* Card heading and icon */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-[#56625B]">{title}</p>
+
+        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#E7F2EC] text-lg text-[#0E6B4E]">
+          {icon}
+        </span>
       </div>
 
-      <h2 className="text-3xl font-semibold mt-3">{value}</h2>
+      {/* Statistic value */}
+      <h2 className="mt-4 text-3xl font-bold text-[#16211C]">{value}</h2>
 
-      <p className="text-sm text-text-muted mt-1">{description}</p>
+      {/* Description */}
+      <p className="mt-2 text-xs text-[#56625B]">{description}</p>
     </div>
   );
 }
