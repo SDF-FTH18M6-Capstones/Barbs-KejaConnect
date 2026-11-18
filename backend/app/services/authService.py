@@ -37,7 +37,9 @@ class AuthService(AuthInterface):
         if not user.email_verified:
             raise EmailNotVerified("Please verify your email before login.")
 
-        token = create_access_token(identity=str(user.id))
+        token = create_access_token(
+            identity=str(user.id), additional_claims={"role": user.role}
+        )
 
         return token, user
 
@@ -82,7 +84,9 @@ class AuthService(AuthInterface):
             user_id=email_ver_token.user_id, update_data={"email_verified": True}
         )
         user_res = UserSchema().dump(user)
-        token = create_access_token(identity=user.id)
+        token = create_access_token(
+            identity=str(user.id), additional_claims={"role": user.role}
+        )
 
         return token, user_res
 

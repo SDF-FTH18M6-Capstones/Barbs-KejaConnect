@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "28373a28a631231ffc1c9e45f9bbefad620b8b7210f3ea41ee67f26c5bbbd829"
+            "sha256": "1375c2b6b57745e37ea3894cccf5e48b9aa240c934a3950ce3873924c129dd37"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -107,6 +107,14 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==1.9.0"
+        },
+        "certifi": {
+            "hashes": [
+                "sha256:a9895e6e2758b371e0545e321a3a8fd1fcfd9829ada8824a936dfb16aaaf36cd",
+                "sha256:e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==2026.10.23"
         },
         "cffi": {
             "hashes": [
@@ -221,6 +229,14 @@
             ],
             "markers": "python_version >= '3.10'",
             "version": "==8.5.1"
+        },
+        "cloudinary": {
+            "hashes": [
+                "sha256:a42d1312b9b581a68a387ba81b3df7ce35d1870d6ff7bfd9d2777589c247e014",
+                "sha256:cf14b75d969960ee4dc04125826c12a6ea02a0ecbb75d4bde2ce2e82af0ad010"
+            ],
+            "index": "pypi",
+            "version": "==1.47.0"
         },
         "cryptography": {
             "hashes": [
@@ -939,6 +955,14 @@
             ],
             "markers": "python_version >= '2'",
             "version": "==2026.6"
+        },
+        "urllib3": {
+            "hashes": [
+                "sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+                "sha256:63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63"
+            ],
+            "markers": "python_version >= '3.10'",
+            "version": "==2.8.0"
         },
         "werkzeug": {
             "hashes": [

@@ -15,7 +15,7 @@ class LoginResource(Resource):
 
         if not isinstance(data, dict) or not data:
             return make_response(
-                {"error": "Bad requenst", "message": "Invalid request object."}, 400
+                {"error": "Bad request", "message": "Invalid request object."}, 400
             )
 
         token, user = self.auth_service.login(
