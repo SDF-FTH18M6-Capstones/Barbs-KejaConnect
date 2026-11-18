@@ -61,8 +61,10 @@ function AuthProvider({ children }) {
       .then((res) => {
         if (!res.ok) {
           return res.json().then((errData) => {
-            console.log(errData);
-            throw new Error(errData.message || "Login failed");
+            throw new Error(
+              `Error:${errData.error}\nmessage:${errData.message}` ||
+                "Login failed",
+            );
           });
         }
         return res.json();
