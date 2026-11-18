@@ -65,23 +65,40 @@ function PosterReview() {
         <h2 className="mb-4 text-lg font-semibold">Submitted documents</h2>
 
         <div className="space-y-3">
-          {poster.documents.map((document, index) => (
-            <div
-              key={`${document}-${index}`}
-              className="flex items-center justify-between rounded-lg border border-border p-4"
-            >
-              <div>
-                <p className="font-medium">{document}</p>
-                <p className="mt-1 text-xs text-text-muted">
-                  Document submitted for verification
-                </p>
-              </div>
+          {poster.documentFiles?.length > 0 ? (
+            poster.documentFiles.map((document) => (
+              <div
+                key={document.id}
+                className="flex flex-col justify-between gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-center"
+              >
+                <div>
+                  <p className="font-medium">{document.name}</p>
+                  <p className="mt-1 text-xs text-text-muted">
+                    {document.fileName}
+                  </p>
+                </div>
 
-              <span className="text-sm font-medium text-[#0E6B4E]">
-                Submitted
-              </span>
-            </div>
-          ))}
+                {document.url ? (
+                  <a
+                    href={document.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-[#0E6B4E] hover:underline"
+                  >
+                    View document
+                  </a>
+                ) : (
+                  <span className="text-xs text-text-muted">
+                    Preview unavailable (mock file)
+                  </span>
+                )}
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-text-muted">
+              No document file details available.
+            </p>
+          )}
         </div>
       </section>
 
