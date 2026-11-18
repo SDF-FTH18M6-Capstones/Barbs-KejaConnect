@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { createInquiry } from "../../api/inquiries";
 import { getToken } from "../../api/client";
 import { USE_MOCKS } from "../../api/config";
-import { ROUTES } from "../../paths";
+import { POSTER, ROUTES } from "../../paths";
+import { getCurrentUser } from "../inquiries/data/currentUser";
 
 const MIN = 10;
 const MAX = 1000;
@@ -12,6 +13,7 @@ const DEFAULT_MESSAGE =
 
 const ERRORS = {
   VALIDATION_ERROR: `Your message must be between ${MIN} and ${MAX} characters.`,
+  UNAUTHORIZED: "Your session has ended. Log in again to send your inquiry.",
   FORBIDDEN:
     "Only tenant accounts can send inquiries. Log in with a tenant account to continue.",
   NOT_FOUND: "This listing is no longer available.",
@@ -19,25 +21,25 @@ const ERRORS = {
   SERVER_ERROR: "Something went wrong on our side. Try again in a moment.",
 };
 
-const box = "rounded-[14px] border border-line bg-white p-5";
+const box = "rounded-[14px] border border-border bg-surface p-5";
 
 export default function InquiryForm({ listing }) {
+  const user = getCurrentUser();
+  const loggedIn = USE_MOCKS ? Boolean(user) : Boolean(getToken());
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
-  const [status, setStatus] = useState("idle"); // idle | sending | sent
+  const [status, setStatus] = useState("idle");
   const [errorCode, setErrorCode] = useState(null);
 
   if (listing.status !== "available") {
     return (
       <div className={box}>
-        <h2 className="font-display text-lg font-semibold">
-          This unit has been taken
-        </h2>
-        <p className="mt-2 text-[15px] text-muted">
+        <h2 className="text-lg font-semibold">This unit has been taken</h2>
+        <p className="mt-2 text-[15px] text-text-muted">
           The poster is no longer accepting inquiries for it.
         </p>
         <Link
           to={ROUTES.listings}
-          className="mt-3 inline-block font-medium text-brand no-underline hover:text-brand-dark"
+          className="mt-3 inline-block font-medium text-primary no-underline hover:text-primary-dark"
         >
           Browse other listings
         </Link>
@@ -45,25 +47,23 @@ export default function InquiryForm({ listing }) {
     );
   }
 
-  if (!getToken() && !USE_MOCKS) {
+  if (!loggedIn) {
     return (
       <div className={box}>
-        <h2 className="font-display text-lg font-semibold">
-          Ask about this unit
-        </h2>
-        <p className="mt-2 text-[15px] text-muted">
+        <h2 className="text-lg font-semibold">Ask about this unit</h2>
+        <p className="mt-2 text-[15px] text-text-muted">
           Log in or sign up as a tenant to message the poster.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
             to={ROUTES.login}
-            className="inline-flex min-h-11 items-center justify-center rounded-[10px] border border-brand bg-brand px-[18px] font-medium text-white no-underline hover:bg-brand-dark"
+            className="inline-flex min-h-11 items-center justify-center rounded-[10px] border border-primary bg-primary px-[18px] font-medium text-text-on-primary no-underline hover:bg-primary-dark"
           >
             Log in
           </Link>
           <Link
             to={ROUTES.register}
-            className="inline-flex min-h-11 items-center justify-center rounded-[10px] border border-line-strong bg-white px-[18px] font-medium text-ink no-underline hover:bg-canvas"
+            className="inline-flex min-h-11 items-center justify-center rounded-[10px] border border-border bg-surface px-[18px] font-medium text-text no-underline hover:bg-bg"
           >
             Sign up
           </Link>
@@ -72,14 +72,40 @@ export default function InquiryForm({ listing }) {
     );
   }
 
+  if (user && user.role !== "tenant") {
+    return (
+      <div className={box}>
+        <h2 className="text-lg font-semibold">Inquiries are for tenants</h2>
+        <p className="mt-2 text-[15px] text-text-muted">
+          You're logged in as a {user.role}. Tenants message posters from here,
+          and posters read them on their dashboard.
+        </p>
+        {(user.role === "manager" || user.role === "owner") && (
+          <Link
+            to={POSTER.inquiries}
+            className="mt-3 inline-block font-medium text-primary no-underline hover:text-primary-dark"
+          >
+            Go to your inquiries
+          </Link>
+        )}
+      </div>
+    );
+  }
+
   if (status === "sent") {
     return (
       <div className={box} role="status">
-        <h2 className="font-display text-lg font-semibold">Inquiry sent</h2>
-        <p className="mt-2 text-[15px] text-muted">
+        <h2 className="text-lg font-semibold">Inquiry sent</h2>
+        <p className="mt-2 text-[15px] text-text-muted">
           The poster will get your message and the contact details on your
           account.
         </p>
+        <Link
+          to={ROUTES.myInquiries}
+          className="mt-3 inline-block font-medium text-primary no-underline hover:text-primary-dark"
+        >
+          See your inquiries
+        </Link>
       </div>
     );
   }
@@ -103,9 +129,7 @@ export default function InquiryForm({ listing }) {
 
   return (
     <form onSubmit={submit} className={box} noValidate>
-      <h2 className="font-display text-lg font-semibold">
-        Ask about this unit
-      </h2>
+      <h2 className="text-lg font-semibold">Ask about this unit</h2>
       <label
         htmlFor="inq-message"
         className="mb-1.5 mt-4 block text-sm font-medium"
@@ -118,9 +142,9 @@ export default function InquiryForm({ listing }) {
         maxLength={MAX}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="w-full rounded-[10px] border border-line-strong bg-white px-3 py-2.5 text-[15px] text-ink focus:outline-2 focus:outline-offset-2 focus:outline-brand"
+        className="w-full rounded-[10px] border border-border bg-surface px-3 py-2.5 text-[15px] text-text focus:outline-2 focus:outline-offset-2 focus:outline-primary"
       />
-      <div className="mt-1 flex justify-between text-[13px] text-muted">
+      <div className="mt-1 flex justify-between text-[13px] text-text-muted">
         <span>{len < MIN ? `At least ${MIN} characters` : ""}</span>
         <span>
           {len} / {MAX}
@@ -128,7 +152,7 @@ export default function InquiryForm({ listing }) {
       </div>
 
       {errorCode && (
-        <p role="alert" className="mt-3 text-[15px] text-ink">
+        <p role="alert" className="mt-3 text-[15px] text-error">
           {ERRORS[errorCode] ?? ERRORS.SERVER_ERROR}
         </p>
       )}
@@ -136,10 +160,10 @@ export default function InquiryForm({ listing }) {
       <button
         type="submit"
         disabled={!valid || status === "sending"}
-        className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-[10px] border border-brand bg-brand px-[18px] font-medium text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-[10px] border border-primary bg-primary px-[18px] font-medium text-text-on-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
       >
         {status === "sending" ? "Sending..." : "Send inquiry"}
       </button>
     </form>
   );
-} 
+}

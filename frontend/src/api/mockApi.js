@@ -1,4 +1,4 @@
-import { mockListings, mockAreas } from "../data/mockListings";
+import { mockAreas } from "../data/mockListings";
 import { ApiError } from "./client";
 import {
   mockDocuments,
@@ -9,6 +9,37 @@ import {
 import { getCurrentUser } from "../components/inquiries/data/currentUser";
 
 const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
+
+const STORE_KEY = "kc_mock";
+const inquiries = [...mockReceivedInquiries];
+
+function load() {
+  try {
+    return JSON.parse(localStorage.getItem(STORE_KEY));
+  } catch {
+    return null;
+  }
+}
+
+const saved = load();
+if (saved?.listings)
+  mockMyListings.splice(0, mockMyListings.length, ...saved.listings);
+if (saved?.inquiries) inquiries.splice(0, inquiries.length, ...saved.inquiries);
+
+function save() {
+  try {
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify({ listings: mockMyListings, inquiries }),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const findListing = (id) =>
+  mockMyListings.find((x) => x.id === Number(id) && x.status !== "removed");
 
 export async function getListings({
   page = 1,
@@ -31,7 +62,7 @@ export async function getListings({
   }
 
   const pp = Math.min(Number(per_page) || 10, 50);
-  const matches = mockListings
+  const matches = mockMyListings
     .filter((l) => l.status === "available")
     .filter((l) => !area || l.area === area)
     .filter((l) => !property_type || l.property_type === property_type)
@@ -62,7 +93,7 @@ function toDetail(l) {
     ...l,
     description: `${l.title} in ${l.area}. Spacious and well maintained, close to shops and public transport. Water and security are included in the rent.`,
     county: "Nairobi",
-    unit_number: `B${l.id}`,
+    unit_number: unitFor(l),
     lr_number: null,
     images: Array.from({ length: 6 }, (_, i) => ({
       id: l.id * 100 + i,
@@ -77,18 +108,20 @@ function toDetail(l) {
 
 export async function getListing(id) {
   await delay();
-  const l = mockListings.find(
-    (x) => x.id === Number(id) && x.status !== "removed",
-  );
+  const l = findListing(id);
   if (!l) throw new ApiError(404, "NOT_FOUND", "Listing not found");
   return { listing: toDetail(l) };
 }
 
 export async function createInquiry(listingId, { message }) {
   await delay(400);
-  const l = mockListings.find(
-    (x) => x.id === Number(listingId) && x.status !== "removed",
-  );
+  const user = getCurrentUser();
+  if (!user)
+    throw new ApiError(401, "UNAUTHORIZED", "Log in to send an inquiry");
+  if (user.role !== "tenant") {
+    throw new ApiError(403, "FORBIDDEN", "Only tenants can send inquiries");
+  }
+  const l = findListing(listingId);
   if (!l) throw new ApiError(404, "NOT_FOUND", "Listing not found");
   if (l.status !== "available")
     throw new ApiError(403, "FORBIDDEN", "Listing is not available");
@@ -98,18 +131,67 @@ export async function createInquiry(listingId, { message }) {
       message: ["Must be 10 to 1000 characters"],
     });
   }
+
+  const inquiry = {
+    id: Date.now(),
+    property_id: l.id,
+    status: "new",
+    created_at: new Date().toISOString(),
+    message: message.trim(),
+    tenant: {
+      id: user.id,
+      full_name: user.full_name,
+      email: user.email ?? null,
+      phone: user.phone ?? null,
+    },
+  };
+  inquiries.push(inquiry);
+  save();
+
   return {
     inquiry: {
-      id: Date.now(),
-      message: message.trim(),
-      status: "new",
-      created_at: new Date().toISOString(),
+      id: inquiry.id,
+      message: inquiry.message,
+      status: inquiry.status,
+      created_at: inquiry.created_at,
       property: { id: l.id, title: l.title },
     },
   };
 }
 
-// ---------- Poster dashboard ----------
+export async function getSentInquiries({ page = 1, per_page = 10 } = {}) {
+  await delay();
+  const user = getCurrentUser();
+  if (user?.role !== "tenant") {
+    throw new ApiError(403, "FORBIDDEN", "Only tenants have sent inquiries");
+  }
+  const items = inquiries
+    .filter((q) => q.tenant?.id === user.id)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .map((q) => {
+      const l = mockMyListings.find((x) => x.id === q.property_id);
+      return {
+        id: q.id,
+        message: q.message,
+        status: q.status,
+        created_at: q.created_at,
+        property: l
+          ? {
+              id: l.id,
+              title: l.title,
+              area: l.area,
+              building_name: l.building_name,
+              unit_number: unitFor(l),
+              price_monthly: l.price_monthly,
+              status: l.status,
+              cover_image_url: l.cover_image_url ?? null,
+              poster_name: l.poster.full_name,
+            }
+          : { id: q.property_id, title: "Listing removed", status: "removed" },
+      };
+    });
+  return paginate(items, page, per_page);
+}
 
 const posterId = () => getCurrentUser()?.id ?? 11;
 
@@ -141,6 +223,7 @@ export async function setListingStatus(id, status) {
   if (l.poster.id !== posterId())
     throw new ApiError(403, "FORBIDDEN", "This is not your listing");
   l.status = status;
+  save();
   return { listing: { ...l } };
 }
 
@@ -200,6 +283,7 @@ export async function createListing(body) {
     created_at: new Date().toISOString(),
   };
   mockMyListings.push(listing);
+  save();
   return { listing };
 }
 
@@ -210,7 +294,7 @@ export async function getReceivedInquiries({
 } = {}) {
   await delay();
   const mine = mockMyListings.filter((l) => l.poster.id === posterId());
-  const items = mockReceivedInquiries
+  const items = inquiries
     .filter((q) => mine.some((l) => l.id === q.property_id))
     .filter((q) => !listing_id || q.property_id === Number(listing_id))
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

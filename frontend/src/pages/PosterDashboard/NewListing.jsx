@@ -13,6 +13,7 @@ import {
 } from "../../components/poster dashboard/data/listingForm";
 import { createListing, getAreas } from "../../api/listings";
 import { PROPERTY_TYPES } from "../../utils/labels";
+import { POSTER } from "../../paths";
 
 function Section({ title, children }) {
   return (
@@ -63,7 +64,7 @@ function NewListingForm() {
     setSaving(true);
     try {
       const { listing } = await createListing(toListingBody(values));
-      navigate("/dashboard/listings", { state: { created: listing.title } });
+      navigate(POSTER.listings, { state: { created: listing.title } });
     } catch (err) {
       if (err.code === "DUPLICATE_LISTING") setDuplicate(err.details ?? {});
       else if (err.code === "VALIDATION_ERROR" && err.details)
@@ -95,7 +96,7 @@ function NewListingForm() {
     <form noValidate onSubmit={handleSubmit} className="max-w-3xl space-y-5">
       <div className="space-y-1">
         <Link
-          to="/dashboard/listings"
+          to={POSTER.listings}
           className="text-sm font-medium text-primary hover:text-primary-dark"
         >
           ← My listings
@@ -268,7 +269,7 @@ function NewListingForm() {
           {saving ? "Publishing…" : "Publish listing"}
         </button>
         <Link
-          to="/dashboard/listings"
+          to={POSTER.listings}
           className="rounded-lg border border-border bg-surface px-6 py-3 font-medium text-text hover:bg-bg"
         >
           Cancel

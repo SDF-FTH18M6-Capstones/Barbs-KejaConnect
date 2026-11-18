@@ -1,12 +1,13 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import Brand from "../Brand";
+import { POSTER } from "../../paths";
 
 const LINKS = [
-  { to: "/dashboard", label: "Dashboard", end: true },
-  { to: "/dashboard/listings", label: "My Listings" },
-  { to: "/listings/new", label: "New listing" },
-  { to: "/dashboard/inquiries", label: "Inquiries", badge: true },
-  { to: "/dashboard/verification", label: "Verification" },
+  { to: POSTER.home, label: "Dashboard", end: true },
+  { to: POSTER.listings, label: "My Listings" },
+  { to: POSTER.newListing, label: "New listing" },
+  { to: POSTER.inquiries, label: "Inquiries" },
+  { to: POSTER.verification, label: "Verification" },
 ];
 
 const initials = (name = "") =>

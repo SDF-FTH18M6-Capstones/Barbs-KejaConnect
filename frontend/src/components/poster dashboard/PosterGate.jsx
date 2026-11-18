@@ -3,6 +3,7 @@ import PosterLayout from "./PosterLayout";
 import useLoad from "./useLoad";
 import { getReceivedInquiries } from "../../api/inquiries";
 import { getCurrentUser } from "../inquiries/data/currentUser";
+import { POSTER } from "../../paths";
 
 const isPoster = (user) => user?.role === "manager" || user?.role === "owner";
 
@@ -53,7 +54,7 @@ export default function PosterGate({ needsApproval = false, children }) {
             You can create and manage listings once an admin has approved your
             documents.
           </p>
-          <Link to="/dashboard/verification" className="font-medium underline">
+          <Link to={POSTER.verification} className="font-medium underline">
             Go to verification
           </Link>
         </div>

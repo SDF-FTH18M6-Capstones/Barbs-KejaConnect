@@ -1,6 +1,12 @@
 const DEV_USERS = {
-  visitor: null, // not logged in, even if localStorage has a saved user
-  tenant: { full_name: "Faith Njeri", role: "tenant", phone: "0710445566" },
+  visitor: null,
+  tenant: {
+    id: 31,
+    full_name: "Faith Njeri",
+    role: "tenant",
+    email: "faith.njeri@example.com",
+    phone: "0710445566",
+  },
   manager: {
     id: 11,
     full_name: "Wanjiku Mwangi",
@@ -30,8 +36,16 @@ const DEV_USERS = {
   admin: { full_name: "KejaConnect Admin", role: "admin" },
 };
 
+function devUserName() {
+  try {
+    return localStorage.getItem("dev_user") ?? import.meta.env.VITE_DEV_USER;
+  } catch {
+    return import.meta.env.VITE_DEV_USER;
+  }
+}
+
 export function getCurrentUser() {
-  const devUser = import.meta.env.VITE_DEV_USER;
+  const devUser = devUserName();
   if (import.meta.env.DEV && devUser in DEV_USERS) {
     return DEV_USERS[devUser];
   }
