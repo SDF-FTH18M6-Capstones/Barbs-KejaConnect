@@ -33,3 +33,26 @@ function AdminSidebar() {
           Admin
         </span>
       </div>
+      {/* Navigation */}
+      <nav className="flex-1 space-y-2">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Menu
+        </p>
+
+        {navigationItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end={item.end}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition ${
+                isActive
+                  ? "bg-[#0E6B4E] font-semibold text-white"
+                  : "text-gray-300 hover:bg-white/10 hover:text-white"
+              }`
+            }
+          >
+            <span>{item.icon}</span>
+            {item.label}
+          </NavLink>
+        ))}
