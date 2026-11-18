@@ -5,6 +5,7 @@ import {
   useEffect,
   useContext,
 } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
@@ -28,6 +29,8 @@ function AuthProvider({ children }) {
     loading: false,
     data: null,
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     get_current_user();
@@ -61,10 +64,7 @@ function AuthProvider({ children }) {
       .then((res) => {
         if (!res.ok) {
           return res.json().then((errData) => {
-            throw new Error(
-              `Error:${errData.error}\nmessage:${errData.message}` ||
-                "Login failed",
-            );
+            throw new Error(errData.error || "Login failed");
           });
         }
         return res.json();
@@ -75,6 +75,10 @@ function AuthProvider({ children }) {
         userDispatch({ type: "SUCCESS", payload: data.user });
       })
       .catch((error) => {
+        if (error.message === "Email not verified") {
+          navigate("/verify-email", { state: { email: login.email } });
+          return;
+        }
         userDispatch({ type: "ERROR", payload: error.message });
       })
       .finally(() => userDispatch({ type: "INIT" }));
