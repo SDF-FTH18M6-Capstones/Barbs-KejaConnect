@@ -5,7 +5,6 @@ import {
   useEffect,
   useContext,
 } from "react";
-import { data } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
@@ -52,7 +51,7 @@ function AuthProvider({ children }) {
       .finally(() => userDispatch({ type: "INIT" }));
   }
 
-  function login(login) {
+  function loginUser(login) {
     userDispatch({ type: "LOADING" });
     fetch("/api/v1/auth/login", {
       method: "POST",
@@ -61,12 +60,17 @@ function AuthProvider({ children }) {
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`Failed to login: ${res.status}`);
+          return res.json().then((errData) => {
+            console.log(errData);
+            throw new Error(errData.message || "Login failed");
+          });
         }
         return res.json();
       })
       .then((data) => {
-        userDispatch({ type: "SUCCESS", payload: data });
+        token = data.token;
+        localStorage.setItem("token", token);
+        userDispatch({ type: "SUCCESS", payload: data.user });
       })
       .catch((error) => {
         userDispatch({ type: "ERROR", payload: error.message });
@@ -74,7 +78,7 @@ function AuthProvider({ children }) {
       .finally(() => userDispatch({ type: "INIT" }));
   }
 
-  const value = { userData, login };
+  const value = { userData, loginUser };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
