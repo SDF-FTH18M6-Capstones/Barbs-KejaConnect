@@ -33,10 +33,12 @@ export default function ListingsTable({ listings, onToggle, busyId }) {
                   <div className="text-[13px] text-text-muted">{l.area}</div>
                 </td>
                 <td className="px-4 py-3">
-                  {l.building_name} {l.unit_number}
+                  {l.building_name} {l.unit_number ?? ""}
                 </td>
                 <td className="px-4 py-3">
-                  {Number(l.rent_kes).toLocaleString("en-KE")}
+                  {Number(l.price_monthly ?? l.rent_kes).toLocaleString(
+                    "en-KE",
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   <span

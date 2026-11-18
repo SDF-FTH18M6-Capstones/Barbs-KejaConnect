@@ -1,6 +1,11 @@
 import { mockListings, mockAreas } from "../data/mockListings";
 import { ApiError } from "./client";
-import { mockMyListings } from "../data/mockPoster";
+import {
+  mockDocuments,
+  mockMyListings,
+  mockReceivedInquiries,
+  unitFor,
+} from "../data/mockPoster";
 import { getCurrentUser } from "../components/inquiries/data/currentUser";
 
 const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
@@ -137,4 +142,116 @@ export async function setListingStatus(id, status) {
     throw new ApiError(403, "FORBIDDEN", "This is not your listing");
   l.status = status;
   return { listing: { ...l } };
+}
+
+const dedupeKey = (area, building, unit) =>
+  [area, building, unit]
+    .map((s) =>
+      String(s ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "_"),
+    )
+    .join("|");
+
+export async function createListing(body) {
+  await delay(500);
+  const user = getCurrentUser();
+  if (user && user.approval_status !== "approved") {
+    throw new ApiError(
+      403,
+      "ACCOUNT_NOT_APPROVED",
+      "Your account has not been approved yet",
+    );
+  }
+  if (!mockAreas.includes(body.area)) {
+    throw new ApiError(400, "VALIDATION_ERROR", "Invalid listing", {
+      area: ["Choose an area from the list"],
+    });
+  }
+  const key = dedupeKey(body.area, body.building_name, body.unit_number);
+  const existing = mockMyListings.find(
+    (l) =>
+      l.status !== "removed" &&
+      dedupeKey(l.area, l.building_name, unitFor(l)) === key,
+  );
+  if (existing) {
+    throw new ApiError(
+      409,
+      "DUPLICATE_LISTING",
+      "This unit is already listed",
+      {
+        existing_listing_id: existing.id,
+        poster_name: existing.poster.full_name,
+      },
+    );
+  }
+  const listing = {
+    ...body,
+    id: Math.max(...mockMyListings.map((l) => l.id)) + 1,
+    county: "Nairobi",
+    status: "available",
+    cover_image_url: null,
+    poster: {
+      id: user?.id ?? 11,
+      full_name: user?.full_name ?? "Wanjiku Mwangi",
+      is_verified: true,
+    },
+    created_at: new Date().toISOString(),
+  };
+  mockMyListings.push(listing);
+  return { listing };
+}
+
+export async function getReceivedInquiries({
+  listing_id,
+  page = 1,
+  per_page = 10,
+} = {}) {
+  await delay();
+  const mine = mockMyListings.filter((l) => l.poster.id === posterId());
+  const items = mockReceivedInquiries
+    .filter((q) => mine.some((l) => l.id === q.property_id))
+    .filter((q) => !listing_id || q.property_id === Number(listing_id))
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .map(({ property_id, ...q }) => {
+      const l = mine.find((x) => x.id === property_id);
+      return { ...q, property: { id: l.id, title: l.title } };
+    });
+  return paginate(items, page, per_page);
+}
+
+export async function getMyDocuments({ page = 1, per_page = 20 } = {}) {
+  await delay();
+  const docs = [...(mockDocuments[posterId()] ?? [])].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at),
+  );
+  return paginate(docs, page, per_page);
+}
+
+export async function uploadDocument(formData) {
+  await delay(600);
+  const file = formData.get("file");
+  if (
+    !file ||
+    !/\.(jpe?g|png|pdf)$/i.test(file.name) ||
+    file.size > 5 * 1024 * 1024
+  ) {
+    throw new ApiError(
+      400,
+      "INVALID_FILE",
+      "Upload a JPG, PNG or PDF of 5 MB or less",
+    );
+  }
+  const document = {
+    id: Date.now(),
+    doc_type: formData.get("doc_type"),
+    file_url: null,
+    status: "pending",
+    rejection_reason: null,
+    created_at: new Date().toISOString(),
+    reviewed_at: null,
+  };
+  (mockDocuments[posterId()] ??= []).push(document);
+  return { document };
 }
