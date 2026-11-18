@@ -80,3 +80,11 @@ export function serverFieldErrors(details = {}) {
     ]),
   );
 }
+
+const asText = (v) => (v === null || v === undefined ? "" : String(v));
+
+export function fromListing(listing) {
+  return Object.fromEntries(
+    Object.keys(EMPTY_LISTING).map((key) => [key, asText(listing[key])]),
+  );
+}
