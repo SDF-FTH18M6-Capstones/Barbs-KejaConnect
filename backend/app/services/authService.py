@@ -38,7 +38,11 @@ class AuthService(AuthInterface):
             raise EmailNotVerified("Please verify your email before login.")
 
         token = create_access_token(
-            identity=str(user.id), additional_claims={"role": user.role}
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role,
+                "approval_status": user.approval_status,
+            },
         )
 
         return token, user
@@ -85,7 +89,11 @@ class AuthService(AuthInterface):
         )
         user_res = UserSchema().dump(user)
         token = create_access_token(
-            identity=str(user.id), additional_claims={"role": user.role}
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role,
+                "approval_status": user.approval_status,
+            },
         )
 
         return token, user_res

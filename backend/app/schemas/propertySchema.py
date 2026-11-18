@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, pre_load
+from marshmallow import Schema, fields, validate, post_load
 
 from ..models import Property
 from ..utils import PROPERTY_TYPE, PROPERTY_STATUS, COUNTIES
@@ -32,6 +32,6 @@ class PropertySchema(Schema):
         "SavedListingSchema", many=True, exclude=("property",)
     )
 
-    @pre_load
+    @post_load
     def to_property(self, data, **kwargs):
         return Property(**data)
