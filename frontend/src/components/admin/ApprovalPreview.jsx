@@ -1,5 +1,6 @@
 import { mockPendingApprovals } from "../../data/mockAdminData";
 import StatusBadge from "./StatusBadge";
+
 function ApprovalPreview() {
   return (
     <section className="rounded-xl border border-[#E1E5E0] bg-white p-6">
@@ -17,6 +18,7 @@ function ApprovalPreview() {
           {mockPendingApprovals.length} Pending
         </span>
       </div>
+
       <div className="space-y-4">
         {mockPendingApprovals.map((poster) => (
           <div
@@ -54,3 +56,5 @@ function ApprovalPreview() {
     </section>
   );
 }
+
+export default ApprovalPreview;
