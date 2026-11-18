@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { createInquiry } from "../../api/inquiries";
 import { getToken } from "../../api/client";
 import { USE_MOCKS } from "../../api/config";
-import { ROUTES } from "../../paths";
+import { POSTER, ROUTES } from "../../paths";
+import { getCurrentUser } from "../inquiries/data/currentUser";
 
 const MIN = 10;
 const MAX = 1000;
@@ -12,6 +13,7 @@ const DEFAULT_MESSAGE =
 
 const ERRORS = {
   VALIDATION_ERROR: `Your message must be between ${MIN} and ${MAX} characters.`,
+  UNAUTHORIZED: "Your session has ended. Log in again to send your inquiry.",
   FORBIDDEN:
     "Only tenant accounts can send inquiries. Log in with a tenant account to continue.",
   NOT_FOUND: "This listing is no longer available.",
@@ -22,6 +24,8 @@ const ERRORS = {
 const box = "rounded-[14px] border border-line bg-white p-5";
 
 export default function InquiryForm({ listing }) {
+  const user = getCurrentUser();
+  const loggedIn = USE_MOCKS ? Boolean(user) : Boolean(getToken());
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
   const [status, setStatus] = useState("idle"); // idle | sending | sent
   const [errorCode, setErrorCode] = useState(null);
@@ -45,7 +49,7 @@ export default function InquiryForm({ listing }) {
     );
   }
 
-  if (!getToken() && !USE_MOCKS) {
+  if (!loggedIn) {
     return (
       <div className={box}>
         <h2 className="font-display text-lg font-semibold">
@@ -72,6 +76,28 @@ export default function InquiryForm({ listing }) {
     );
   }
 
+  if (user && user.role !== "tenant") {
+    return (
+      <div className={box}>
+        <h2 className="font-display text-lg font-semibold">
+          Inquiries are for tenants
+        </h2>
+        <p className="mt-2 text-[15px] text-muted">
+          You're logged in as a {user.role}. Tenants message posters from here,
+          and posters read them on their dashboard.
+        </p>
+        {(user.role === "manager" || user.role === "owner") && (
+          <Link
+            to={POSTER.inquiries}
+            className="mt-3 inline-block font-medium text-brand no-underline hover:text-brand-dark"
+          >
+            Go to your inquiries
+          </Link>
+        )}
+      </div>
+    );
+  }
+
   if (status === "sent") {
     return (
       <div className={box} role="status">
@@ -80,10 +106,17 @@ export default function InquiryForm({ listing }) {
           The poster will get your message and the contact details on your
           account.
         </p>
+        <Link
+          to={ROUTES.myInquiries}
+          className="mt-3 inline-block font-medium text-brand no-underline hover:text-brand-dark"
+        >
+          See your inquiries
+        </Link>
       </div>
     );
   }
 
+  // 5. Tenant: show the form
   const len = message.trim().length;
   const valid = len >= MIN && len <= MAX;
 
@@ -142,4 +175,4 @@ export default function InquiryForm({ listing }) {
       </button>
     </form>
   );
-} 
+}

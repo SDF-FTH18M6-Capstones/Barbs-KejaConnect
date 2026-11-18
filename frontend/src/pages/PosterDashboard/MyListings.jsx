@@ -6,6 +6,7 @@ import LoadError from "../../components/poster dashboard/LoadError";
 import Pager from "../../components/poster dashboard/Pager";
 import useLoad from "../../components/poster dashboard/useLoad";
 import { getMyListings, setListingStatus } from "../../api/listings";
+import { POSTER } from "../../paths";
 
 const FILTERS = [
   { value: "", label: "All" },
@@ -65,7 +66,7 @@ function MyListingsContent() {
           </p>
         </div>
         <Link
-          to="/listings/new"
+          to={POSTER.newListing}
           className="rounded-lg bg-primary px-5 py-3 font-medium text-text-on-primary hover:bg-primary-dark"
         >
           + New listing
@@ -145,7 +146,7 @@ function MyListingsContent() {
             </p>
             {!filter && (
               <Link
-                to="/listings/new"
+                to={POSTER.newListing}
                 className="font-medium text-primary hover:text-primary-dark"
               >
                 Create your first listing
