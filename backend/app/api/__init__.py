@@ -18,7 +18,6 @@ register_error_handlers(v1)
 user_repo = UserRepo()
 email_ver_repo = EmailVerificationRepo()
 auth_service = AuthService(user_repo=user_repo, email_ver_repo=email_ver_repo)
-auth_service = AuthService(user_repo=user_repo)
 
 api.add_resource(HealthCheck, "/health")
 api.add_resource(
