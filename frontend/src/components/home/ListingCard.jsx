@@ -18,7 +18,7 @@ export default function ListingCard({ listing, index = 0 }) {
 
   return (
     <Link
-      to="/"
+      to={`/listings/${id}`}
       className="flex flex-col overflow-hidden rounded-[14px] border border-line bg-white text-ink no-underline transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
     >
       <div
