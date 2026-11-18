@@ -7,6 +7,7 @@ from app.exceptions import (
     DatabasePersistenceError,
     ResourceNotFoundError,
     EmailVerificationNotSentError,
+    FileUploadFailed,
 )
 
 
@@ -46,3 +47,7 @@ def register_error_handlers(app):
     @app.errorhandler(DatabasePersistenceError)
     def handle_persistence_error(error):
         return make_response({"error": "Peristence Error", "message": str(error)})
+
+    @app.errorhandler(FileUploadFailed)
+    def handle_file_upload_failed(error):
+        return make_response({"error": "Upload Error", "message": str(error)})

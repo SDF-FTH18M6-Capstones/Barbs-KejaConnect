@@ -28,3 +28,7 @@ class InvalidCredentialsError(BaseError):
 
 class DatabasePersistenceError(BaseError):
     pass
+
+
+class FileUploadFailed(BaseError):
+    pass
