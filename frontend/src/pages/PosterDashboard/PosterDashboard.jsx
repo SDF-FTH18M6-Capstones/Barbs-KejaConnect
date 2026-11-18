@@ -155,7 +155,7 @@ function DashboardHome({ user }) {
                   You haven't posted any listings yet.
                 </p>
                 <Link
-                  to="/listings/new"
+                  to={POSTER.newListing}
                   className="font-medium text-primary hover:text-primary-dark"
                 >
                   Create your first listing
