@@ -13,3 +13,17 @@ function AdminApprovalQueue() {
   const filteredApplications = applications.filter((poster) => {
     const matchesTab =
       activeTab === "all" || poster.status === activeTab;
+    const matchesSearch = [
+      poster.name,
+      poster.email,
+      poster.company,
+    ]
+      .join(" ")
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchesRole =
+      role === "all" || poster.role.toLowerCase() === role;
+
+    return matchesTab && matchesSearch && matchesRole;
+  });
