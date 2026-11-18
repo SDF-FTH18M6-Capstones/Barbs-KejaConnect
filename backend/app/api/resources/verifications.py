@@ -8,8 +8,7 @@ from ...services import UploadFilesService, VerificationDocsService
 
 
 class Verifications(Resource):
-    def __init__(self, upload: UploadFilesService, ver_doc: VerificationDocsService):
-        self.upload = upload
+    def __init__(self, ver_doc: VerificationDocsService):
         self.ver_doc = ver_doc
 
     @jwt_required()
@@ -39,7 +38,7 @@ class Verifications(Resource):
         )
 
     @jwt_required()
-    def patch(self):
+    def patch(self, id):
         role = get_jwt().get("role")
         if role not in ("admin"):
             return make_response(
@@ -56,7 +55,6 @@ class Verifications(Resource):
                 {"error": "Bad request", "message": "Invalid request object."}, 400
             )
 
-        ver_id = data.get("file_id", "")
         action = data.get("action", "")
         reason = data.get("reason", "")
 
@@ -69,11 +67,11 @@ class Verifications(Resource):
                 403,
             )
 
-        ver_doc = self.ver_doc.update(ver_id, action, reason)
+        ver_doc = self.ver_doc.update(id, action, reason)
 
         return make_response(
             {
-                "message": "FILE_UPLOADED",
+                "message": "FILE_UPDATED",
                 "verification_doc": VerificationDocumentSchema().dump(ver_doc),
             }
         )
