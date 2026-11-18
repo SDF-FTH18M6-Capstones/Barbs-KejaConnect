@@ -1,7 +1,6 @@
 from flask_jwt_extended import get_jwt_identity
 from ..repository import ListingsRepository, UserRepo
 from .interface.listingInterface import ListingsInterface
-from datetime import datetime, timezone
 
 
 class ListingsService(ListingsInterface):
@@ -19,4 +18,6 @@ class ListingsService(ListingsInterface):
         return self.listing_repo.create_listing(listing=listing)
 
     def update_listing(self, listing_id, update_data):
-        return self.update_listing(listing_id=listing_id, update_data=update_data)
+        return self.listing_repo.update_listing(
+            listing_id=listing_id, update_data=update_data
+        )

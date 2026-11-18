@@ -3,6 +3,7 @@ from ..models import Property
 from ..exceptions import ResourceNotFoundError, AlreadyExists, DatabasePersistenceError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from ..config import db
+from datetime import datetime, timezone
 
 
 class ListingsRepository(ListingsRepoInterface):
@@ -23,6 +24,7 @@ class ListingsRepository(ListingsRepoInterface):
             for key, value in update_data.items():
                 if hasattr(listing, key):
                     setattr(listing, key, value)
+            listing.updated_at = datetime.now(timezone.utc)
 
             db.session.commit()
             return listing

@@ -8,6 +8,7 @@ from .resources.verify_email import VerifyEmailResource
 from .resources.verification_documents import VerificationDocumentsResource
 from .resources.verifications import Verifications
 from .resources.listings import ListingsResource
+from .resources.listingById import ListingByIdResource
 from .error_handlers import register_error_handlers
 from ..repository import (
     UserRepo,
@@ -69,5 +70,10 @@ api.add_resource(
 api.add_resource(
     ListingsResource,
     "/listings",
+    resource_class_kwargs={"listing_service": listing_service},
+)
+api.add_resource(
+    ListingByIdResource,
+    "/listings/<int:id>",
     resource_class_kwargs={"listing_service": listing_service},
 )
