@@ -6,6 +6,7 @@ from .resources.login import LoginResource
 from .resources.signup import SignupResource
 from .resources.verify_email import VerifyEmailResource
 from .resources.verification_documents import VerificationDocumentsResource
+from .resources.verifications import Verifications
 from .error_handlers import register_error_handlers
 from ..repository import (
     UserRepo,
@@ -47,4 +48,10 @@ api.add_resource(
     VerificationDocumentsResource,
     "/verification/documents",
     resource_class_kwargs={"upload": upload_service, "ver_doc": ver_docs_service},
+)
+api.add_resource(
+    Verifications,
+    "/admin/verifications",
+    "/admin/verifications/<int:id>",
+    resource_class_kwargs={"ver_doc": ver_docs_service},
 )

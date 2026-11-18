@@ -12,12 +12,16 @@ class VerificationRepoInterface(ABC):
         """get document by id"""
 
     @abstractmethod
-    def get_by_user(self, user_id):
+    def get_by_user(self, user_id, page, per_page):
         """get all verification docs belonging to user"""
 
     @abstractmethod
     def add_document(self, ver_doc):
         """create new verificatio docs"""
+
+    @abstractmethod
+    def update(self, doc_id, update_data: dict):
+        """update verification document entity"""
 
     @abstractmethod
     def delete(self, doc_id):

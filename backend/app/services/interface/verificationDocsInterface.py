@@ -8,9 +8,13 @@ class VerificationDocsInterface(ABC):
         """get all verification documents"""
 
     @abstractmethod
-    def get_user_docs(self, user_id):
+    def get_user_docs(self, user_id, page, per_page):
         """get current or specific users documents"""
 
     @abstractmethod
     def get_by_id(self, id):
         """get specific doc by id"""
+
+    @abstractmethod
+    def update(self, doc_id, action, reason):
+        """Update document entity"""
