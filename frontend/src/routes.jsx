@@ -12,6 +12,7 @@ import NewListing from "./pages/PosterDashboard/NewListing";
 import PosterInquiries from "./pages/PosterDashboard/PosterInquiries";
 import Verification from "./pages/PosterDashboard/Verification";
 
+
 export const router = createBrowserRouter([
   { path: "/signup", element: <Navigate to="/signup/tenant" replace /> },
   { path: "/signup/:role", element: <Signup /> },
