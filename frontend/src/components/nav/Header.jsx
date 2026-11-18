@@ -3,6 +3,7 @@ import ButtonAlternate from "../ButtonAlternate";
 import ButtonPrimary from "../ButtonPrimary";
 import Brand from "../Brand";
 import { getCurrentUser } from "../inquiries/data/currentUser";
+import { POSTER, ROUTES } from "../../paths";
 
 // "Faith Njeri" -> "FN"
 const initials = (name) =>
@@ -44,16 +45,13 @@ export default function Header() {
             Browse
           </NavLink>
           {isPoster && ( // ← only posters can create listings
-            <NavLink
-              to="/poster_dashboard"
-              className="text-text hover:text-primary"
-            >
+            <NavLink to={POSTER.home} className="text-text hover:text-primary">
               Dashboard
             </NavLink>
           )}
           {user?.role === "tenant" && ( // ← only tenants send inquiries
             <NavLink
-              to="/my-inquiries"
+              to={ROUTES.myInquiries}
               className="text-text hover:text-primary"
             >
               My Inquiries
