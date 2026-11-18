@@ -75,5 +75,6 @@ api.add_resource(
 api.add_resource(
     ListingByIdResource,
     "/listings/<int:id>",
+    "/listings/<int:id>/status",
     resource_class_kwargs={"listing_service": listing_service},
 )
