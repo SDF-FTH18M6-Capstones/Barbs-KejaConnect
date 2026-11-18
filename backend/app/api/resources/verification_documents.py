@@ -20,7 +20,8 @@ class VerificationDocumentsResource(Resource):
                 {
                     "error": "Not allowed.",
                     "message": f"User of type {claims.get('role')} can not perform that operation.",
-                }
+                },
+                403,
             )
         page = request.args.get("page", 1, type=int)
         per_page = request.args.get("per_page", 5, type=int)
@@ -39,6 +40,15 @@ class VerificationDocumentsResource(Resource):
 
     @jwt_required()
     def post(self):
+        role = get_jwt().get("role")
+        if role not in ("manager", "owner"):
+            return make_response(
+                {
+                    "error": "Not allowed.",
+                    "message": f"User of type {role} can not perform that operation.",
+                },
+                403,
+            )
         data = request.get_json(silent=True)
 
         if not isinstance(data, dict) and not data:
