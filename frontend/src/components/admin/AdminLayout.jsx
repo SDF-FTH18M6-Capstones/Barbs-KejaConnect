@@ -3,10 +3,12 @@ import AdminSidebar from "./AdminSidebar";
 
 function AdminLayout() {
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="flex min-h-screen bg-[#F7F8F5]">
+      {/* Sidebar */}
       <AdminSidebar />
 
-      <main className="flex-1 min-w-0 p-6 lg:p-8">
+      {/* Main content */}
+      <main className="min-w-0 flex-1 p-8">
         <Outlet />
       </main>
     </div>
