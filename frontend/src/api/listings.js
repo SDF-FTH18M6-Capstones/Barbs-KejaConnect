@@ -32,3 +32,8 @@ export const createListing = (body) =>
   USE_MOCKS
     ? mock.createListing(body)
     : api("/listings", { method: "POST", body, auth: true });
+
+export const updateListing = (id, body) =>
+  USE_MOCKS
+    ? mock.updateListing(id, body)
+    : api(`/listings/${id}`, { method: "PUT", body, auth: true });

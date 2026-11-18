@@ -17,6 +17,7 @@ const FILTERS = [
 function MyListingsContent() {
   const location = useLocation();
   const created = location.state?.created;
+  const updated = location.state?.updated;
 
   const [filter, setFilter] = useState("");
   const [page, setPage] = useState(1);
@@ -55,6 +56,7 @@ function MyListingsContent() {
       setBusyId(null);
     }
   }
+
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -79,6 +81,15 @@ function MyListingsContent() {
           className="rounded-lg bg-success/10 p-3 text-sm font-medium text-success"
         >
           “{created}” is now live.
+        </p>
+      )}
+
+      {updated && (
+        <p
+          role="status"
+          className="rounded-lg bg-success/10 p-3 text-sm font-medium text-success"
+        >
+          Changes to “{updated}” saved.
         </p>
       )}
 
