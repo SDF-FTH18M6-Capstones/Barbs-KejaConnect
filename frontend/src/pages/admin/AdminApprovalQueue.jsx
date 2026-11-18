@@ -3,34 +3,25 @@ import { useState } from "react";
 import { mockPendingApprovals } from "../../data/mockAdminData";
 
 function AdminApprovalQueue() {
-  const [applications, setApplications] = useState(
-    mockPendingApprovals
-  );
+  const [applications, setApplications] = useState(mockPendingApprovals);
   const [activeTab, setActiveTab] = useState("pending");
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("all");
 
   const filteredApplications = applications.filter((poster) => {
-    const matchesTab =
-      activeTab === "all" || poster.status === activeTab;
-    const matchesSearch = [
-      poster.name,
-      poster.email,
-      poster.company,
-    ]
+    const matchesTab = activeTab === "all" || poster.status === activeTab;
+    const matchesSearch = [poster.name, poster.email, poster.company]
       .join(" ")
       .toLowerCase()
       .includes(search.toLowerCase());
 
-    const matchesRole =
-      role === "all" || poster.role.toLowerCase() === role;
+    const matchesRole = role === "all" || poster.role.toLowerCase() === role;
 
     return matchesTab && matchesSearch && matchesRole;
   });
 
-return (
+  return (
     <div className="space-y-6">
-
       <div>
         <h1 className="text-3xl font-semibold">Posters</h1>
         <p className="text-text-muted mt-1">
@@ -55,7 +46,6 @@ return (
       </div>
       {/* Search and role filter */}
       <div className="flex flex-wrap gap-3">
-
         <input
           type="search"
           placeholder="Name, email or company"
@@ -73,11 +63,9 @@ return (
           <option value="manager">Manager</option>
           <option value="owner">Owner</option>
         </select>
-
       </div>
       {/* Application results */}
       <div className="bg-surface border border-border rounded-xl overflow-x-auto">
-
         <table className="w-full text-sm text-left">
           <thead>
             <tr>
@@ -95,27 +83,34 @@ return (
               <tr key={poster.id} className="border-t border-border">
                 <td className="p-4">
                   <div className="font-medium">{poster.name}</div>
-                  <div className="text-text-muted">
-                    {poster.email}
-                  </div>
+                  <div className="text-text-muted">{poster.email}</div>
                 </td>
 
                 <td className="p-4">{poster.role}</td>
 
-                <td className="p-4">
-                  {poster.documents.join(", ")}
-                </td>
+                <td className="p-4">{poster.documents.join(", ")}</td>
 
                 <td className="p-4">{poster.submittedAt}</td>
 
-                <td className="p-4 capitalize">
-                  {poster.status}
-                </td>
+                <td className="p-4 capitalize">{poster.status}</td>
 
                 <td className="p-4">
-                  <button className="text-primary font-medium">
-                    Review
-                  </button>
+                  <button className="text-primary font-medium">Review</button>
                 </td>
               </tr>
             ))}
+            {filteredApplications.length === 0 && (
+              <tr>
+                <td colSpan="6" className="p-8 text-center">
+                  No applications found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export default AdminApprovalQueue;
