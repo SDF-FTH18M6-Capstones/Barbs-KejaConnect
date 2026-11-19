@@ -10,7 +10,6 @@ def test_emailed_token_verifies_the_user(client, urls, mailbox):
     payload = create_user(client, urls)
     res = client.get(verify_path(urls, mailbox.last_token()))
     assert res.status_code == 200
-    # A verified user can now log in.
     assert login(client, urls, payload).status_code == 200
 
 def test_token_can_only_be_used_once(client, urls, mailbox):
@@ -37,7 +36,6 @@ def test_expired_token_is_rejected(client, urls, mailbox):
 
     res = client.get(verify_path(urls, mailbox.last_token()))
     assert res.status_code in (400, 401)
-    # And the user is still unverified.
     assert login(client, urls, payload).status_code == 403
 
 @pytest.mark.xfail(strict=True, reason="contract: a malformed token (no '.<id>') must be 400 INVALID_TOKEN; today rsplit raises ValueError")
