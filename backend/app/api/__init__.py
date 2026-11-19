@@ -16,6 +16,7 @@ from ..repository import (
     EmailVerificationRepo,
     VerificationDocumentsRepository,
     ListingsRepository,
+    PropertyImgRepository,
 )
 from ..services import (
     AuthService,
@@ -34,9 +35,12 @@ user_repo = UserRepo()
 email_ver_repo = EmailVerificationRepo()
 ver_docs_repo = VerificationDocumentsRepository()
 listing_repo = ListingsRepository()
+property_image_repo = PropertyImgRepository()
 
 auth_service = AuthService(user_repo=user_repo, email_ver_repo=email_ver_repo)
-upload_service = UploadFilesService(ver_repo=ver_docs_repo)
+upload_service = UploadFilesService(
+    ver_repo=ver_docs_repo, property_image_repo=property_image_repo
+)
 ver_docs_service = VerificationDocsService(ver_doc_repo=ver_docs_repo)
 listing_service = ListingsService(listing_repo=listing_repo, user_repo=user_repo)
 

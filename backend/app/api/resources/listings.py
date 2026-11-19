@@ -35,7 +35,7 @@ class ListingsResource(Resource):
             "owner",
             "manager",
         ):
-            raise make_response(
+            return make_response(
                 {
                     "error": "Not allowed.",
                     "message": f"You either not approved or allowed to perform that operation.",
