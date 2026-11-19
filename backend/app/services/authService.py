@@ -92,15 +92,8 @@ class AuthService(AuthInterface):
             user_id=email_ver_token.user_id, update_data={"email_verified": True}
         )
         user_res = UserSchema().dump(user)
-        token = create_access_token(
-            identity=str(user.id),
-            additional_claims={
-                "role": user.role,
-                "approval_status": user.approval_status,
-            },
-        )
 
-        return token, user_res
+        return user_res
 
     def send_verification_email(self, user: User):
         email_ver_token: EmailVerificationToken = self.email_ver_repo.set_token(

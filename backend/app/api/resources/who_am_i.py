@@ -6,6 +6,8 @@ from ...schemas import UserSchema
 
 
 class WhoAmI(Resource):
+    def __init__(self):
+        super().__init__()
 
     @jwt_required()
     def get(sefl):
