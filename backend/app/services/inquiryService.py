@@ -1,9 +1,10 @@
 from .interface.inquiryInterface import InquiryInterface
 from ..repository import InquiriesRepository, ListingsRepository, UserRepo
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, get_jwt
 from ..utils import send_email, inquiry_email
 from ..models import User, Property, Inquiry
 from ..schemas import InquirySchema, UserSchema
+from ..exceptions import NotAllowedError
 
 
 class InquiryService(InquiryInterface):
@@ -43,3 +44,17 @@ class InquiryService(InquiryInterface):
             )
 
         return saved_inquiry
+
+    def received_inquiries(self):
+        user_id = get_jwt_identity()
+        claims = get_jwt()
+        if claims.get("role", "") not in ("manager", "owner"):
+            return NotAllowedError(
+                f"User of type {claims.get('role','')} can not perform this operation."
+            )
+        return self.inquiry_repo.get_poster_inquiries(user_id)
+
+    def sent_inquiries(self):
+        user_id = get_jwt_identity()
+
+        return self.inquiry_repo.get_sent_inquiries(user_id=user_id)

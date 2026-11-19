@@ -11,7 +11,10 @@ from .resources.listings import ListingsResource
 from .resources.listingById import ListingByIdResource
 from .resources.propertyImages import PropertyImagesResource
 from .resources.propertyImagesById import PropertyImagesByIdResource
-from .resources.InquiiresByListing import InquiriesByListing
+from .resources.inquiiresByListing import InquiriesByListing
+from .resources.inquiriesReceived import InquiriesByListing
+from .resources.inquiriesReceived import InquiriesReceived
+from .resources.inquiriesSent import InquiriesSent
 
 from .error_handlers import register_error_handlers
 from ..repository import (
@@ -108,5 +111,15 @@ api.add_resource(
 api.add_resource(
     InquiriesByListing,
     "/listings/:id/inquiries",
+    resource_class_kwargs={"inquiry_service": inquiry_service},
+)
+api.add_resource(
+    InquiriesReceived,
+    "/inquiries/received",
+    resource_class_kwargs={"inquiry_service": inquiry_service},
+)
+api.add_resource(
+    InquiriesSent,
+    "/inquiries/sent",
     resource_class_kwargs={"inquiry_service": inquiry_service},
 )
