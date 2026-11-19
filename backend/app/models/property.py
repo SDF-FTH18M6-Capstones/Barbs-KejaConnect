@@ -28,7 +28,9 @@ class Property(db.Model):
     __tablename__ = "properties"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    poster_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    poster_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String(250), nullable=False)
     property_type = db.Column(db.String, nullable=False)

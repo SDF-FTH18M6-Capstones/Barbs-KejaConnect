@@ -34,14 +34,22 @@ class AuthService(AuthInterface):
         if not user or not user.authenticate(password=password):
             raise InvalidCredentialsError("Invalid email or password.")
 
+        verification_sent = False
+
         if not user.email_verified:
+            verification_sent = self.send_verification_email(user=user)
+
             raise EmailNotVerified("Please verify your email before login.")
 
         token = create_access_token(
-            identity=str(user.id), additional_claims={"role": user.role}
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role,
+                "approval_status": user.approval_status,
+            },
         )
 
-        return token, user
+        return token, user, verification_sent
 
     def signup(self, email, phone, role, full_name, password):
         if not email or not phone or not role or not full_name or not password:
@@ -66,7 +74,13 @@ class AuthService(AuthInterface):
 
         verification_sent = self.send_verification_email(user=saved_user)
 
-        return saved_user
+        return saved_user, verification_sent
+
+    def get_user(self, user_id):
+        if not user_id:
+            return
+        user: User = self.user_repo.get_by_id(user_id)
+        return user
 
     def verify_email(self, token):
         if not token:
@@ -83,12 +97,16 @@ class AuthService(AuthInterface):
         user: User = self.user_repo.update_user(
             user_id=email_ver_token.user_id, update_data={"email_verified": True}
         )
-        user_res = UserSchema().dump(user)
-        token = create_access_token(
-            identity=str(user.id), additional_claims={"role": user.role}
+        create_access_token(
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role,
+                "approval_status": user.approval_status,
+            },
         )
+        user_res = UserSchema().dump(user)
 
-        return token, user_res
+        return user_res
 
     def send_verification_email(self, user: User):
         email_ver_token: EmailVerificationToken = self.email_ver_repo.set_token(
@@ -112,4 +130,5 @@ class AuthService(AuthInterface):
                 )
             return True
         except Exception as e:
-            raise EmailVerificationNotSentError(e)
+            # raise EmailVerificationNotSentError(e)
+            return False
