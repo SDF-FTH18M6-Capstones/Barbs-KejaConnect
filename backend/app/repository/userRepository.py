@@ -9,6 +9,9 @@ class UserRepo(UserRepoInterface):
     def get_by_email(self, email):
         return User.query.filter_by(email=email).first()
 
+    def get_by_id(self, id):
+        return User.query.filter_by(id=id).first()
+
     def create_user(self, user: User):
         try:
             db.session.add(user)

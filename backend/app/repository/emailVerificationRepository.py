@@ -11,6 +11,13 @@ class EmailVerificationRepo(EmailRepoInterface):
         return EmailVerificationToken.query.filter_by(id=id).first()
 
     def set_token(self, user_id):
+        existing_token: EmailVerificationToken = EmailVerificationToken.query.filter_by(
+            user_id=user_id
+        ).first()
+        if existing_token:
+            db.session.delete(existing_token)
+            db.session.flush()
+
         email_ver_token = EmailVerificationTokenSchema().load({"user_id": user_id})
 
         try:
