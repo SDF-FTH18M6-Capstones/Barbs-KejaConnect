@@ -9,10 +9,10 @@ from ...services import InquiryService, VerificationDocsService, ListingsService
 
 class InquiriesByListing(Resource):
     def __init__(
-        self, inquiry_service: InquiryService, listing_service: ListingsService
+        self,
+        inquiry_service: InquiryService,
     ):
         self.inquiry_service = inquiry_service
-        self.listing_service = listing_service
 
     @jwt_required()
     def post(self, id):
@@ -27,7 +27,7 @@ class InquiriesByListing(Resource):
                 },
                 404,
             )
-        inquiry = self.inquiry_service.make_inquiry(message)
+        inquiry = self.inquiry_service.make_inquiry(message, id)
 
         return make_response(
             {"message": "INQUIRY_SENT", "inquiry": InquirySchema().dump(inquiry)}

@@ -2,4 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class InquiryInterface(ABC):
-    pass
+    @abstractmethod
+    def make_inquiry(self, message, id):
+        """create inquiry and send email"""

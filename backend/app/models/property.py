@@ -62,6 +62,8 @@ class Property(db.Model):
         "SavedListing", back_populates="property", cascade="all,delete"
     )
 
+    user = db.relationship("User")
+
     @validates("property_type")
     def val_property_type(self, key, value):
         if value not in PROPERTY_TYPE:
