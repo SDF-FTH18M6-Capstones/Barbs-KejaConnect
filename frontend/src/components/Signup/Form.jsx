@@ -1,26 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Field from "./Field";
 import PasswordRules from "./PasswordRules";
-import { ROLES, AREAS } from "../../components/Signup/data/signupRoles";
+import { ROLES } from "../../components/Signup/data/signupRoles";
 import { validateSignup } from "../../components/Signup/data/signupValidation";
-import { registerUser } from "../../components/Signup/data/signupApi";
+import { toSignupBody } from "../../components/Signup/data/signupApi";
 import { useAuth } from "../../providers/AuthProvider";
 
-//this should mimic this
-// {
-//   "email": "vilisij109@anonmart.com",
-//   "password": "testpass",
-//   "phone": "0706123456",
-//   "role": "tenant",
-//   "full_name": "hete jn"
-// }
 const EMPTY = {
   fullName: "",
   phone: "",
   email: "",
-  company: "",
-  area: "",
   password: "",
   confirm: "",
   agree: false,
@@ -28,11 +17,10 @@ const EMPTY = {
 
 export default function Form({ roleId }) {
   const role = ROLES[roleId];
-  const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const { userData, signupUser } = useAuth();
-  const { data, loading, error } = userData;
+  const { loading, error } = userData;
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -42,15 +30,11 @@ export default function Form({ roleId }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const found = validateSignup(form, role);
+    const found = validateSignup(form);
     setErrors(found);
     if (Object.keys(found).length) return;
 
-    try {
-      signupUser(form);
-    } catch (err) {
-      setServerError(err.message);
-    }
+    signupUser(toSignupBody(form, roleId));
   }
 
   // Shared props for each input
@@ -97,28 +81,6 @@ export default function Form({ roleId }) {
         hint="We'll send a confirmation link here."
         {...field("email")}
       />
-
-      {(role.showCompany || role.areaLabel) && (
-        <div
-          className={`grid gap-4 ${role.showCompany ? "sm:grid-cols-2" : ""}`}
-        >
-          {role.showCompany && (
-            <Field
-              label="Company or agency name (optional)"
-              autoComplete="organization"
-              {...field("company")}
-            />
-          )}
-          {role.areaLabel && (
-            <Field
-              label={role.areaLabel}
-              options={AREAS}
-              hint={role.areaHint}
-              {...field("area")}
-            />
-          )}
-        </div>
-      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
