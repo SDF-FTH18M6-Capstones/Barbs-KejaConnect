@@ -10,6 +10,8 @@ from .resources.verifications import Verifications
 from .resources.listings import ListingsResource
 from .resources.listingById import ListingByIdResource
 from .resources.propertyImages import PropertyImagesResource
+from .resources.propertyImagesById import PropertyImagesByIdResource
+
 from .error_handlers import register_error_handlers
 from ..repository import (
     UserRepo,
@@ -87,5 +89,10 @@ api.add_resource(
 api.add_resource(
     PropertyImagesResource,
     "/listings/:id/images",
+    resource_class_kwargs={"upload": upload_service},
+)
+api.add_resource(
+    PropertyImagesByIdResource,
+    "/listings/:id/images/:image_id",
     resource_class_kwargs={"upload": upload_service},
 )
