@@ -7,6 +7,14 @@ import { validateSignup } from "../../components/Signup/data/signupValidation";
 import { registerUser } from "../../components/Signup/data/signupApi";
 import { useAuth } from "../../providers/AuthProvider";
 
+//this should mimic this
+// {
+//   "email": "vilisij109@anonmart.com",
+//   "password": "testpass",
+//   "phone": "0706123456",
+//   "role": "tenant",
+//   "full_name": "hete jn"
+// }
 const EMPTY = {
   fullName: "",
   phone: "",
