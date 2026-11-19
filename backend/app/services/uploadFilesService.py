@@ -1,6 +1,6 @@
 import os
 import cloudinary.uploader
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, get_jwt
 from ..repository import VerificationDocumentsRepository, PropertyImgRepository
 from .interface.uploadFileInterface import UploadFilesInterface
 from ..models import VerificationDocument, PropertyImage
@@ -9,6 +9,7 @@ from ..exceptions import (
     InvalidCredentialsError,
     AlreadyExists,
     FileUploadFailed,
+    NotAllowedError,
 )
 
 
@@ -71,3 +72,19 @@ class UploadFilesService(UploadFilesInterface):
                 property_images.append(image)
 
         return property_images
+
+    def delete_property_image(self, listing_id, image_id):
+        user_id = get_jwt_identity()
+        image_data: PropertyImage = self.property_image_repo.get_image_by_id(image_id)
+        claims = get_jwt()
+        if claims.get("role") not in ("manager", "owner"):
+            raise NotAllowedError("You are not authorized to perform this operation.")
+
+        try:
+            result = cloudinary.uploader.destroy(image_data.cloudinary_public_id)
+            if result.get("result") == "ok":
+                self.property_image_repo.delete_image(image_data)
+                return True
+            raise Exception("Failed to delete image.")
+        except Exception as e:
+            raise FileUploadFailed("Something wen wrong when uploading your file.")
