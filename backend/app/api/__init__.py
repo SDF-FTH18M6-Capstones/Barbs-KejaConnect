@@ -11,6 +11,7 @@ from .resources.listings import ListingsResource
 from .resources.listingById import ListingByIdResource
 from .resources.propertyImages import PropertyImagesResource
 from .resources.propertyImagesById import PropertyImagesByIdResource
+from .resources.InquiiresByListing import InquiriesByListing
 
 from .error_handlers import register_error_handlers
 from ..repository import (
@@ -19,12 +20,14 @@ from ..repository import (
     VerificationDocumentsRepository,
     ListingsRepository,
     PropertyImgRepository,
+    InquiriesRepository,
 )
 from ..services import (
     AuthService,
     UploadFilesService,
     VerificationDocsService,
     ListingsService,
+    InquiryService,
 )
 
 v1 = Blueprint("v1", __name__)
@@ -38,6 +41,7 @@ email_ver_repo = EmailVerificationRepo()
 ver_docs_repo = VerificationDocumentsRepository()
 listing_repo = ListingsRepository()
 property_image_repo = PropertyImgRepository()
+inquiry_repo = InquiriesRepository()
 
 auth_service = AuthService(user_repo=user_repo, email_ver_repo=email_ver_repo)
 upload_service = UploadFilesService(
@@ -45,6 +49,9 @@ upload_service = UploadFilesService(
 )
 ver_docs_service = VerificationDocsService(ver_doc_repo=ver_docs_repo)
 listing_service = ListingsService(listing_repo=listing_repo, user_repo=user_repo)
+inquiry_service = InquiryService(
+    inquiry_repo=inquiry_repo, listing_repo=listing_repo, user_repo=user_repo
+)
 
 api.add_resource(HealthCheck, "/health")
 api.add_resource(WhoAmI, "/me", resource_class_kwargs={"auth_service": auth_service})
@@ -95,4 +102,11 @@ api.add_resource(
     PropertyImagesByIdResource,
     "/listings/:id/images/:image_id",
     resource_class_kwargs={"upload": upload_service},
+)
+
+# inquiries
+api.add_resource(
+    InquiriesByListing,
+    "/listings/:id/inquiries",
+    resource_class_kwargs={"inquiry_service": inquiry_service},
 )
