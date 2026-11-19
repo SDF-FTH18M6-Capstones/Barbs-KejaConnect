@@ -76,6 +76,12 @@ class AuthService(AuthInterface):
 
         return saved_user, verification_sent
 
+    def get_user(self, user_id):
+        if not user_id:
+            return
+        user: User = self.user_repo.get_by_id(user_id)
+        return user
+
     def verify_email(self, token):
         if not token:
             raise InvalidCredentialsError("Verification token missing.")
@@ -90,6 +96,13 @@ class AuthService(AuthInterface):
 
         user: User = self.user_repo.update_user(
             user_id=email_ver_token.user_id, update_data={"email_verified": True}
+        )
+        create_access_token(
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role,
+                "approval_status": user.approval_status,
+            },
         )
         user_res = UserSchema().dump(user)
 
