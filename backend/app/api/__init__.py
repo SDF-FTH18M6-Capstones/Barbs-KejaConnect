@@ -40,7 +40,7 @@ ver_docs_service = VerificationDocsService(ver_doc_repo=ver_docs_repo)
 listing_service = ListingsService(listing_repo=listing_repo, user_repo=user_repo)
 
 api.add_resource(HealthCheck, "/health")
-api.add_resource(WhoAmI, "/me")
+api.add_resource(WhoAmI, "/me", resource_class_kwargs={"auth_service": auth_service})
 api.add_resource(
     LoginResource, "/auth/login", resource_class_kwargs={"auth_service": auth_service}
 )

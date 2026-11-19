@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 import AuthLayout from "../../components/auth/AuthLayout";
 import FormInput from "../../components/auth/FormInput";
 
 export default function VerifyEmail() {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
   const initialStatus = searchParams.get("status") || "pending";
@@ -12,6 +13,13 @@ export default function VerifyEmail() {
   const [status, setStatus] = useState(initialStatus);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const login_email = location.state?.email;
+    if (login_email) {
+      setEmail(login_email);
+    }
+  }, [location]);
 
   function handleResend(event) {
     event.preventDefault();
