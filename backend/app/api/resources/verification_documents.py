@@ -56,7 +56,7 @@ class VerificationDocumentsResource(Resource):
                 {"error": "Bad request", "message": "Invalid request object."}, 400
             )
 
-        file = data.get("file", "")
+        file = request.files.get("files")
         type = data.get("type", "")
 
         ver_doc = self.upload.upload_verification_doc(file=file, type=type)
