@@ -10,3 +10,4 @@ from .data import (
 )
 
 from .email_text import verification_email
+from .send_email import send_email
