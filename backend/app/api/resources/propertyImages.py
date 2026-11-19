@@ -34,11 +34,11 @@ class PropertyImagesResource(Resource):
 
         file = request.files.getlist("files")
 
-        ver_doc = self.upload.upload_verification_doc(file=file, type=type)
+        property_images = self.upload.upload_property_images(file=file, listing_id=id)
 
         return make_response(
             {
                 "message": "FILES_UPLOADED",
-                "verification_doc": PropertyImageSchema(many=True).dump(ver_doc),
+                "property_images": PropertyImageSchema(many=True).dump(property_images),
             }
         )

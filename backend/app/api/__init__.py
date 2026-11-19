@@ -9,6 +9,7 @@ from .resources.verification_documents import VerificationDocumentsResource
 from .resources.verifications import Verifications
 from .resources.listings import ListingsResource
 from .resources.listingById import ListingByIdResource
+from .resources.propertyImages import PropertyImagesResource
 from .error_handlers import register_error_handlers
 from ..repository import (
     UserRepo,
@@ -77,4 +78,10 @@ api.add_resource(
     "/listings/<int:id>",
     "/listings/<int:id>/status",
     resource_class_kwargs={"listing_service": listing_service},
+)
+# listing images
+api.add_resource(
+    PropertyImagesResource,
+    "/listings/:id/images",
+    resource_class_kwargs={"upload": upload_service},
 )
