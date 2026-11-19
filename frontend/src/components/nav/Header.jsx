@@ -4,6 +4,7 @@ import ButtonPrimary from "../ButtonPrimary";
 import Brand from "../Brand";
 import { POSTER, ROUTES } from "../../paths";
 import { useAuth } from "../../providers/AuthProvider";
+import { useCurrentUser } from "../inquiries/data/currentUser";
 
 const initials = (name = "") =>
   name
@@ -15,30 +16,22 @@ const initials = (name = "") =>
     .join("");
 
 export default function Header() {
-  const { userData, logout } = useAuth();
-  const { data, loading, error } = userData;
-  const user = data || null;
-
+  const { logout } = useAuth();
+  const { user } = useCurrentUser();
   const navigate = useNavigate();
   const isPoster = user?.role === "manager" || user?.role === "owner";
 
-  const handleButtonClick = (type) => {
-    console.log(type);
-    if (type == "login") {
-      navigate("/login");
-    } else {
-      navigate("/signup");
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("dev_user");
+    logout();
   };
-
-  const handleLogout = () => logout();
 
   return (
     <nav className="logo flex justify-between py-5 px-10 h-20">
       <Brand />
       <div className="flex justify-between gap-3">
         <div className="actions flex items-center gap-4">
-          <NavLink to="/" className="text-text hover:text-primary">
+          <NavLink to={ROUTES.home} className="text-text hover:text-primary">
             Browse
           </NavLink>
           {isPoster && (
@@ -64,16 +57,16 @@ export default function Header() {
                 </span>
                 <span className="text-sm text-text">{user.full_name}</span>
               </span>
-              <ButtonAlternate onClick={handleLogout} text="Log out" />
+              <ButtonAlternate onclick={handleLogout} text="Log out" />
             </>
           ) : (
             <>
               <ButtonAlternate
-                onclick={() => handleButtonClick("login")}
+                onclick={() => navigate(ROUTES.login)}
                 text="Log in"
               />
               <ButtonPrimary
-                onclick={() => handleButtonClick("")}
+                onclick={() => navigate(ROUTES.register)}
                 text="Sign Up"
               />
             </>
