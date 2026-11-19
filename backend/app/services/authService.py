@@ -13,7 +13,7 @@ from ..exceptions import (
     EmailVerificationNotSentError,
 )
 from ..config import sg
-from ..utils import verification_email
+from ..utils import verification_email, send_email
 
 BACKEND_URL = os.getenv("BACKEND_URL", "")
 FROM_EMAIL = os.getenv("FROM_EMAIL", "")
@@ -115,20 +115,9 @@ class AuthService(AuthInterface):
         print(email_ver_token.id)
         url = f"{BACKEND_URL}/api/v1/auth/verify-email/{email_ver_token.raw_token}.{email_ver_token.id}"
         VERIFICATION_EMAIL = verification_email(verification_url=url)
-        message = Mail(
-            from_email=FROM_EMAIL,
-            to_emails=user.email,
-            subject="KejaConnect email verification.",
+
+        return send_email(
+            email_to=user.email,
+            subject="KEJACONNECT EMAIL VERIFICATION",
             html_content=VERIFICATION_EMAIL,
         )
-
-        try:
-            res = sg.send(message)
-            if res.status_code not in (200, 201, 202):
-                raise EmailVerificationNotSentError(
-                    "Failed to send email verification."
-                )
-            return True
-        except Exception as e:
-            # raise EmailVerificationNotSentError(e)
-            return False

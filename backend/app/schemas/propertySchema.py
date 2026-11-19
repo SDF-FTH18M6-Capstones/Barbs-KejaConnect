@@ -32,6 +32,18 @@ class PropertySchema(Schema):
         "SavedListingSchema", many=True, exclude=("property",)
     )
 
+    user = fields.Nested(
+        "UserSchema",
+        many=False,
+        exclude=(
+            "email_verification_token",
+            "verification_documents",
+            "inquiries",
+            "saved_listings",
+            "reports",
+        ),
+    )
+
     @post_load
     def to_property(self, data, **kwargs):
         return Property(**data)

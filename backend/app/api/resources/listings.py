@@ -15,15 +15,14 @@ class ListingsResource(Resource):
         page = request.args.get("page", 1, type=int)
         per_page = request.args.get("per_page", 5, type=int)
         listings = self.listing_service.get_all_listings(page=page, per_page=per_page)
-        res = (
-            {
-                "items": [PropertySchema().dump(v) for v in listings.items],
-                "page": page,
-                "per_page": per_page,
-                "total": listings.total,
-                "pages": listings.pages,
-            },
-        )
+        res = {
+            "items": [PropertySchema().dump(v) for v in listings.items],
+            "page": page,
+            "per_page": per_page,
+            "total": listings.total,
+            "pages": listings.pages,
+        }
+
         return make_response(res, 200)
 
     @jwt_required()
@@ -36,7 +35,7 @@ class ListingsResource(Resource):
             "owner",
             "manager",
         ):
-            raise make_response(
+            return make_response(
                 {
                     "error": "Not allowed.",
                     "message": f"You either not approved or allowed to perform that operation.",

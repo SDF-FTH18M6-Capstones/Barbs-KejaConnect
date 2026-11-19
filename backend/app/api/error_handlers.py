@@ -8,6 +8,7 @@ from app.exceptions import (
     ResourceNotFoundError,
     EmailVerificationNotSentError,
     FileUploadFailed,
+    NotAllowedError,
 )
 
 
@@ -51,3 +52,7 @@ def register_error_handlers(app):
     @app.errorhandler(FileUploadFailed)
     def handle_file_upload_failed(error):
         return make_response({"error": "Upload Error", "message": str(error)})
+
+    @app.errorhandler(NotAllowedError)
+    def handle_not_allowed(error):
+        return make_response({"error": "Permission Error", "message": str(error)})

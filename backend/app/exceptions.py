@@ -32,3 +32,7 @@ class DatabasePersistenceError(BaseError):
 
 class FileUploadFailed(BaseError):
     pass
+
+
+class NotAllowedError(BaseError):
+    pass
