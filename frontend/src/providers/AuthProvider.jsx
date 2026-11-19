@@ -102,7 +102,7 @@ export function AuthProvider({ children }) {
         if (data.email_sent) {
           navigate("/verify-email", { state: { email: signup.email } });
         }
-        userDispatch({ type: "SUCCESS", payload: data });
+        userDispatch({ type: "SUCCESS", payload: data.user });
       })
       .catch((error) => {
         userDispatch({ type: "ERROR", payload: error.message });
@@ -110,7 +110,13 @@ export function AuthProvider({ children }) {
       .finally(() => userDispatch({ type: "INIT" }));
   }
 
-  const value = { userData, loginUser, signupUser };
+  function logout() {
+    localStorage.removeItem("token");
+    window.location.reload();
+    navigate("/");
+  }
+
+  const value = { userData, loginUser, signupUser, logout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
