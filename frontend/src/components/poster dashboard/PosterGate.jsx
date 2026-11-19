@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import PosterLayout from "./PosterLayout";
 import useLoad from "./useLoad";
 import { getReceivedInquiries } from "../../api/inquiries";
-import { getCurrentUser } from "../inquiries/data/currentUser";
+import { useCurrentUser } from "../inquiries/data/currentUser";
 import { POSTER } from "../../paths";
 
 const isPoster = (user) => user?.role === "manager" || user?.role === "owner";
@@ -19,7 +19,15 @@ function Notice({ title, children }) {
 }
 
 export default function PosterGate({ needsApproval = false, children }) {
-  const user = getCurrentUser();
+  const { user, loading } = useCurrentUser();
+
+  if (loading) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-bg text-text-muted">
+        Checking your account…
+      </div>
+    );
+  }
 
   if (!isPoster(user)) {
     return (
