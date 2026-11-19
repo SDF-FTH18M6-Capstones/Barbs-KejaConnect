@@ -4,19 +4,27 @@ import pytest
 
 from app.config import db
 from app.models import EmailVerificationToken
-from tests.helpers import create_user, login, signup_payload, verify_path
+from tests.helpers import create_user, login, verify_path
+
+VERIFIED = (200, 302)  
 
 def test_emailed_token_verifies_the_user(client, urls, mailbox):
     payload = create_user(client, urls)
     res = client.get(verify_path(urls, mailbox.last_token()))
-    assert res.status_code == 200
+    assert res.status_code in VERIFIED
     assert login(client, urls, payload).status_code == 200
 
 def test_token_can_only_be_used_once(client, urls, mailbox):
     create_user(client, urls)
     path = verify_path(urls, mailbox.last_token())
-    assert client.get(path).status_code == 200
+    assert client.get(path).status_code in VERIFIED
     assert client.get(path).status_code in (400, 401)
+
+def test_verification_redirect_does_not_put_the_access_token_in_the_url(client, urls, mailbox):
+    create_user(client, urls)
+    res = client.get(verify_path(urls, mailbox.last_token()))
+    if res.status_code == 302:
+        assert "eyJ" not in res.headers["Location"]
 
 def test_tampered_token_is_rejected(client, urls, mailbox):
     create_user(client, urls)

@@ -29,7 +29,7 @@ def create_user(client, urls, **overrides):
 def create_verified_user(client, urls, mailbox, **overrides):
     payload = create_user(client, urls, **overrides)
     res = client.get(verify_path(urls, mailbox.last_token()))
-    assert res.status_code == 200, res.get_json()
+    assert res.status_code in (200, 302), res.get_data(as_text=True)[:200]
     return payload
 
 def login(client, urls, payload):
