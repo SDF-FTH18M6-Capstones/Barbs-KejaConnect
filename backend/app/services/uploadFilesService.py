@@ -88,3 +88,6 @@ class UploadFilesService(UploadFilesInterface):
             raise Exception("Failed to delete image.")
         except Exception as e:
             raise FileUploadFailed("Something wen wrong when uploading your file.")
+
+
+# todo:make cover image make_cover(listing_id,image_id)
