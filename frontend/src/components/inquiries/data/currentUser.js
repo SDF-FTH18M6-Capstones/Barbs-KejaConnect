@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { AuthContext } from "../../../providers/AuthProvider";
+
 const DEV_USERS = {
   visitor: null,
   tenant: {
@@ -54,4 +57,16 @@ export function getCurrentUser() {
   } catch {
     return null;
   }
+}
+
+export function useCurrentUser() {
+  const auth = useContext(AuthContext);
+  const devUser = devUserName();
+  if (import.meta.env.DEV && devUser in DEV_USERS) {
+    return { user: DEV_USERS[devUser], loading: false };
+  }
+  return {
+    user: auth?.userData.data ?? null,
+    loading: auth?.userData.loading ?? false,
+  };
 }

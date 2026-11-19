@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useState,
-  useReducer,
-  useEffect,
-  useContext,
-} from "react";
+import { createContext, useReducer, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext(null);
@@ -19,6 +13,8 @@ function handleAuth(state, action) {
       return { ...state, loading: false, data: action.payload };
     case "ERROR":
       return { ...state, loading: false, error: action.payload };
+    case "LOGOUT":
+      return { error: null, loading: false, data: null };
     default:
       break;
   }
@@ -32,16 +28,13 @@ export function AuthProvider({ children }) {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    get_current_user();
-  }, []);
-
   function get_current_user() {
-    userDispatch({ type: "INIT" });
     const token = localStorage.getItem("token");
     if (!token) {
+      userDispatch({ type: "INIT" });
       return;
     }
+    userDispatch({ type: "LOADING" });
     fetch("/api/v1/me", { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => {
         if (!res.ok) {
@@ -50,9 +43,13 @@ export function AuthProvider({ children }) {
         return res.json();
       })
       .then((data) => userDispatch({ type: "SUCCESS", payload: data.user }))
-      .catch((error) => userDispatch({ type: "INIT" }))
+      .catch(() => userDispatch({ type: "INIT" }))
       .finally(() => userDispatch({ type: "INIT" }));
   }
+
+  useEffect(() => {
+    get_current_user();
+  }, []);
 
   function loginUser(login) {
     userDispatch({ type: "LOADING" });
@@ -84,7 +81,6 @@ export function AuthProvider({ children }) {
   }
 
   function signupUser(signup) {
-    console.log(signup);
     userDispatch({ type: "LOADING" });
     fetch("/api/v1/auth/signup", {
       method: "POST",
@@ -99,10 +95,10 @@ export function AuthProvider({ children }) {
         return res.json();
       })
       .then((data) => {
+        userDispatch({ type: "INIT" });
         if (data.email_sent) {
           navigate("/verify-email", { state: { email: signup.email } });
         }
-        userDispatch({ type: "SUCCESS", payload: data.user });
       })
       .catch((error) => {
         userDispatch({ type: "ERROR", payload: error.message });
@@ -112,7 +108,7 @@ export function AuthProvider({ children }) {
 
   function logout() {
     localStorage.removeItem("token");
-    window.location.reload();
+    userDispatch({ type: "LOGOUT" });
     navigate("/");
   }
 

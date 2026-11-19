@@ -1,6 +1,6 @@
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:5000/api/v1";
+const BASE = "/api/v1";
 
-export const TOKEN_KEY = "access_token";
+export const TOKEN_KEY = "token";
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
 
 export class ApiError extends Error {
