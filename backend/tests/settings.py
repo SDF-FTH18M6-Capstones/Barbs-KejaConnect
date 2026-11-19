@@ -9,7 +9,7 @@ class TestingConfig(Config):
     """
 
     TESTING = True
-    SECRET_KEY = "test-secret-key"
-    JWT_SECRET_KEY = "test-jwt-secret-key"
+    SECRET_KEY = "test-secret-key-long-enough-for-hs256-signing"
+    JWT_SECRET_KEY = "test-jwt-secret-key-long-enough-for-hs256-signing"
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     BCRYPT_LOG_ROUNDS = 4  
