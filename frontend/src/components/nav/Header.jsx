@@ -15,7 +15,7 @@ const initials = (name = "") =>
     .join("");
 
 export default function Header() {
-  const { userData } = useAuth();
+  const { userData, logout } = useAuth();
   const { data, loading, error } = userData;
   const user = data || null;
 
@@ -31,11 +31,7 @@ export default function Header() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.reload();
-    navigate("/");
-  };
+  const handleLogout = () => logout();
 
   return (
     <nav className="logo flex justify-between py-5 px-10 h-20">
