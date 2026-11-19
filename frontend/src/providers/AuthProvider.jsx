@@ -49,8 +49,8 @@ export function AuthProvider({ children }) {
         }
         return res.json();
       })
-      .then((data) => userDispatch({ type: "SUCCESS", payload: data }))
-      .catch((error) => userDispatch({ type: "ERROR", payload: error.message }))
+      .then((data) => userDispatch({ type: "SUCCESS", payload: data.user }))
+      .catch((error) => userDispatch({ type: "INIT" }))
       .finally(() => userDispatch({ type: "INIT" }));
   }
 
@@ -63,7 +63,6 @@ export function AuthProvider({ children }) {
     })
       .then(async (res) => {
         if (!res.ok) {
-          console.log(res.status);
           const errData = await res.json();
           throw new Error(errData.error || "Login failed");
         }
@@ -84,7 +83,34 @@ export function AuthProvider({ children }) {
       .finally(() => userDispatch({ type: "INIT" }));
   }
 
-  const value = { userData, loginUser };
+  function signupUser(signup) {
+    console.log(signup);
+    userDispatch({ type: "LOADING" });
+    fetch("/api/v1/auth/signup", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify(signup),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || "signup failed");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.email_sent) {
+          navigate("/verify-email", { state: { email: signup.email } });
+        }
+        userDispatch({ type: "SUCCESS", payload: data });
+      })
+      .catch((error) => {
+        userDispatch({ type: "ERROR", payload: error.message });
+      })
+      .finally(() => userDispatch({ type: "INIT" }));
+  }
+
+  const value = { userData, loginUser, signupUser };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -5,6 +5,7 @@ import PasswordRules from "./PasswordRules";
 import { ROLES, AREAS } from "../../components/Signup/data/signupRoles";
 import { validateSignup } from "../../components/Signup/data/signupValidation";
 import { registerUser } from "../../components/Signup/data/signupApi";
+import { useAuth } from "../../providers/AuthProvider";
 
 const EMPTY = {
   fullName: "",
@@ -22,8 +23,8 @@ export default function Form({ roleId }) {
   const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { userData, signupUser } = useAuth();
+  const { data, loading, error } = userData;
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -37,16 +38,10 @@ export default function Form({ roleId }) {
     setErrors(found);
     if (Object.keys(found).length) return;
 
-    setLoading(true);
-    setServerError("");
     try {
-      await registerUser(form, roleId);
-      // The email verification page (task A2) reads this with useLocation().state?.email
-      navigate("/verify-email", { state: { email: form.email } });
+      signupUser(form);
     } catch (err) {
       setServerError(err.message);
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -66,12 +61,12 @@ export default function Form({ roleId }) {
     >
       <h2 className="text-xl font-semibold text-text">Your details</h2>
 
-      {serverError && (
+      {error && (
         <p
           role="alert"
           className="rounded-lg bg-error/10 p-3 text-sm text-error"
         >
-          {serverError}
+          {error}
         </p>
       )}
 

@@ -33,6 +33,7 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    window.location.reload();
     navigate("/");
   };
 
