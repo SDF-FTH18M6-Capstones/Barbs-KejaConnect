@@ -11,7 +11,9 @@ class Report(db.Model):
     property_id = db.Column(
         db.Integer, db.ForeignKey("properties.id", ondelete="CASCADE"), nullable=False
     )
-    reporter_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    reporter_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     reason = db.Column(db.String, nullable=False)
     status = db.Column(db.String, default="open")
     resolved_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)

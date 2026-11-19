@@ -34,6 +34,8 @@ class AuthService(AuthInterface):
         if not user or not user.authenticate(password=password):
             raise InvalidCredentialsError("Invalid email or password.")
 
+        verification_sent = False
+
         if not user.email_verified:
             verification_sent = self.send_verification_email(user=user)
 
@@ -122,4 +124,5 @@ class AuthService(AuthInterface):
                 )
             return True
         except Exception as e:
-            raise EmailVerificationNotSentError(e)
+            # raise EmailVerificationNotSentError(e)
+            return False
