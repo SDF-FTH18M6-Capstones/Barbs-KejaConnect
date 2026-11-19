@@ -3,3 +3,4 @@ from .emailVerificationRepository import EmailVerificationRepo
 from .verificationDocsRepository import VerificationDocumentsRepository
 from .listingsRepository import ListingsRepository
 from .propertyImgRepository import PropertyImgRepository
+from .inquiiresRepository import InquiriesRepository

@@ -9,5 +9,5 @@ from .data import (
     REPORT_STATUS,
 )
 
-from .email_text import verification_email
+from .email_text import verification_email, inquiry_email
 from .send_email import send_email
