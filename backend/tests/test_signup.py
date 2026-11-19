@@ -34,4 +34,38 @@ def test_signup_duplicate_email_returns_409(client, urls):
     assert res.status_code == 409
 
 def test_signup_empty_body_returns_400(client, urls):
-    res =
+    res = client.post(urls.signup, json={})
+    assert res.status_code == 400
+
+@pytest.mark.xfail(strict=True, reason="contract: duplicate email must return code EMAIL_TAKEN (handlers send no `code`)")
+def test_signup_duplicate_email_code_is_email_taken(client, urls):
+    first = signup_payload()
+    client.post(urls.signup, json=first)
+    res = client.post(urls.signup, json=signup_payload(email=first["email"]))
+    assert res.get_json()["code"] == "EMAIL_TAKEN"
+
+@pytest.mark.xfail(strict=True, reason="contract: missing fields must be 400 VALIDATION_ERROR (currently 401 Invalid credentials)")
+def test_signup_missing_fields_is_a_validation_error(client, urls):
+    res = client.post(urls.signup, json={"email": "only@example.com"})
+    assert res.status_code == 400
+    assert res.get_json()["code"] == "VALIDATION_ERROR"
+
+@pytest.mark.xfail(strict=True, reason="contract: password needs 8+ chars with a letter and a number (no validation today)")
+def test_signup_rejects_weak_password(client, urls):
+    res = client.post(urls.signup, json=signup_payload(password="short"))
+    assert res.status_code == 400
+
+@pytest.mark.xfail(strict=False, reason="contract: phone must be 07XXXXXXXX or +2547XXXXXXXX (UserSchema not reviewed yet)")
+def test_signup_rejects_invalid_phone(client, urls):
+    res = client.post(urls.signup, json=signup_payload(phone="123"))
+    assert res.status_code == 400
+
+@pytest.mark.xfail(strict=True, reason="SECURITY, contract: registering as admin must be rejected with 400")
+def test_signup_cannot_register_as_admin(client, urls):
+    res = client.post(urls.signup, json=signup_payload(role="admin"))
+    assert res.status_code == 400
+
+@pytest.mark.xfail(strict=True, reason="AuthService.signup lowercases full_name, so 'Wanjiku Mwangi' is stored as 'wanjiku mwangi'")
+def test_signup_keeps_full_name_as_entered(client, urls):
+    res = client.post(urls.signup, json=signup_payload(full_name="Wanjiku Mwangi"))
+    assert res.get_json()["user"]["full_name"] == "Wanjiku Mwangi"
