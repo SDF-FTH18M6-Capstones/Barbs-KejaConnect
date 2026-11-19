@@ -17,7 +17,7 @@ const initials = (name = "") =>
 export default function Header() {
   const { userData } = useAuth();
   const { data, loading, error } = userData;
-  const user = data?.user || null;
+  const user = data || null;
 
   const navigate = useNavigate();
   const isPoster = user?.role === "manager" || user?.role === "owner";
@@ -32,8 +32,7 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("access_token");
+    localStorage.removeItem("token");
     navigate("/");
   };
 

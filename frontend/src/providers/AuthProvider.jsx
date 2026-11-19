@@ -7,7 +7,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 function handleAuth(state, action) {
   switch (action.type) {
@@ -23,7 +23,7 @@ function handleAuth(state, action) {
       break;
   }
 }
-function AuthProvider({ children }) {
+export function AuthProvider({ children }) {
   const [userData, userDispatch] = useReducer(handleAuth, {
     error: null,
     loading: false,
@@ -61,16 +61,16 @@ function AuthProvider({ children }) {
       headers: { "Content-type": "application/json" },
       body: JSON.stringify(login),
     })
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) {
-          return res.json().then((errData) => {
-            throw new Error(errData.error || "Login failed");
-          });
+          console.log(res.status);
+          const errData = await res.json();
+          throw new Error(errData.error || "Login failed");
         }
         return res.json();
       })
       .then((data) => {
-        token = data.token;
+        const token = data.token;
         localStorage.setItem("token", token);
         userDispatch({ type: "SUCCESS", payload: data.user });
       })
@@ -89,12 +89,10 @@ function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-function useAuth() {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (context === null || context === undefined) {
     throw new Error("Cannot use Authcontext outside of provider.");
   }
   return context;
 }
-
-export { AuthProvider, useAuth };
