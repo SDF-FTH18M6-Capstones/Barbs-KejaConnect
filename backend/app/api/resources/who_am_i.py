@@ -16,7 +16,7 @@ class WhoAmI(Resource):
 
         if user_id:
             # replace with service call
-            user = self.auth.get_user(user_id)
+            user = self.auth_service.get_user(user_id)
             return make_response({"user": UserSchema().dump(user)}, 200)
 
         return make_response({"errors": ["UNAUTHENTICATED"]}, 401)
