@@ -5,10 +5,11 @@ export const AdminStatsContext = createContext(null);
 
 const initalState = {
   error: null,
-  loading: false,
+  loading: true,
   users: null,
   listings: null,
   approvals: null,
+  total_approved: 0,
   page: 1,
   per_page: 10,
 };
@@ -25,6 +26,7 @@ function handleAdminStats(state, action) {
         users: action.payload.stats.users,
         listings: action.payload.stats.listings,
         approvals: action.payload.stats.approvals,
+        total_approved: action.payload.stats.total_approved,
         page: action.payload.page,
         per_page: action.payload.per_page,
       };
@@ -53,7 +55,6 @@ export function AdminStatsProvider({ children }) {
   }, [adminStatsData.page, adminStatsData.per_page]);
 
   async function getAdminStats() {
-    adminStatsDispatch({ type: "INIT" });
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("Unauthorized user.");
@@ -69,6 +70,7 @@ export function AdminStatsProvider({ children }) {
       });
       if (!res.ok) throw new Error("Failed to fetch admin stats.");
       const data = await res.json();
+      console.log(data);
       adminStatsDispatch({ type: "SUCCESS", payload: data });
     } catch (error) {
       adminStatsDispatch({ type: "ERROR", payload: error.message });

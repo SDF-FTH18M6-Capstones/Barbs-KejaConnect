@@ -45,7 +45,9 @@ class AdminRepository(AdminStatsRepoInterface):
             page=page, per_page=perpage
         )
 
-        return tenats, owners, managers, admins
+        total_approved = len(User.query.filter_by(approval_status="approved").all())
+
+        return tenats, owners, managers, admins, total_approved
 
     def get_listings(self, page, perpage):
         available = Property.query.filter_by(status="available").paginate(

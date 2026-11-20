@@ -29,7 +29,9 @@ class AdminService(AdminServiceInterface):
         claims = get_jwt()
         if claims.get("role", "") != "admin":
             raise NotAllowedError("You are not authorized to perform this action.")
-        tenats, owners, managers, admins = self.get_users(page=page, perpage=per_page)
+        tenats, owners, managers, admins, total_approved = self.get_users(
+            page=page, perpage=per_page
+        )
         users = dict(
             tenats=dict(
                 items=[UserSchema().dump(v) for v in tenats.items],
@@ -85,6 +87,11 @@ class AdminService(AdminServiceInterface):
             ),
         )
 
-        approvals = VerificationDocumentSchema().dump(self.get_approvals())
+        approvals = VerificationDocumentSchema(many=True).dump(self.get_approvals())
 
-        return dict(users=users, listings=listings, approvals=approvals)
+        return dict(
+            users=users,
+            listings=listings,
+            approvals=approvals,
+            total_approved=total_approved,
+        )

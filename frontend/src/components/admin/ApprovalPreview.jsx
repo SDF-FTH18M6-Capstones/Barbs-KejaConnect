@@ -1,7 +1,7 @@
 import { mockPendingApprovals } from "../../data/mockAdminData";
 import StatusBadge from "./StatusBadge";
 
-function ApprovalPreview() {
+function ApprovalPreview({ approvals }) {
   return (
     <section className="rounded-xl border border-[#E1E5E0] bg-white p-6">
       <div className="mb-5 flex items-center justify-between">
@@ -15,28 +15,28 @@ function ApprovalPreview() {
         </div>
 
         <span className="rounded-full bg-[#FFF3D6] px-3 py-1 text-sm font-medium text-[#946200]">
-          {mockPendingApprovals.length} Pending
+          {approvals.length} Pending
         </span>
       </div>
 
       <div className="space-y-4">
-        {mockPendingApprovals.map((poster) => (
+        {approvals.map((poster) => (
           <div
             key={poster.id}
             className="flex flex-col justify-between gap-4 border-b border-[#E1E5E0] pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center"
           >
             <div>
-              <h3 className="font-medium text-[#16211C]">{poster.name}</h3>
+              <h3 className="font-medium text-[#16211C]">{poster.user.name}</h3>
 
-              <p className="mt-1 text-sm text-[#56625B]">{poster.email}</p>
+              <p className="mt-1 text-sm text-[#56625B]">{poster.user.email}</p>
 
               <p className="mt-1 text-xs text-[#7A857E]">
-                {poster.role}
+                {poster.user.role}
                 {poster.company && ` · ${poster.company}`}
               </p>
 
               <p className="mt-2 text-xs text-[#7A857E]">
-                Documents: {poster.documents.join(", ")}
+                Documents: {poster.doc_type}
               </p>
             </div>
 
