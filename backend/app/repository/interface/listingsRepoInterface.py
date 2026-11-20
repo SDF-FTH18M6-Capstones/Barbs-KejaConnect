@@ -7,6 +7,10 @@ class ListingsRepoInterface(ABC):
         """retrieive all listings"""
 
     @abstractmethod
+    def get_poster_listings(self, poster_id, page, per_page):
+        """retrieive all listings by specific poster"""
+
+    @abstractmethod
     def create_listing(self, listing):
         """create new listing"""
 

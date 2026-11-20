@@ -12,7 +12,7 @@ class WhoAmI(Resource):
 
     @jwt_required()
     def get(self):
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
 
         if user_id:
             # replace with service call

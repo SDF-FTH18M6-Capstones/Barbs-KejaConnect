@@ -7,7 +7,7 @@ class InquiriesRepoInterface(ABC):
         """Create new inquiry"""
 
     @abstractmethod
-    def get_poster_inquiries(self, poster_id):
+    def get_poster_inquiries(self, poster_id, page, per_page):
         """get all inquirires for properties of a specific poster"""
 
     @abstractmethod

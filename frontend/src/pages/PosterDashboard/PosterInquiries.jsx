@@ -6,10 +6,14 @@ import Pager from "../../components/poster dashboard/Pager";
 import useLoad from "../../components/poster dashboard/useLoad";
 import { getReceivedInquiries } from "../../api/inquiries";
 import { getMyListings } from "../../api/listings";
+import { useInquiries } from "../../providers/InquiriesProvider";
+import { useListings } from "../../providers/ListingsProvider";
 
 const loadListings = () => getMyListings({ per_page: 50 });
 
 function InquiriesContent() {
+  const { inquiriesData } = useInquiries();
+  console.log(inquiriesData);
   const [listingId, setListingId] = useState("");
   const [page, setPage] = useState(1);
 
@@ -18,7 +22,7 @@ function InquiriesContent() {
     [listingId, page],
   );
   const { loading, data, error, retry } = useLoad(load);
-  const listings = useLoad(loadListings); // for the "Listing" dropdown
+  const { listingsData } = useListings(); // for the "Listing" dropdown
 
   return (
     <>
@@ -40,7 +44,7 @@ function InquiriesContent() {
             className="min-h-11 rounded-lg border border-border bg-surface px-3 font-normal"
           >
             <option value="">All listings</option>
-            {listings.data?.items.map((l) => (
+            {listingsData.items.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.title} · {l.building_name}
               </option>
@@ -49,7 +53,7 @@ function InquiriesContent() {
         </label>
       </div>
 
-      {loading && (
+      {inquiriesData.loading && (
         <div aria-busy="true" className="space-y-3">
           {[1, 2, 3].map((n) => (
             <div key={n} className="h-28 animate-pulse rounded-xl bg-border" />
@@ -58,9 +62,11 @@ function InquiriesContent() {
         </div>
       )}
 
-      {error && <LoadError error={error} onRetry={retry} />}
+      {inquiriesData.error && (
+        <LoadError error={inquiriesData.error} onRetry={retry} />
+      )}
 
-      {data && data.items.length === 0 && (
+      {inquiriesData && inquiriesData.items.length === 0 && (
         <div className="rounded-2xl border border-border bg-surface p-8 text-center text-text-muted">
           {listingId
             ? "No inquiries for this listing yet."
@@ -68,15 +74,20 @@ function InquiriesContent() {
         </div>
       )}
 
-      {data && data.items.length > 0 && (
+      {inquiriesData && inquiriesData.items.length > 0 && (
         <section aria-label="Inquiries" className="space-y-3">
           <p className="text-sm text-text-muted">
-            {data.total} {data.total === 1 ? "inquiry" : "inquiries"}
+            {inquiriesData.total}{" "}
+            {inquiriesData.total === 1 ? "inquiry" : "inquiries"}
           </p>
-          {data.items.map((q) => (
+          {inquiriesData.items.map((q) => (
             <ReceivedInquiry key={q.id} inquiry={q} />
           ))}
-          <Pager page={data.page} pages={data.pages} onPage={setPage} />
+          <Pager
+            page={inquiriesData.page}
+            pages={inquiriesData.pages}
+            onPage={setPage}
+          />
         </section>
       )}
     </>

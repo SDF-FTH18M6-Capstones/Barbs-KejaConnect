@@ -17,6 +17,7 @@ import PosterReview from "./pages/admin/PosterReview";
 import { POSTER } from "./paths";
 import EditListing from "./pages/PosterDashboard/EditListing";
 import RootLayout from "./layouts/RootLayout";
+import DocumentsLayout from "./layouts/DocumentsLayout";
 
 export const router = createBrowserRouter([
   {
@@ -35,22 +36,27 @@ export const router = createBrowserRouter([
         ],
       },
       //poster dashboard
-      { path: POSTER.home, element: <PosterDashboard /> },
-      { path: POSTER.listings, element: <MyListings /> },
-      { path: POSTER.newListing, element: <NewListing /> },
-      { path: POSTER.editListing(":id"), element: <EditListing /> },
-      { path: POSTER.inquiries, element: <PosterInquiries /> },
-      { path: POSTER.verification, element: <Verification /> },
-      // "Browse listings" buttons link here; the listings are on the home page
-      { path: "/listings", element: <Navigate to="/" replace /> },
-
-      //admin
-      { path: "/admin_dashboard", element: <AdminDashboard /> },
       {
-        path: "/admin_dashboard/approval_queue",
-        element: <AdminApprovalQueue />,
+        element: <DocumentsLayout />,
+        children: [
+          { path: POSTER.home, element: <PosterDashboard /> },
+          { path: POSTER.listings, element: <MyListings /> },
+          { path: POSTER.newListing, element: <NewListing /> },
+          { path: POSTER.editListing(":id"), element: <EditListing /> },
+          { path: POSTER.inquiries, element: <PosterInquiries /> },
+          { path: POSTER.verification, element: <Verification /> },
+          // "Browse listings" buttons link here; the listings are on the home page
+          { path: "/listings", element: <Navigate to="/" replace /> },
+
+          //admin
+          { path: "/admin_dashboard", element: <AdminDashboard /> },
+          {
+            path: "/admin_dashboard/approval_queue",
+            element: <AdminApprovalQueue />,
+          },
+          { path: "/admin_dashboard/poster_review", element: <PosterReview /> },
+        ],
       },
-      { path: "/admin_dashboard/poster_review", element: <PosterReview /> },
     ],
   },
 ]);

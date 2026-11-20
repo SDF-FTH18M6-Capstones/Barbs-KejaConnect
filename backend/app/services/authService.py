@@ -1,7 +1,6 @@
 import os
-from flask_jwt_extended import create_access_token, get_jwt_identity
-from sendgrid.helpers.mail import Mail
-from datetime import datetime, timezone
+from flask_jwt_extended import create_access_token
+from datetime import timedelta
 from .interface.authInterface import AuthInterface
 from ..repository import UserRepo, EmailVerificationRepo
 from ..models import User, EmailVerificationToken
@@ -10,7 +9,6 @@ from ..exceptions import (
     InvalidCredentialsError,
     EmailNotVerified,
     AlreadyExists,
-    EmailVerificationNotSentError,
 )
 from ..config import sg
 from ..utils import verification_email, send_email
@@ -47,6 +45,7 @@ class AuthService(AuthInterface):
                 "role": user.role,
                 "approval_status": user.approval_status,
             },
+            expires_delta=timedelta(days=1),
         )
 
         return token, user, verification_sent

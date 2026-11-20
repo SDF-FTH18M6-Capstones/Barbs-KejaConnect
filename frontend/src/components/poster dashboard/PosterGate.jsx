@@ -4,6 +4,7 @@ import useLoad from "./useLoad";
 import { getReceivedInquiries } from "../../api/inquiries";
 import { useCurrentUser } from "../inquiries/data/currentUser";
 import { POSTER } from "../../paths";
+import { useAuth } from "../../providers/AuthProvider";
 
 const isPoster = (user) => user?.role === "manager" || user?.role === "owner";
 
@@ -19,15 +20,9 @@ function Notice({ title, children }) {
 }
 
 export default function PosterGate({ needsApproval = false, children }) {
-  const { user, loading } = useCurrentUser();
-
-  if (loading) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-bg text-text-muted">
-        Checking your account…
-      </div>
-    );
-  }
+  const { userData } = useAuth();
+  const { error, loading, data } = userData;
+  const user = data;
 
   if (!isPoster(user)) {
     return (
