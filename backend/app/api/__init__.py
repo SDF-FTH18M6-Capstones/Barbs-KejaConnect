@@ -16,6 +16,7 @@ from .resources.inquiiresByListing import InquiriesByListing
 from .resources.inquiiresByListing import InquiriesByListing
 from .resources.inquiriesReceived import InquiriesReceived
 from .resources.inquiriesSent import InquiriesSent
+from .resources.adminStats import AdminStats
 
 from .error_handlers import register_error_handlers
 from ..repository import (
@@ -25,6 +26,7 @@ from ..repository import (
     ListingsRepository,
     PropertyImgRepository,
     InquiriesRepository,
+    AdminRepository,
 )
 from ..services import (
     AuthService,
@@ -32,6 +34,7 @@ from ..services import (
     VerificationDocsService,
     ListingsService,
     InquiryService,
+    AdminService,
 )
 
 v1 = Blueprint("v1", __name__)
@@ -46,6 +49,7 @@ ver_docs_repo = VerificationDocumentsRepository()
 listing_repo = ListingsRepository()
 property_image_repo = PropertyImgRepository()
 inquiry_repo = InquiriesRepository()
+admin_repo = AdminRepository()
 
 auth_service = AuthService(user_repo=user_repo, email_ver_repo=email_ver_repo)
 upload_service = UploadFilesService(
@@ -56,6 +60,7 @@ listing_service = ListingsService(listing_repo=listing_repo, user_repo=user_repo
 inquiry_service = InquiryService(
     inquiry_repo=inquiry_repo, listing_repo=listing_repo, user_repo=user_repo
 )
+admin_service = AdminService(admin_repo=admin_repo)
 
 api.add_resource(HealthCheck, "/health")
 api.add_resource(WhoAmI, "/me", resource_class_kwargs={"auth_service": auth_service})
@@ -128,4 +133,10 @@ api.add_resource(
     InquiriesSent,
     "/inquiries/sent",
     resource_class_kwargs={"inquiry_service": inquiry_service},
+)
+
+api.add_resource(
+    AdminStats,
+    "/admin/stats",
+    resource_class_kwargs={"admin_service": admin_service},
 )

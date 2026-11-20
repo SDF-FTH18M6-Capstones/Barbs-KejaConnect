@@ -6,6 +6,7 @@ from ..schemas import (
     VerificationDocumentSchema,
     PropertySchema,
 )
+from ..exceptions import NotAllowedError
 
 
 class AdminService(AdminServiceInterface):
@@ -25,6 +26,9 @@ class AdminService(AdminServiceInterface):
         return self.admin_repo.get_approvals()
 
     def get_stats(self, page, per_page):
+        claims = get_jwt()
+        if claims.get("role", "") != "admin":
+            raise NotAllowedError("You are not authorized to perform this action.")
         tenats, owners, managers, admins = self.get_users(page=page, perpage=per_page)
         users = dict(
             tenats=dict(
@@ -83,4 +87,4 @@ class AdminService(AdminServiceInterface):
 
         approvals = VerificationDocumentSchema().dump(self.get_approvals())
 
-        return (users, listings, approvals)
+        return dict(users, listings, approvals)
