@@ -18,6 +18,12 @@ class ListingsRepository(ListingsRepoInterface):
 
         return listing
 
+    def get_poster_listings(self, poster_id, page, per_page):
+        listings = Property.query.filter_by(poster_id=poster_id).paginate(
+            page=page, per_page=per_page
+        )
+        return listings
+
     def update_listing(self, listing_id, update_data):
         try:
             listing: Property = self.get_by_id(listing_id=listing_id)

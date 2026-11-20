@@ -8,6 +8,7 @@ from .resources.verify_email import VerifyEmailResource
 from .resources.verification_documents import VerificationDocumentsResource
 from .resources.verifications import Verifications
 from .resources.listings import ListingsResource
+from .resources.listingsMine import ListingsMine
 from .resources.listingById import ListingByIdResource
 from .resources.propertyImages import PropertyImagesResource
 from .resources.propertyImagesById import PropertyImagesByIdResource
@@ -87,6 +88,11 @@ api.add_resource(
 api.add_resource(
     ListingsResource,
     "/listings",
+    resource_class_kwargs={"listing_service": listing_service},
+)
+api.add_resource(
+    ListingsMine,
+    "/listings/mine",
     resource_class_kwargs={"listing_service": listing_service},
 )
 api.add_resource(

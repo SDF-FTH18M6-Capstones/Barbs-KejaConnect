@@ -11,6 +11,12 @@ class ListingsService(ListingsInterface):
     def get_all_listings(self, page, per_page):
         return self.listing_repo.get_all(page=page, per_page=per_page)
 
+    def get_poster_listings(self, page, per_page):
+        user_id = int(get_jwt_identity())
+        return self.listing_repo.get_poster_listings(
+            poster_id=user_id, page=page, per_page=per_page
+        )
+
     def get_by_id(self, listing_id):
         return self.listing_repo.get_by_id(listing_id=listing_id)
 
