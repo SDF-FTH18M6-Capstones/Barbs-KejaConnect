@@ -51,7 +51,7 @@ export function ListingsProvider({ children }) {
   }
 
   useEffect(() => {
-    get_listings();
+    get_all_listings();
   }, [listingsData.page, listingsData.per_page]);
 
   async function get_listings() {
@@ -72,14 +72,14 @@ export function ListingsProvider({ children }) {
     }
   }
 
-  async function get_listings() {
+  async function get_listings(url) {
     listingsDispatch({ type: "INIT" });
     try {
       const params = new URLSearchParams({
         page: listingsData.page,
         per_page: listingsData.per_page,
       });
-      const res = await fetch(`/api/v1/listings?${params}`);
+      const res = await fetch(`${url}?${params}`);
       if (!res.ok) throw new Error("Failed to fetch listings.");
       const data = await res.json();
       listingsDispatch({ type: "SUCCESS", payload: data.listings });
@@ -90,62 +90,13 @@ export function ListingsProvider({ children }) {
     }
   }
 
-  function loginUser(login) {
-    listingsDispatch({ type: "LOADING" });
-    fetch("/api/v1/auth/login", {
-      method: "POST",
-      headers: { "Content-type": "application/json" },
-      body: JSON.stringify(login),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || "Login failed");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        const token = data.token;
-        localStorage.setItem("token", token);
-        listingsDispatch({ type: "SUCCESS", payload: data.user });
-      })
-      .catch((error) => {
-        if (error.message === "Email not verified") {
-          navigate("/verify-email", { state: { email: login.email } });
-          return;
-        }
-        listingsDispatch({ type: "ERROR", payload: error.message });
-      })
-      .finally(() => listingsDispatch({ type: "INIT" }));
+  function get_all_listings() {
+    get_listings("/api/v1/listings");
   }
 
-  function signupUser(signup) {
-    console.log(signup);
-    listingsDispatch({ type: "LOADING" });
-    fetch("/api/v1/auth/signup", {
-      method: "POST",
-      headers: { "Content-type": "application/json" },
-      body: JSON.stringify(signup),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || "signup failed");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.email_sent) {
-          navigate("/verify-email", { state: { email: signup.email } });
-        }
-        listingsDispatch({ type: "SUCCESS", payload: data.user });
-      })
-      .catch((error) => {
-        listingsDispatch({ type: "ERROR", payload: error.message });
-      })
-      .finally(() => listingsDispatch({ type: "INIT" }));
+  function get_poster_listings() {
+    get_listings("/api/v1/listings/mine");
   }
-
   const value = { listingsData, listingsDispatch, setPage };
 
   return (

@@ -4,6 +4,7 @@ import useLoad from "./useLoad";
 import { getReceivedInquiries } from "../../api/inquiries";
 import { getCurrentUser } from "../inquiries/data/currentUser";
 import { POSTER } from "../../paths";
+import { useAuth } from "../../providers/AuthProvider";
 
 const isPoster = (user) => user?.role === "manager" || user?.role === "owner";
 
@@ -19,7 +20,9 @@ function Notice({ title, children }) {
 }
 
 export default function PosterGate({ needsApproval = false, children }) {
-  const user = getCurrentUser();
+  const { userData } = useAuth();
+  const { error, loading, data } = userData;
+  const user = data;
 
   if (!isPoster(user)) {
     return (
