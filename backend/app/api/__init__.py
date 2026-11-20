@@ -12,7 +12,7 @@ from .resources.listingById import ListingByIdResource
 from .resources.propertyImages import PropertyImagesResource
 from .resources.propertyImagesById import PropertyImagesByIdResource
 from .resources.inquiiresByListing import InquiriesByListing
-from .resources.inquiriesReceived import InquiriesByListing
+from .resources.inquiiresByListing import InquiriesByListing
 from .resources.inquiriesReceived import InquiriesReceived
 from .resources.inquiriesSent import InquiriesSent
 

@@ -23,7 +23,7 @@ class ListingsResource(Resource):
             "pages": listings.pages,
         }
 
-        return make_response(res, 200)
+        return make_response({"message": "LISTINGS", "listings": res}, 200)
 
     @jwt_required()
     def post(self):
