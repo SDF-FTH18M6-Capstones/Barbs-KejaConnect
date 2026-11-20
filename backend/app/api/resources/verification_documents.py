@@ -27,9 +27,10 @@ class VerificationDocumentsResource(Resource):
         per_page = request.args.get("per_page", 5, type=int)
 
         ver_docs = self.ver_doc.get_user_docs(page=page, per_page=per_page)
+        doc_list = [VerificationDocumentSchema().dump(v) for v in ver_docs.items]
         return make_response(
             {
-                "items": [VerificationDocumentSchema().dump(v) for v in ver_docs.items],
+                "items": doc_list,
                 "page": page,
                 "per_page": per_page,
                 "total": ver_docs.total,
