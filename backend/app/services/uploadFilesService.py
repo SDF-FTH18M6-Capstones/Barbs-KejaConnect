@@ -23,29 +23,35 @@ class UploadFilesService(UploadFilesInterface):
         self.property_image_repo = property_image_repo
 
     def upload_file(self, file, type):
+        print("we got here.")
         if not file or type not in ("property", "verification"):
             raise InvalidCredentialsError(
                 'Check your file has data or your input type is "property" or "verification".'
             )
         try:
-            result = cloudinary.uploader.upload(file, folder=type)
+            file.stream.seek(0)
+            result = cloudinary.uploader.upload(
+                file.stream, folder=type, resource_type="auto"
+            )
             return result.get("secure_url"), result.get("public_id")
         except Exception as e:
-            raise FileUploadFailed("Something wen wrong when uploading your file.")
+            print("CLOUDINARY ERROR:", repr(e))
+            raise FileUploadFailed("Something went wrong when uploading your file.")
 
-    def upload_verification_doc(self, file):
-        user_id = get_jwt_identity()
+    def upload_verification_doc(self, file, doc_type):
+        user_id = int(get_jwt_identity())
 
         file_url, public_id = self.upload_file(file=file, type="verification")
-
+        print("past uploader")
         new_ver_doc = VerificationDocumentSchema().load(
             {
                 "user_id": user_id,
-                "doc_type": type,
+                "doc_type": doc_type,
                 "file_url": file_url,
                 "cloudinary_public_id": public_id,
             }
         )
+        print("past database")
 
         ver_doc = self.ver_repo.add_document(ver_doc=new_ver_doc)
 

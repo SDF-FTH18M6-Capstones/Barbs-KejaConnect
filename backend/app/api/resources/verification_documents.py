@@ -49,21 +49,20 @@ class VerificationDocumentsResource(Resource):
                 },
                 403,
             )
-        data = request.get_json(silent=True)
 
-        if not isinstance(data, dict) and not data:
+        files = request.files.get("files")
+        type = request.form.get("doc_type", "")
+        if not files:
             return make_response(
-                {"error": "Bad request", "message": "Invalid request object."}, 400
+                {"error": "No file provided", "message": "Invalid request object."}, 400
             )
 
-        file = request.files.get("files")
-        type = data.get("type", "")
-
-        ver_doc = self.upload.upload_verification_doc(file=file, type=type)
+        ver_doc = self.upload.upload_verification_doc(file=files, doc_type=type)
 
         return make_response(
             {
                 "message": "FILE_UPLOADED",
                 "verification_doc": VerificationDocumentSchema().dump(ver_doc),
-            }
+            },
+            201,
         )

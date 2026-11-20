@@ -28,7 +28,8 @@ class VerificationDocsService(VerificationDocsInterface):
 
         return self.ver_doc_repo.update(doc_id=doc_id, update_data=update_data)
 
-    def get_user_docs(self, user_id, page, per_page):
+    def get_user_docs(self, page, per_page):
+        user_id = int(get_jwt_identity())
         return self.ver_doc_repo.get_by_user(
             user_id=user_id, page=page, per_page=per_page
         )

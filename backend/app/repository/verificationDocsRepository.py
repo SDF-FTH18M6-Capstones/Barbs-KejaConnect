@@ -24,7 +24,7 @@ class VerificationDocumentsRepository(VerificationRepoInterface):
     def add_document(self, ver_doc):
         try:
             db.session.add(ver_doc)
-            db.session.commit(ver_doc)
+            db.session.commit()
             db.session.refresh(ver_doc)
             return ver_doc
         except IntegrityError as e:
