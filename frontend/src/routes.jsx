@@ -18,6 +18,7 @@ import { POSTER } from "./paths";
 import EditListing from "./pages/PosterDashboard/EditListing";
 import RootLayout from "./layouts/RootLayout";
 import DocumentsLayout from "./layouts/DocumentsLayout";
+import AdminLayout from "./layouts/AdminLayout";
 
 export const router = createBrowserRouter([
   {
@@ -49,12 +50,20 @@ export const router = createBrowserRouter([
           { path: "/listings", element: <Navigate to="/" replace /> },
 
           //admin
-          { path: "/admin_dashboard", element: <AdminDashboard /> },
           {
-            path: "/admin_dashboard/approval_queue",
-            element: <AdminApprovalQueue />,
+            element: <AdminLayout />,
+            children: [
+              { path: "/admin_dashboard", element: <AdminDashboard /> },
+              {
+                path: "/admin_dashboard/approval_queue",
+                element: <AdminApprovalQueue />,
+              },
+              {
+                path: "/admin_dashboard/poster_review",
+                element: <PosterReview />,
+              },
+            ],
           },
-          { path: "/admin_dashboard/poster_review", element: <PosterReview /> },
         ],
       },
     ],

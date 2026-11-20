@@ -54,12 +54,19 @@ export function InquiriesProvider({ children }) {
 
   async function get_inquiries() {
     inquiriesDispatch({ type: "INIT" });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Unauthorized user.");
+    }
     try {
       const params = new URLSearchParams({
         page: inquiriesData.page,
         per_page: inquiriesData.per_page,
       });
-      const res = await fetch(`/api/v1/inquiries?${params}`);
+      const res = await fetch(`/api/v1/inquiries?${params}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!res.ok) throw new Error("Failed to fetch inquiries.");
       const data = await res.json();
       inquiriesDispatch({ type: "SUCCESS", payload: data.inquiries });
@@ -72,17 +79,24 @@ export function InquiriesProvider({ children }) {
 
   async function get_inquiries(url) {
     inquiriesDispatch({ type: "INIT" });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Unauthorized user.");
+    }
     try {
       const params = new URLSearchParams({
         page: inquiriesData.page,
         per_page: inquiriesData.per_page,
       });
-      const res = await fetch(`${url}?${params}`);
+      const res = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!res.ok) throw new Error("Failed to fetch inquiries.");
       const data = await res.json();
-      inquiriesDispatch({ type: "SUCCESS", payload: data.inquiries });
+      inquiriesDispatch({ type: "SUCCESS", payload: data });
     } catch (error) {
-      inquiriesDispatch({ type: "SUCCESS", payload: data.inquiries });
+      inquiriesDispatch({ type: "ERROR", payload: error.message });
     } finally {
       inquiriesDispatch({ type: "INIT" });
     }
