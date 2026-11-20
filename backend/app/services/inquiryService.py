@@ -49,7 +49,7 @@ class InquiryService(InquiryInterface):
         user_id = int(get_jwt_identity())
         claims = get_jwt()
         if claims.get("role", "") not in ("manager", "owner"):
-            return NotAllowedError(
+            raise NotAllowedError(
                 f"User of type {claims.get('role','')} can not perform this operation."
             )
         return self.inquiry_repo.get_poster_inquiries(

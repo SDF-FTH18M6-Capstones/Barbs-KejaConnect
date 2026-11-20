@@ -87,4 +87,4 @@ class AdminService(AdminServiceInterface):
 
         approvals = VerificationDocumentSchema().dump(self.get_approvals())
 
-        return dict(users, listings, approvals)
+        return dict(users=users, listings=listings, approvals=approvals)

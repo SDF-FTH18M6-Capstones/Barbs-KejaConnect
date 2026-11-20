@@ -51,10 +51,10 @@ class AdminRepository(AdminStatsRepoInterface):
         available = Property.query.filter_by(status="available").paginate(
             page=page, per_page=perpage
         )
-        taken = Property.query.filter_by(role="taken").paginate(
+        taken = Property.query.filter_by(status="taken").paginate(
             page=page, per_page=perpage
         )
-        removed = Property.query.filter_by(role="removed").paginate(
+        removed = Property.query.filter_by(status="removed").paginate(
             page=page, per_page=perpage
         )
 
