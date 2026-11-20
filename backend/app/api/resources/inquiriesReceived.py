@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from flask import make_response
+from flask import make_response, request
 from flask_jwt_extended import jwt_required
 from ...models import Inquiry
 from ...schemas import InquirySchema
@@ -12,11 +12,19 @@ class InquiriesReceived(Resource):
 
     @jwt_required()
     def get(self):
-        inquiries = self.inquiry_service.received_inquiries()
+        page = request.args.get("page", 1, type=int)
+        per_page = request.args.get("per_page", 5, type=int)
+        inquiries = self.inquiry_service.received_inquiries(
+            page=page, per_page=per_page
+        )
 
         return make_response(
             {
-                "message": "INQUIRIES",
-                "inquiries": InquirySchema(many=True).dump(inquiries),
-            }
+                "items": inquiries.items,
+                "page": page,
+                "per_page": per_page,
+                "total": inquiries.total,
+                "pages": inquiries.pages,
+            },
+            200,
         )

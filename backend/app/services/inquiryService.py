@@ -45,14 +45,16 @@ class InquiryService(InquiryInterface):
 
         return saved_inquiry
 
-    def received_inquiries(self):
-        user_id = get_jwt_identity()
+    def received_inquiries(self, page, per_page):
+        user_id = int(get_jwt_identity())
         claims = get_jwt()
         if claims.get("role", "") not in ("manager", "owner"):
             return NotAllowedError(
                 f"User of type {claims.get('role','')} can not perform this operation."
             )
-        return self.inquiry_repo.get_poster_inquiries(user_id)
+        return self.inquiry_repo.get_poster_inquiries(
+            user_id, page=page, per_page=per_page
+        )
 
     def sent_inquiries(self):
         user_id = get_jwt_identity()

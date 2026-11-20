@@ -1,10 +1,9 @@
 from .interface.inquiriesRepoInterface import InquiriesRepoInterface
-from ..models import Inquiry, Property, User
-from ..models import Inquiry, Property
-from ..exceptions import ResourceNotFoundError, AlreadyExists, DatabasePersistenceError
+from ..models import Inquiry, User
+from ..models import Inquiry
+from ..exceptions import AlreadyExists, DatabasePersistenceError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from ..config import db
-from datetime import datetime, timezone
 
 
 class InquiriesRepository(InquiriesRepoInterface):
@@ -23,11 +22,11 @@ class InquiriesRepository(InquiriesRepoInterface):
             db.session.rollback()
             raise DatabasePersistenceError(f"Failed to create new inquiry.")
 
-    def get_poster_inquiries(self, poster_id):
-        properties: list[Property] = Property.query.filter_by(poster_id=poster_id).all()
-        inquiries = [
-            inquiry for property in properties for inquiry in property.inquiries
-        ]
+    def get_poster_inquiries(self, poster_id, page, per_page):
+        inquiries = Inquiry.query.filter_by(poster_id=poster_id).paginate(
+            page=page, per_page=per_page
+        )
+
         return inquiries
 
     def get_sent_inquiries(self, user_id):
