@@ -1,6 +1,7 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Brand from "../Brand";
 import { POSTER } from "../../paths";
+import { useAuth } from "../../providers/AuthProvider";
 
 const LINKS = [
   { to: POSTER.home, label: "Dashboard", end: true },
@@ -19,12 +20,11 @@ const initials = (name = "") =>
     .toUpperCase();
 
 export default function PosterLayout({ user, unread = 0, children }) {
-  const navigate = useNavigate();
+  const { logout: authLogout } = useAuth();
 
   function logout() {
-    localStorage.removeItem("user");
-    localStorage.removeItem("access_token");
-    navigate("/");
+    localStorage.removeItem("dev_user");
+    authLogout();
   }
 
   return (

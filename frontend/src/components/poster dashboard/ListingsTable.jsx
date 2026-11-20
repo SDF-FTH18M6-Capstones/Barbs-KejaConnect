@@ -26,7 +26,7 @@ export default function ListingsTable({ listings, onToggle, busyId }) {
               <tr key={l.id} className="border-b border-border/60 text-sm">
                 <td className="px-4 py-3">
                   <Link
-                    to={POSTER.editListing(l.id)}
+                    to={`/listings/${l.id}`}
                     className="font-medium text-text hover:text-primary"
                   >
                     {l.title}
@@ -57,7 +57,7 @@ export default function ListingsTable({ listings, onToggle, busyId }) {
                 </td>
                 <td className="space-x-2 whitespace-nowrap px-4 py-3 text-right">
                   <Link
-                    to={`/listings/${l.id}/edit`}
+                    to={POSTER.editListing(l.id)}
                     className={`${button} inline-flex items-center`}
                   >
                     Edit

@@ -6,20 +6,18 @@ export function passwordChecks(password) {
   ];
 }
 
-export function validateSignup(form, role) {
+export function validateSignup(form) {
   const errors = {};
 
   if (form.fullName.trim().length < 3)
     errors.fullName = "Enter your full name (at least 3 characters).";
 
-  if (!/^(\+254|0)[17]\d{8}$/.test(form.phone.replace(/\s/g, ""))) {
-    errors.phone = "Enter a Kenyan number, like 0712 345 678.";
+  if (!/^(07\d{8}|\+2547\d{8})$/.test(form.phone.replace(/\s/g, ""))) {
+    errors.phone = "Enter a Kenyan number, like 0712 345 678 or +254712345678.";
   }
 
   if (!/^\S+@\S+\.\S{2,}$/.test(form.email.trim()))
     errors.email = "Enter a valid email address.";
-
-  if (role.areaLabel && !form.area) errors.area = "Choose an area.";
 
   if (passwordChecks(form.password).some((rule) => !rule.ok)) {
     errors.password = "Use at least 8 characters with a letter and a number.";

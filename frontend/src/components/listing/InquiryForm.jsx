@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { createInquiry } from "../../api/inquiries";
-import { getToken } from "../../api/client";
-import { USE_MOCKS } from "../../api/config";
 import { POSTER, ROUTES } from "../../paths";
-import { getCurrentUser } from "../inquiries/data/currentUser";
+import { useCurrentUser } from "../inquiries/data/currentUser";
 
 const MIN = 10;
 const MAX = 1000;
@@ -24,8 +22,8 @@ const ERRORS = {
 const box = "rounded-[14px] border border-border bg-surface p-5";
 
 export default function InquiryForm({ listing }) {
-  const user = getCurrentUser();
-  const loggedIn = USE_MOCKS ? Boolean(user) : Boolean(getToken());
+  const { user, loading } = useCurrentUser();
+  const loggedIn = Boolean(user);
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
   const [status, setStatus] = useState("idle");
   const [errorCode, setErrorCode] = useState(null);
@@ -43,6 +41,14 @@ export default function InquiryForm({ listing }) {
         >
           Browse other listings
         </Link>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className={box}>
+        <p className="text-[15px] text-text-muted">Checking your account…</p>
       </div>
     );
   }

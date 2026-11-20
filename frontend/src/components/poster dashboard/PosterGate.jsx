@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import PosterLayout from "./PosterLayout";
 import useLoad from "./useLoad";
 import { getReceivedInquiries } from "../../api/inquiries";
-import { getCurrentUser } from "../inquiries/data/currentUser";
+import { useCurrentUser } from "../inquiries/data/currentUser";
 import { POSTER } from "../../paths";
 import { useAuth } from "../../providers/AuthProvider";
 

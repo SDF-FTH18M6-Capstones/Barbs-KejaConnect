@@ -4,10 +4,10 @@ import InquiryCard from "../../components/inquiries/InquiryCard";
 import EmptyInquiries from "../../components/inquiries/EmptyInquiries";
 import Pager from "../../components/inquiries/Pager";
 import { getSentInquiries } from "../../api/inquiries";
-import { getCurrentUser } from "../../components/inquiries/data/currentUser";
+import { useCurrentUser } from "../../components/inquiries/data/currentUser";
 
 export default function MyInquiries() {
-  const user = getCurrentUser();
+  const { user, loading: checkingUser } = useCurrentUser();
   const location = useLocation();
   const isTenant = user?.role === "tenant";
 
@@ -58,7 +58,11 @@ export default function MyInquiries() {
           )}
         </div>
 
-        {!user && (
+        {checkingUser && (
+          <p className="text-text-muted">Checking your account…</p>
+        )}
+
+        {!checkingUser && !user && (
           <div className="space-y-3 rounded-2xl border border-border bg-surface p-6 text-center">
             <p>Log in to see the inquiries you've sent.</p>
             <Link
