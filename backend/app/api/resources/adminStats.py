@@ -15,4 +15,4 @@ class AdminStats(Resource):
 
         stats = self.admin_service.get_stats(page=page, per_page=per_page)
 
-        return make_response(stats, 200)
+        return make_response({"stats": stats, page: page, per_page: per_page}, 200)
