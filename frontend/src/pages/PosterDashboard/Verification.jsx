@@ -77,7 +77,6 @@ function VerificationContent({ user }) {
   const status = justUploaded ? "pending" : user.approval_status;
   const banner = BANNERS[status] ?? BANNERS.not_required;
   const latest = latestByType(docs?.items);
-  console.log("from react", docs.items);
 
   useEffect(() => {
     getDocuments();
