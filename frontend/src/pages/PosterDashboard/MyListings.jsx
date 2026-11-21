@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import PosterGate from "../../components/poster dashboard/PosterGate";
 import ListingsTable from "../../components/poster dashboard/ListingsTable";
@@ -7,6 +7,7 @@ import Pager from "../../components/poster dashboard/Pager";
 import useLoad from "../../components/poster dashboard/useLoad";
 import { getMyListings, setListingStatus } from "../../api/listings";
 import { POSTER } from "../../paths";
+import { useListings } from "../../providers/ListingsProvider";
 
 const FILTERS = [
   { value: "", label: "All" },
@@ -20,15 +21,14 @@ function MyListingsContent() {
   const updated = location.state?.updated;
 
   const [filter, setFilter] = useState("");
-  const [page, setPage] = useState(1);
   const [busyId, setBusyId] = useState(null);
   const [rowError, setRowError] = useState("");
 
-  const load = useCallback(
-    () => getMyListings({ status: filter, page, per_page: 10 }),
-    [filter, page],
-  );
-  const { loading, error, data, retry, setData } = useLoad(load);
+  const { listingsData, setPage, getPosterListings } = useListings();
+
+  useEffect(() => {
+    getPosterListings();
+  }, []);
 
   function changeFilter(value) {
     setFilter(value);
@@ -114,9 +114,10 @@ function MyListingsContent() {
               {f.label}
             </button>
           ))}
-          {data && (
+          {listingsData && (
             <span className="ml-auto self-center text-sm text-text-muted">
-              {data.total} {data.total === 1 ? "listing" : "listings"}
+              {listingsData.total}{" "}
+              {listingsData.total === 1 ? "listing" : "listings"}
             </span>
           )}
         </div>
@@ -130,7 +131,7 @@ function MyListingsContent() {
           </p>
         )}
 
-        {loading && (
+        {listingsData.loading && (
           <div aria-busy="true" className="space-y-2 p-5 pt-0">
             {[1, 2, 3].map((n) => (
               <div
@@ -142,13 +143,18 @@ function MyListingsContent() {
           </div>
         )}
 
-        {error && (
+        {listingsData.error && (
           <div className="p-5 pt-0">
-            <LoadError error={error} onRetry={retry} />
+            <LoadError
+              error={listingsData.error}
+              onRetry={() => {
+                getPosterListings();
+              }}
+            />
           </div>
         )}
 
-        {data && data.items.length === 0 && (
+        {listingsData && listingsData.items.length === 0 && (
           <div className="space-y-3 p-8 pt-2 text-center">
             <p className="text-text-muted">
               {filter
@@ -166,14 +172,18 @@ function MyListingsContent() {
           </div>
         )}
 
-        {data && data.items.length > 0 && (
+        {listingsData && listingsData.items.length > 0 && (
           <>
             <ListingsTable
-              listings={data.items}
+              listings={listingsData.items}
               onToggle={toggleListing}
               busyId={busyId}
             />
-            <Pager page={data.page} pages={data.pages} onPage={setPage} />
+            <Pager
+              page={listingsData.page}
+              pages={listingsData.pages}
+              onPage={setPage}
+            />
           </>
         )}
       </section>

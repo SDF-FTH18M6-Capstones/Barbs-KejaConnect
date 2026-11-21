@@ -107,7 +107,12 @@ export function ListingsProvider({ children }) {
         page: listingsData.page,
         per_page: listingsData.per_page,
       });
-      const res = await fetch(`${url}?${params}`);
+      const res = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Failed to fetch listings.");
       const data = await res.json();
       listingsDispatch({ type: "SUCCESS", payload: data.listings });
@@ -122,7 +127,7 @@ export function ListingsProvider({ children }) {
     get_listings("/api/v1/listings");
   }
 
-  function get_poster_listings() {
+  function getPosterListings() {
     get_listings("/api/v1/listings/mine");
   }
 
@@ -158,6 +163,7 @@ export function ListingsProvider({ children }) {
     newlisting,
     createListing,
     setPage,
+    getPosterListings,
   };
 
   return (
