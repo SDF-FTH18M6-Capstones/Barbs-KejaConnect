@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PosterGate from "../../components/poster dashboard/PosterGate";
 import StatCard from "../../components/poster dashboard/StatCard";
@@ -9,6 +9,8 @@ import useLoad from "../../components/poster dashboard/useLoad";
 import { getMyListings, setListingStatus } from "../../api/listings";
 import { getReceivedInquiries } from "../../api/inquiries";
 import { POSTER } from "../../paths";
+import { useListings } from "../../providers/ListingsProvider";
+import { useInquiries } from "../../providers/InquiriesProvider";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 12) return "Good morning";
@@ -37,6 +39,11 @@ async function loadDashboard() {
 }
 
 function DashboardHome({ user }) {
+  const { listingsData, getPosterListings } = useListings();
+  const { inquiriesData } = useInquiries();
+  useEffect(() => {
+    getPosterListings();
+  }, []);
   const { loading, data, error, retry, setData } = useLoad(loadDashboard);
   const [busyId, setBusyId] = useState(null);
   const [rowError, setRowError] = useState("");
@@ -96,7 +103,7 @@ function DashboardHome({ user }) {
         </Link>
       </div>
 
-      {loading && (
+      {(listingsData.loading || inquiriesData.loading) && (
         <div aria-busy="true" className="space-y-4">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[1, 2, 3, 4].map((n) => (
@@ -111,7 +118,7 @@ function DashboardHome({ user }) {
         </div>
       )}
 
-      {error && <LoadError error={error} onRetry={retry} />}
+      {listingsData.error && <LoadError error={error} onRetry={retry} />}
 
       {data && (
         <>
@@ -138,7 +145,7 @@ function DashboardHome({ user }) {
                 to={POSTER.listings}
                 className="text-sm font-medium text-primary hover:text-primary-dark"
               >
-                View all {data.listings.total}
+                View all {listingsData.total}
               </Link>
             </div>
             {rowError && (
@@ -149,7 +156,7 @@ function DashboardHome({ user }) {
                 {rowError}
               </p>
             )}
-            {data.listings.items.length === 0 ? (
+            {listingsData.items.length === 0 ? (
               <div className="space-y-3 p-8 pt-2 text-center">
                 <p className="text-text-muted">
                   You haven't posted any listings yet.
@@ -163,14 +170,14 @@ function DashboardHome({ user }) {
               </div>
             ) : (
               <ListingsTable
-                listings={data.listings.items}
+                listings={listingsData.items}
                 onToggle={toggleListing}
                 busyId={busyId}
               />
             )}
           </section>
 
-          <RecentInquiries inquiries={data.inquiries} />
+          <RecentInquiries inquiries={inquiriesData.items} />
         </>
       )}
     </>
