@@ -9,7 +9,6 @@ from datetime import datetime, timezone
 class ListingsRepository(ListingsRepoInterface):
     def get_all(self, page, per_page):
         pagination = Property.query.paginate(page=page, per_page=per_page)
-        print(pagination)
         return pagination
 
     def get_by_id(self, listing_id):
