@@ -13,6 +13,7 @@ class ListingsService(ListingsInterface):
 
     def get_poster_listings(self, page, per_page):
         user_id = int(get_jwt_identity())
+        print("This is the id:", user_id)
         return self.listing_repo.get_poster_listings(
             poster_id=user_id, page=page, per_page=per_page
         )

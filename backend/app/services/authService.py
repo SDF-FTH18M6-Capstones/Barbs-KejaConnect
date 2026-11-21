@@ -50,7 +50,7 @@ class AuthService(AuthInterface):
 
         return token, user, verification_sent
 
-    def signup(self, email, phone, role, full_name, password):
+    def signup(self, email, phone, role, full_name, password, approval_status):
         if not email or not phone or not role or not full_name or not password:
             raise InvalidCredentialsError("Missing credentials.")
 
@@ -65,6 +65,7 @@ class AuthService(AuthInterface):
                 "phone": phone.strip().lower(),
                 "role": role.strip().lower(),
                 "full_name": full_name.strip().lower(),
+                "approval_status": approval_status,
             }
         )
         new_user.password_hash = password

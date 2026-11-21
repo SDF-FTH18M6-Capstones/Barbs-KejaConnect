@@ -24,9 +24,15 @@ class SignupResource(Resource):
         phone = data.get("phone", "")
         role = data.get("role", "")
         password = data.get("password", "")
+        approval_status = data.get("approval_status", "")
 
         user, verification_sent = self.auth_service.signup(
-            full_name=full_name, email=email, phone=phone, role=role, password=password
+            full_name=full_name,
+            email=email,
+            phone=phone,
+            role=role,
+            password=password,
+            approval_status=approval_status,
         )
         res_user = UserSchema().dump(user)
         return make_response(

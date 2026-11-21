@@ -1,6 +1,5 @@
 from .interface.inquiriesRepoInterface import InquiriesRepoInterface
-from ..models import Inquiry, User
-from ..models import Inquiry
+from ..models import Inquiry, User, Property
 from ..exceptions import AlreadyExists, DatabasePersistenceError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from ..config import db
@@ -23,8 +22,10 @@ class InquiriesRepository(InquiriesRepoInterface):
             raise DatabasePersistenceError(f"Failed to create new inquiry.")
 
     def get_poster_inquiries(self, poster_id, page, per_page):
-        inquiries = Inquiry.query.filter_by(poster_id=poster_id).paginate(
-            page=page, per_page=per_page
+        inquiries = (
+            Inquiry.query.join(Property)
+            .filter(Property.poster_id == poster_id)
+            .paginate(page=page, per_page=per_page)
         )
 
         return inquiries

@@ -43,7 +43,7 @@ def register_error_handlers(app):
 
     @app.errorhandler(AlreadyExists)
     def handle_already_exists(error):
-        return make_response({"error": "Already exists", "message": str(error)}, 409)
+        return make_response({"error": "DUPLICATE_ERROR", "message": str(error)}, 409)
 
     @app.errorhandler(DatabasePersistenceError)
     def handle_persistence_error(error):

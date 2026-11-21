@@ -1,9 +1,8 @@
 export const PROPERTY_TYPES = [
+  { value: "single_room", label: "Single room" },
   { value: "bedsitter", label: "Bedsitter" },
   { value: "studio", label: "Studio" },
-  { value: "one_bedroom", label: "1 bedroom" },
-  { value: "two_bedroom", label: "2 bedroom" },
-  { value: "three_bedroom", label: "3 bedroom" },
+  { value: "apartment", label: "Apartment" },
   { value: "house", label: "House" },
   { value: "commercial", label: "Commercial" },
 ];

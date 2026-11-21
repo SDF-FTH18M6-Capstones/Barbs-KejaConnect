@@ -16,13 +16,13 @@ function handleAuth(state, action) {
     case "LOGOUT":
       return { error: null, loading: false, data: null };
     default:
-      break;
+      return state;
   }
 }
 export function AuthProvider({ children }) {
   const [userData, userDispatch] = useReducer(handleAuth, {
     error: null,
-    loading: false,
+    loading: true,
     data: null,
   });
 
@@ -42,7 +42,9 @@ export function AuthProvider({ children }) {
         }
         return res.json();
       })
-      .then((data) => userDispatch({ type: "SUCCESS", payload: data.user }))
+      .then((data) => {
+        userDispatch({ type: "SUCCESS", payload: data.user });
+      })
       .catch(() => userDispatch({ type: "INIT" }))
       .finally(() => userDispatch({ type: "INIT" }));
   }

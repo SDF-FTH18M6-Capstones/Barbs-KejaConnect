@@ -40,7 +40,6 @@ class PropertySchema(Schema):
             "verification_documents",
             "inquiries",
             "saved_listings",
-            "reports",
         ),
     )
 

@@ -10,7 +10,8 @@ export const getListings = (params) =>
 export const getListing = (id) =>
   USE_MOCKS ? mock.getListing(id) : api(`/listings/${id}`);
 
-export const getAreas = () => (USE_MOCKS ? mock.getAreas() : api("/areas"));
+export const getAreas = (params) =>
+  USE_MOCKS ? mock.getAreas(params) : api("/areas", { params });
 
 // ---------- Poster dashboard ----------
 
