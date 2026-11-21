@@ -31,6 +31,5 @@ class InquiriesRepository(InquiriesRepoInterface):
         return inquiries
 
     def get_sent_inquiries(self, user_id):
-        user: User = User.query.filter_by(id=user_id).first()
-        inquiries = [inquiry for inquiry in user.inquiries]
+        inquiries = Inquiry.query.filter_by(tenant_id=user_id).all()
         return inquiries

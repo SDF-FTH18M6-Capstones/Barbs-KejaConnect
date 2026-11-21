@@ -6,6 +6,7 @@ import { ROUTES } from "../paths";
 import { formatKES, timeAgo } from "../utils/format";
 import { PROPERTY_TYPES } from "../utils/labels";
 import { getListing } from "../api/listings";
+import { useListings } from "../providers/ListingsProvider";
 
 const ROLE_LABEL = { manager: "Property manager", owner: "Property owner" };
 const typeLabel = (v) => PROPERTY_TYPES.find((t) => t.value === v)?.label ?? v;
@@ -36,33 +37,15 @@ function Shell({ children }) {
 
 export default function ListingDetail() {
   const { id } = useParams();
-  const [listing, setListing] = useState(null);
-  const [status, setStatus] = useState("loading");
-  const [error, setError] = useState(null);
+  const { listingData, getListing } = useListings();
+  const { loading, listing, error } = listingData;
   const [retry, setRetry] = useState(0);
 
   useEffect(() => {
-    let ignore = false;
-    setStatus("loading");
-    getListing(id)
-      .then(({ listing }) => {
-        if (!ignore) {
-          setListing(listing);
-          setStatus("ready");
-        }
-      })
-      .catch((e) => {
-        if (!ignore) {
-          setError(e);
-          setStatus("error");
-        }
-      });
-    return () => {
-      ignore = true;
-    };
+    getListing(id);
   }, [id, retry]);
 
-  if (status === "loading") {
+  if (loading) {
     return (
       <Shell>
         <div
@@ -78,7 +61,7 @@ export default function ListingDetail() {
     );
   }
 
-  if (status === "error") {
+  if (error) {
     const gone = error?.code === "NOT_FOUND";
     return (
       <Shell>
@@ -111,7 +94,7 @@ export default function ListingDetail() {
       </Shell>
     );
   }
-
+  console.log(listing);
   const l = listing;
   const available = l.status === "available";
 
@@ -132,7 +115,7 @@ export default function ListingDetail() {
         <span>{l.building_name}</span>
       </nav>
 
-      <ImageGallery images={l.images} title={l.title} />
+      <ImageGallery images={l.property_images} title={l.title} />
 
       <div className="mt-6 flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[999_1_480px] flex-col gap-6">
@@ -187,15 +170,15 @@ export default function ListingDetail() {
               aria-hidden="true"
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-tint font-display font-semibold text-brand-dark"
             >
-              {initials(l.poster.full_name)}
+              {initials(l.user.full_name)}
             </span>
             <div className="min-w-0">
-              <div className="truncate font-medium">{l.poster.full_name}</div>
+              <div className="truncate font-medium">{l.user.full_name}</div>
               <div className="text-sm text-muted">
-                {ROLE_LABEL[l.poster.role] ?? "Poster"}
+                {ROLE_LABEL[l.user.role] ?? "Poster"}
               </div>
             </div>
-            {l.poster.is_verified && (
+            {l.user.is_verified && (
               <span className="ml-auto rounded-full bg-brand-tint px-2.5 py-1 text-xs font-medium text-brand-dark">
                 Verified
               </span>

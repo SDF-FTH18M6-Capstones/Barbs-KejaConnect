@@ -1,5 +1,5 @@
 import { createContext, useReducer, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 
 export const ListingsContext = createContext(null);
 
@@ -9,7 +9,7 @@ const initalState = {
   per_page: 10,
   total: 0,
   pages: 0,
-  loading: false,
+  loading: true,
   error: null,
 };
 const initialNewListing = {
@@ -17,6 +17,9 @@ const initialNewListing = {
   loading: false,
   error: null,
 };
+
+const intialListing = { listing: null, loading: true, error: null };
+
 function handleListings(state, action) {
   switch (action.type) {
     case "INIT":
@@ -61,6 +64,24 @@ function handleCreateListing(state, action) {
       return state;
   }
 }
+function handleGetListing(state, action) {
+  switch (action.type) {
+    case "INIT":
+      return { ...state, loading: false };
+    case "LOADING":
+      return { ...state, loading: true, error: null };
+    case "SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        listing: action.payload,
+      };
+    case "ERROR":
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+}
 export function ListingsProvider({ children }) {
   const [listingsData, listingsDispatch] = useReducer(
     handleListings,
@@ -72,36 +93,58 @@ export function ListingsProvider({ children }) {
     initialNewListing,
   );
 
+  const [listingData, listingDispatch] = useReducer(
+    handleGetListing,
+    intialListing,
+  );
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   function setPage(page) {
     listingsDispatch({ type: "SET_PAGE", payload: page });
   }
 
   useEffect(() => {
-    get_all_listings();
+    if (matchPath("/api/v1/listings/mine", location.pathname)) {
+      getPosterListings();
+    } else {
+      getAllListings();
+    }
   }, [listingsData.page, listingsData.per_page]);
 
-  async function get_listings() {
-    listingsDispatch({ type: "INIT" });
+  async function getAllListings() {
+    await get_listings("/api/v1/listings");
+  }
+
+  async function getPosterListings() {
+    await get_listings("/api/v1/listings/mine");
+  }
+
+  async function getListing(id) {
+    listingDispatch({ type: "LOADING" });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Unauthorized user.");
+    }
     try {
-      const params = new URLSearchParams({
-        page: listingsData.page,
-        per_page: listingsData.per_page,
-      });
-      const res = await fetch(`/api/v1/listings?${params}`);
+      const res = await fetch(`/api/v1/listings/${id}`);
       if (!res.ok) throw new Error("Failed to fetch listings.");
       const data = await res.json();
-      listingsDispatch({ type: "SUCCESS", payload: data.listings });
+      listingDispatch({ type: "SUCCESS", payload: data.listing });
     } catch (error) {
-      listingsDispatch({ type: "ERROR", payload: error.message });
+      listingDispatch({ type: "ERROR", payload: error.message });
     } finally {
-      listingsDispatch({ type: "INIT" });
+      listingDispatch({ type: "INIT" });
     }
   }
 
   async function get_listings(url) {
-    listingsDispatch({ type: "INIT" });
+    listingsDispatch({ type: "LOADING" });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Unauthorized user.");
+    }
     try {
       const params = new URLSearchParams({
         page: listingsData.page,
@@ -123,14 +166,6 @@ export function ListingsProvider({ children }) {
     }
   }
 
-  function get_all_listings() {
-    get_listings("/api/v1/listings");
-  }
-
-  function getPosterListings() {
-    get_listings("/api/v1/listings/mine");
-  }
-
   async function createListing(formdata) {
     newListingDispatch({ type: "LOADING" });
     try {
@@ -148,10 +183,8 @@ export function ListingsProvider({ children }) {
       });
       if (!res.ok) throw new Error("Failed to fetch listings.");
       const data = await res.json();
-      console.log(data);
       newListingDispatch({ type: "SUCCESS", payload: data.listing });
     } catch (error) {
-      console.log("Error::::", error);
       newListingDispatch({ type: "ERROR", payload: error.message });
     } finally {
       listingsDispatch({ type: "INIT" });
@@ -164,6 +197,9 @@ export function ListingsProvider({ children }) {
     createListing,
     setPage,
     getPosterListings,
+    getAllListings,
+    listingData,
+    getListing,
   };
 
   return (

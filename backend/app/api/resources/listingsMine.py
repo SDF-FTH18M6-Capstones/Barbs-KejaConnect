@@ -16,6 +16,7 @@ class ListingsMine(Resource):
         listings = self.listing_service.get_poster_listings(
             page=page, per_page=per_page
         )
+
         res = {
             "items": [PropertySchema().dump(v) for v in listings.items],
             "page": page,

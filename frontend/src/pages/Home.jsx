@@ -13,7 +13,7 @@ const PAGE_SIZE = 9;
 const EMPTY = { area: "", property_type: "", min: "", max: "" };
 
 export default function Home() {
-  const { listingsData, lisingsDispatch, setPage } = useListings();
+  const { listingsData, setPage, getAllListings } = useListings();
   const { items, page, per_page, total, pages, loading, error } = listingsData;
   const [filters, setFilters] = useState(EMPTY);
 
@@ -32,6 +32,10 @@ export default function Home() {
     setFilters(EMPTY);
     setPage(1);
   };
+
+  useState(() => {
+    getAllListings();
+  }, []);
 
   return (
     <div className="min-h-screen bg-canvas font-sans text-ink">

@@ -13,7 +13,6 @@ class ListingByIdResource(Resource):
 
     def get(self, id):
         listing = self.listing_service.get_by_id(listing_id=id)
-
         return make_response(
             {"message": "LISTING_RETRIEVED", "listing": PropertySchema().dump(listing)},
             200,
