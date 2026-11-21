@@ -3,9 +3,12 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import AdminHeader from "../../components/admin/AdminHeader";
 import ApprovalTable from "../../components/admin/ApprovalTable";
 import { mockAdminApplications } from "../../data/mockAdminData";
+import { useAdminStats } from "../../providers/AdminStatsProvider";
 
 function AdminApprovalQueue() {
   const [applications, setApplications] = useState(mockAdminApplications);
+  const { adminStatsData } = useAdminStats();
+  const { approvals } = adminStatsData;
 
   const pendingCount = applications.filter(
     (poster) => poster.status === "pending",

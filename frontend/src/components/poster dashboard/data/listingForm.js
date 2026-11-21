@@ -1,11 +1,63 @@
+export const COUNTIES = [
+  "Mombasa",
+  "Kwale",
+  "Kilifi",
+  "Tana River",
+  "Lamu",
+  "Taita-Taveta",
+  "Garissa",
+  "Wajir",
+  "Mandera",
+  "Marsabit",
+  "Isiolo",
+  "Meru",
+  "Tharaka-Nithi",
+  "Embu",
+  "Kitui",
+  "Machakos",
+  "Makueni",
+  "Nyandarua",
+  "Nyeri",
+  "Kirinyaga",
+  "Murang'a",
+  "Kiambu",
+  "Turkana",
+  "West Pokot",
+  "Samburu",
+  "Trans-Nzoia",
+  "Uasin Gishu",
+  "Elgeyo-Marakwet",
+  "Nandi",
+  "Baringo",
+  "Laikipia",
+  "Nakuru",
+  "Narok",
+  "Kajiado",
+  "Kericho",
+  "Bomet",
+  "Kakamega",
+  "Vihiga",
+  "Bungoma",
+  "Busia",
+  "Siaya",
+  "Kisumu",
+  "Homa Bay",
+  "Migori",
+  "Kisii",
+  "Nyamira",
+  "Nairobi",
+];
+
 export const EMPTY_LISTING = {
   title: "",
   property_type: "",
   price_monthly: "",
   bedrooms: "",
   bathrooms: "",
+  county: "",
   area: "",
   building_name: "",
+  street_address: "",
   unit_number: "",
   lr_number: "",
   description: "",
@@ -20,6 +72,7 @@ const wholeNumber = (v) => /^\d+$/.test(String(v).trim());
 export const validateListing = (v) => {
   const errors = {};
   const commercial = v.property_type === "commercial";
+  const isHouse = v.property_type === "house";
 
   if (v.title.trim().length < 5)
     errors.title = "Enter a title with at least 5 characters";
@@ -39,9 +92,17 @@ export const validateListing = (v) => {
     errors.bathrooms = "Enter the number of bathrooms";
   }
 
+  if (!v.county) errors.county = "Choose the county";
   if (!v.area) errors.area = "Choose the area";
-  if (!v.building_name.trim())
+
+  if (isHouse) {
+    if (!v.street_address.trim()) {
+      errors.street_address = "Enter the street address";
+    }
+  } else if (!v.building_name.trim()) {
     errors.building_name = "Enter the building or estate name";
+  }
+
   if (!v.unit_number.trim())
     errors.unit_number = "Enter the unit number, e.g. B4";
 
@@ -65,8 +126,10 @@ export function toListingBody(v) {
     price_monthly: Number(v.price_monthly),
     bedrooms: noBedroom ? 0 : numberOrNull(v.bedrooms),
     bathrooms: numberOrNull(v.bathrooms),
+    county: v.county,
     area: v.area,
-    building_name: v.building_name.trim(),
+    building_name: v.building_name.trim() || null,
+    street_address: v.street_address.trim() || null,
     unit_number: v.unit_number.trim(),
     lr_number: v.lr_number.trim() || null,
   };

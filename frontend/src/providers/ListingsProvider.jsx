@@ -12,6 +12,11 @@ const initalState = {
   loading: false,
   error: null,
 };
+const initialNewListing = {
+  listing: null,
+  loading: false,
+  error: null,
+};
 function handleListings(state, action) {
   switch (action.type) {
     case "INIT":
@@ -38,10 +43,33 @@ function handleListings(state, action) {
       return state;
   }
 }
+function handleCreateListing(state, action) {
+  switch (action.type) {
+    case "INIT":
+      return { ...state, loading: false };
+    case "LOADING":
+      return { ...state, loading: true, error: null };
+    case "SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        listing: action.payload,
+      };
+    case "ERROR":
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+}
 export function ListingsProvider({ children }) {
   const [listingsData, listingsDispatch] = useReducer(
     handleListings,
     initalState,
+  );
+
+  const [newlisting, newListingDispatch] = useReducer(
+    handleCreateListing,
+    initialNewListing,
   );
 
   const navigate = useNavigate();
@@ -66,7 +94,7 @@ export function ListingsProvider({ children }) {
       const data = await res.json();
       listingsDispatch({ type: "SUCCESS", payload: data.listings });
     } catch (error) {
-      listingsDispatch({ type: "SUCCESS", payload: data.listings });
+      listingsDispatch({ type: "ERROR", payload: error.message });
     } finally {
       listingsDispatch({ type: "INIT" });
     }
@@ -84,7 +112,7 @@ export function ListingsProvider({ children }) {
       const data = await res.json();
       listingsDispatch({ type: "SUCCESS", payload: data.listings });
     } catch (error) {
-      listingsDispatch({ type: "SUCCESS", payload: data.listings });
+      listingsDispatch({ type: "ERROR", payload: error.message });
     } finally {
       listingsDispatch({ type: "INIT" });
     }
@@ -97,7 +125,40 @@ export function ListingsProvider({ children }) {
   function get_poster_listings() {
     get_listings("/api/v1/listings/mine");
   }
-  const value = { listingsData, listingsDispatch, setPage };
+
+  async function createListing(formdata) {
+    newListingDispatch({ type: "LOADING" });
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Unauthorized user.");
+      }
+      const res = await fetch("/api/v1/listings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formdata),
+      });
+      if (!res.ok) throw new Error("Failed to fetch listings.");
+      const data = await res.json();
+      console.log(data);
+      newListingDispatch({ type: "SUCCESS", payload: data.listing });
+    } catch (error) {
+      console.log("Error::::", error);
+      newListingDispatch({ type: "ERROR", payload: error.message });
+    } finally {
+      listingsDispatch({ type: "INIT" });
+    }
+  }
+  const value = {
+    listingsData,
+    listingsDispatch,
+    newlisting,
+    createListing,
+    setPage,
+  };
 
   return (
     <ListingsContext.Provider value={value}>

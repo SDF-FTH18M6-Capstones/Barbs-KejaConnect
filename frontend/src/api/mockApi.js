@@ -83,18 +83,28 @@ export async function getListings({
   };
 }
 
-export async function getAreas() {
+export async function getAreas({ county } = {}) {
   await delay(100);
-  return { items: mockAreas };
+  // If mockAreas is an object keyed by county (e.g. { Nairobi: [...], Mombasa: [...] }),
+  // return mockAreas[county] ?? []; otherwise return mockAreas for Nairobi / default.
+  if (Array.isArray(mockAreas)) {
+    return { items: !county || county === "Nairobi" ? mockAreas : [] };
+  }
+  return {
+    items: county ? (mockAreas[county] ?? []) : Object.values(mockAreas).flat(),
+  };
 }
 
 function toDetail(l) {
   return {
     ...l,
-    description: `${l.title} in ${l.area}. Spacious and well maintained, close to shops and public transport. Water and security are included in the rent.`,
-    county: "Nairobi",
-    unit_number: unitFor(l),
-    lr_number: null,
+    description:
+      l.description ??
+      `${l.title} in ${l.area}. Spacious and well maintained, close to shops and public transport. Water and security are included in the rent.`,
+    county: l.county ?? "Nairobi",
+    street_address: l.street_address ?? null,
+    unit_number: l.unit_number ?? unitFor(l),
+    lr_number: l.lr_number ?? null,
     images: Array.from({ length: 6 }, (_, i) => ({
       id: l.id * 100 + i,
       url: null,
@@ -102,10 +112,9 @@ function toDetail(l) {
       position: i,
     })),
     poster: { ...l.poster, role: l.id % 2 ? "manager" : "owner" },
-    updated_at: l.created_at,
+    updated_at: l.updated_at ?? l.created_at,
   };
 }
-
 export async function getListing(id) {
   await delay();
   const l = findListing(id);
@@ -226,16 +235,25 @@ export async function setListingStatus(id, status) {
   save();
   return { listing: { ...l } };
 }
+const normalizePart = (s) =>
+  String(s ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
 
-const dedupeKey = (area, building, unit) =>
-  [area, building, unit]
-    .map((s) =>
-      String(s ?? "")
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "_"),
-    )
-    .join("|");
+const dedupeKey = ({
+  property_type,
+  area,
+  building_name,
+  street_address,
+  unit_number,
+}) => {
+  const anchor =
+    property_type === "house" && street_address
+      ? street_address
+      : building_name;
+  return [area, anchor, unit_number].map(normalizePart).join("|");
+};
 
 export async function createListing(body) {
   await delay(500);
@@ -247,16 +265,22 @@ export async function createListing(body) {
       "Your account has not been approved yet",
     );
   }
-  if (!mockAreas.includes(body.area)) {
+
+  const validAreas = Array.isArray(mockAreas)
+    ? mockAreas
+    : (mockAreas[body.county] ?? []);
+
+  if (validAreas.length > 0 && !validAreas.includes(body.area)) {
     throw new ApiError(400, "VALIDATION_ERROR", "Invalid listing", {
       area: ["Choose an area from the list"],
     });
   }
-  const key = dedupeKey(body.area, body.building_name, body.unit_number);
+
+  const key = dedupeKey(body);
   const existing = mockMyListings.find(
     (l) =>
       l.status !== "removed" &&
-      dedupeKey(l.area, l.building_name, unitFor(l)) === key,
+      dedupeKey({ ...l, unit_number: l.unit_number ?? unitFor(l) }) === key,
   );
   if (existing) {
     throw new ApiError(
@@ -269,10 +293,11 @@ export async function createListing(body) {
       },
     );
   }
+
   const listing = {
     ...body,
-    id: Math.max(...mockMyListings.map((l) => l.id)) + 1,
-    county: "Nairobi",
+    id: Math.max(0, ...mockMyListings.map((l) => l.id)) + 1,
+    county: body.county || "Nairobi",
     status: "available",
     cover_image_url: null,
     poster: {
@@ -302,17 +327,23 @@ export async function updateListing(id, body) {
   if (l.poster.id !== posterId()) {
     throw new ApiError(403, "FORBIDDEN", "You can only edit your own listings");
   }
-  if (!mockAreas.includes(body.area)) {
+
+  const validAreas = Array.isArray(mockAreas)
+    ? mockAreas
+    : (mockAreas[body.county] ?? []);
+
+  if (validAreas.length > 0 && !validAreas.includes(body.area)) {
     throw new ApiError(400, "VALIDATION_ERROR", "Invalid listing", {
       area: ["Choose an area from the list"],
     });
   }
-  const key = dedupeKey(body.area, body.building_name, body.unit_number);
+
+  const key = dedupeKey(body);
   const existing = mockMyListings.find(
     (x) =>
       x.id !== l.id &&
       x.status !== "removed" &&
-      dedupeKey(x.area, x.building_name, unitFor(x)) === key,
+      dedupeKey({ ...x, unit_number: x.unit_number ?? unitFor(x) }) === key,
   );
   if (existing) {
     throw new ApiError(
@@ -325,7 +356,11 @@ export async function updateListing(id, body) {
       },
     );
   }
-  Object.assign(l, body);
+
+  Object.assign(l, body, {
+    county: body.county || l.county || "Nairobi",
+    updated_at: new Date().toISOString(),
+  });
   save();
   return { listing: { ...l } };
 }

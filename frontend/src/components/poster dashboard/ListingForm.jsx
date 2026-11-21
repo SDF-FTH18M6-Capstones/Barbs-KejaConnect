@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Field from "./Field";
-import useLoad from "./useLoad";
 import {
+  COUNTIES,
   DESCRIPTION_MAX,
   NO_BEDROOM_TYPES,
   serverFieldErrors,
@@ -32,24 +32,88 @@ export default function ListingForm({
   submitLabel,
   savingLabel,
   onSave,
+  externalError = null,
+  isSubmitting = false,
 }) {
-  const areas = useLoad(getAreas);
-
   const [values, setValues] = useState(initialValues);
+  const [areas, setAreas] = useState({
+    data: null,
+    loading: false,
+    error: null,
+  });
   const [errors, setErrors] = useState({});
   const [duplicate, setDuplicate] = useState(null);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const busy = saving || isSubmitting;
   const noBedroom = NO_BEDROOM_TYPES.includes(values.property_type);
   const commercial = values.property_type === "commercial";
+  const isHouse = values.property_type === "house";
+
+  function applyServerError(err) {
+    if (!err) return;
+    if (err.code === "DUPLICATE_LISTING") setDuplicate(err.details ?? {});
+    else if (err.code === "VALIDATION_ERROR" && err.details)
+      setErrors(serverFieldErrors(err.details));
+    else if (err.code === "ACCOUNT_NOT_APPROVED")
+      setFormError(
+        "Your account is not approved yet, so you can't manage listings.",
+      );
+    else if (err.status === 403)
+      setFormError("You can only edit your own listings.");
+    else setFormError(err.message || "Could not save the listing. Try again.");
+  }
+
+  useEffect(() => {
+    applyServerError(externalError);
+  }, [externalError]);
+
+  useEffect(() => {
+    if (!values.county) {
+      setAreas({ data: null, loading: false, error: null });
+      return;
+    }
+
+    let cancelled = false;
+    setAreas((prev) => ({ ...prev, loading: true, error: null }));
+
+    getAreas({ county: values.county })
+      .then((data) => {
+        if (!cancelled) setAreas({ data, loading: false, error: null });
+      })
+      .catch((error) => {
+        if (!cancelled) setAreas({ data: null, loading: false, error });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [values.county]);
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setValues((v) => ({ ...v, [name]: value }));
-    setErrors((er) => ({ ...er, [name]: "" }));
-    if (["area", "building_name", "unit_number"].includes(name))
+    setValues((v) => ({
+      ...v,
+      [name]: value,
+      ...(name === "county" ? { area: "" } : {}),
+    }));
+    setErrors((er) => ({
+      ...er,
+      [name]: "",
+      ...(name === "county" ? { area: "" } : {}),
+    }));
+    if (
+      [
+        "county",
+        "area",
+        "building_name",
+        "street_address",
+        "unit_number",
+      ].includes(name)
+    ) {
       setDuplicate(null);
+    }
     setFormError("");
   }
 
@@ -69,17 +133,8 @@ export default function ListingForm({
     try {
       await onSave(toListingBody(values));
     } catch (err) {
-      if (err.code === "DUPLICATE_LISTING") setDuplicate(err.details ?? {});
-      else if (err.code === "VALIDATION_ERROR" && err.details)
-        setErrors(serverFieldErrors(err.details));
-      else if (err.code === "ACCOUNT_NOT_APPROVED")
-        setFormError(
-          "Your account is not approved yet, so you can't manage listings.",
-        );
-      else if (err.status === 403)
-        setFormError("You can only edit your own listings.");
-      else
-        setFormError(err.message || "Could not save the listing. Try again.");
+      applyServerError(err);
+    } finally {
       setSaving(false);
     }
   }
@@ -117,7 +172,6 @@ export default function ListingForm({
         >
           {input("title", { maxLength: 80 })}
         </Field>
-
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Property type" error={errors.property_type}>
             {(props) => (
@@ -163,6 +217,23 @@ export default function ListingForm({
 
       <Section title="Location">
         <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="County" error={errors.county}>
+            {(props) => (
+              <select
+                {...props}
+                name="county"
+                value={values.county}
+                onChange={handleChange}
+              >
+                <option value="">Choose a county</option>
+                {COUNTIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
           <Field
             label="Area"
             error={
@@ -176,10 +247,14 @@ export default function ListingForm({
                 name="area"
                 value={values.area}
                 onChange={handleChange}
-                disabled={areas.loading}
+                disabled={!values.county || areas.loading}
               >
                 <option value="">
-                  {areas.loading ? "Loading areas…" : "Choose an area"}
+                  {!values.county
+                    ? "Choose a county first"
+                    : areas.loading
+                      ? "Loading areas…"
+                      : "Choose an area"}
                 </option>
                 {areas.data?.items.map((a) => (
                   <option key={a} value={a}>
@@ -189,8 +264,19 @@ export default function ListingForm({
               </select>
             )}
           </Field>
-          <Field label="Building or estate" error={errors.building_name}>
+          <Field
+            label="Building or estate"
+            optional={isHouse}
+            error={errors.building_name}
+          >
             {input("building_name", { placeholder: "Jabavu Court" })}
+          </Field>
+          <Field
+            label="Street address"
+            optional={!isHouse}
+            error={errors.street_address}
+          >
+            {input("street_address", { placeholder: "Argwings Kodhek Rd" })}
           </Field>
           <Field
             label="Unit number"
@@ -219,7 +305,7 @@ export default function ListingForm({
               {duplicate.poster_name
                 ? `${duplicate.poster_name} has`
                 : "Someone has"}{" "}
-              already posted this area, building and unit. Check the unit
+              already posted this area, building/street and unit. Check the unit
               number, or report the listing if you manage this unit.
             </p>
             {duplicate.existing_listing_id && (
@@ -264,11 +350,12 @@ export default function ListingForm({
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          disabled={saving}
+          disabled={busy}
           className="rounded-lg bg-primary px-6 py-3 font-medium text-text-on-primary hover:bg-primary-dark disabled:opacity-60"
         >
-          {saving ? savingLabel : submitLabel}
+          {busy ? savingLabel : submitLabel}
         </button>
+
         <Link
           to={POSTER.listings}
           className="rounded-lg border border-border bg-surface px-6 py-3 font-medium text-text hover:bg-bg"

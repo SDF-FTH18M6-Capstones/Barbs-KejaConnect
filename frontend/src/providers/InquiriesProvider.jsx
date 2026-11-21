@@ -78,7 +78,7 @@ export function InquiriesProvider({ children }) {
   }
 
   async function get_inquiries(url) {
-    inquiriesDispatch({ type: "INIT" });
+    inquiriesDispatch({ type: "LOADING" });
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("Unauthorized user.");

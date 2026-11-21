@@ -5,7 +5,7 @@ import { useAuth } from "../../providers/AuthProvider";
 
 const LINKS = [
   { to: POSTER.home, label: "Dashboard", end: true },
-  { to: POSTER.listings, label: "My Listings" },
+  { to: POSTER.listings, label: "My Listings", end: true },
   { to: POSTER.newListing, label: "New listing" },
   { to: POSTER.inquiries, label: "Inquiries" },
   { to: POSTER.verification, label: "Verification" },
