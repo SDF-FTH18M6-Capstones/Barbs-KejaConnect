@@ -45,7 +45,7 @@ class ListingsRepository(ListingsRepoInterface):
         try:
             db.session.add(listing)
             db.session.commit()
-            db.session.refresh()
+            db.session.refresh(listing)
             return listing
         except IntegrityError as e:
             db.session.rollback()
@@ -54,4 +54,4 @@ class ListingsRepository(ListingsRepoInterface):
             )
         except SQLAlchemyError as e:
             db.session.rollback()
-            raise DatabasePersistenceError(f"Failed to upload new listing.")
+            raise DatabasePersistenceError(f"Failed to upload new listing:  {e}")

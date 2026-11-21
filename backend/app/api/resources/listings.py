@@ -28,7 +28,7 @@ class ListingsResource(Resource):
     @jwt_required()
     def post(self):
         data = request.get_json(silent=True)
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         claims = get_jwt()
         approval_status = claims.get("approval_status")
         if approval_status != "approved" or claims.get("role") not in (
@@ -43,7 +43,7 @@ class ListingsResource(Resource):
                 403,
             )
 
-        data["poster_id"] = user_id
+        data = data | {"poster_id": user_id}
 
         validate_listing = PropertySchema().load(data)
 
