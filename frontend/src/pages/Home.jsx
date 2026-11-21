@@ -13,7 +13,7 @@ const PAGE_SIZE = 9;
 const EMPTY = { area: "", property_type: "", min: "", max: "" };
 
 export default function Home() {
-  const { listingsData, lisingsDispatch, setPage } = useListings();
+  const { listingsData, setPage } = useListings();
   const { items, page, per_page, total, pages, loading, error } = listingsData;
   const [filters, setFilters] = useState(EMPTY);
 
