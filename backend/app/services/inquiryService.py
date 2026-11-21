@@ -57,6 +57,6 @@ class InquiryService(InquiryInterface):
         )
 
     def sent_inquiries(self):
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
 
         return self.inquiry_repo.get_sent_inquiries(user_id=user_id)
