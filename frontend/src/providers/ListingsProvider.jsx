@@ -17,6 +17,9 @@ const initialNewListing = {
   loading: false,
   error: null,
 };
+
+const intialListing = { listing: null, loading: true, error: null };
+
 function handleListings(state, action) {
   switch (action.type) {
     case "INIT":
@@ -61,6 +64,24 @@ function handleCreateListing(state, action) {
       return state;
   }
 }
+function handleGetListing(state, action) {
+  switch (action.type) {
+    case "INIT":
+      return { ...state, loading: false };
+    case "LOADING":
+      return { ...state, loading: true, error: null };
+    case "SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        listing: action.payload,
+      };
+    case "ERROR":
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+}
 export function ListingsProvider({ children }) {
   const [listingsData, listingsDispatch] = useReducer(
     handleListings,
@@ -70,6 +91,11 @@ export function ListingsProvider({ children }) {
   const [newlisting, newListingDispatch] = useReducer(
     handleCreateListing,
     initialNewListing,
+  );
+
+  const [listingData, listingDispatch] = useReducer(
+    handleGetListing,
+    intialListing,
   );
 
   const navigate = useNavigate();
@@ -86,6 +112,32 @@ export function ListingsProvider({ children }) {
       getAllListings();
     }
   }, [listingsData.page, listingsData.per_page]);
+
+  async function getAllListings() {
+    await get_listings("/api/v1/listings");
+  }
+
+  async function getPosterListings() {
+    await get_listings("/api/v1/listings/mine");
+  }
+
+  async function getListing(id) {
+    listingDispatch({ type: "LOADING" });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Unauthorized user.");
+    }
+    try {
+      const res = await fetch(`/api/v1/listings/${id}`);
+      if (!res.ok) throw new Error("Failed to fetch listings.");
+      const data = await res.json();
+      listingDispatch({ type: "SUCCESS", payload: data.listing });
+    } catch (error) {
+      listingDispatch({ type: "ERROR", payload: error.message });
+    } finally {
+      listingDispatch({ type: "INIT" });
+    }
+  }
 
   async function get_listings(url) {
     listingsDispatch({ type: "LOADING" });
@@ -114,14 +166,6 @@ export function ListingsProvider({ children }) {
     }
   }
 
-  async function getAllListings() {
-    await get_listings("/api/v1/listings");
-  }
-
-  async function getPosterListings() {
-    await get_listings("/api/v1/listings/mine");
-  }
-
   async function createListing(formdata) {
     newListingDispatch({ type: "LOADING" });
     try {
@@ -139,10 +183,8 @@ export function ListingsProvider({ children }) {
       });
       if (!res.ok) throw new Error("Failed to fetch listings.");
       const data = await res.json();
-      console.log(data);
       newListingDispatch({ type: "SUCCESS", payload: data.listing });
     } catch (error) {
-      console.log("Error::::", error);
       newListingDispatch({ type: "ERROR", payload: error.message });
     } finally {
       listingsDispatch({ type: "INIT" });
@@ -155,6 +197,9 @@ export function ListingsProvider({ children }) {
     createListing,
     setPage,
     getPosterListings,
+    getAllListings,
+    listingData,
+    getListing,
   };
 
   return (

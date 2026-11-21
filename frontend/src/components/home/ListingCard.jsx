@@ -12,9 +12,10 @@ export default function ListingCard({ listing, index = 0 }) {
     building_name,
     price_monthly,
     created_at,
-    cover_image_url,
+    property_images,
     poster,
   } = listing;
+  const cover_image_url = property_images[0].url;
 
   return (
     <Link
