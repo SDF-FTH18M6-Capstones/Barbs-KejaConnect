@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import PosterGate from "../../components/poster dashboard/PosterGate";
 import StatCard from "../../components/poster dashboard/StatCard";
@@ -9,8 +9,6 @@ import useLoad from "../../components/poster dashboard/useLoad";
 import { getMyListings, setListingStatus } from "../../api/listings";
 import { getReceivedInquiries } from "../../api/inquiries";
 import { POSTER } from "../../paths";
-import { useListings } from "../../providers/ListingsProvider";
-import { useInquiries } from "../../providers/InquiriesProvider";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 12) return "Good morning";
@@ -18,19 +16,24 @@ function greeting(hour = new Date().getHours()) {
   return "Good evening";
 }
 
+const countStatus = (items) => ({
+  available: items.filter((l) => l.status === "available").length,
+  taken: items.filter((l) => l.status === "taken").length,
+});
+
 async function loadDashboard() {
-  const [recent, available, taken, inquiries] = await Promise.all([
-    getMyListings({ per_page: 5 }),
-    getMyListings({ status: "available", per_page: 1 }),
-    getMyListings({ status: "taken", per_page: 1 }),
-    getReceivedInquiries({ per_page: 50 }),
+  const [mine, inquiries] = await Promise.all([
+    getMyListings({ per_page: 100 }),
+    getReceivedInquiries({ per_page: 50 }).catch(() => ({
+      items: [],
+      total: 0,
+    })),
   ]);
   return {
-    listings: recent,
+    listings: { ...mine, items: mine.items.slice(0, 5) },
     summary: {
-      available: available.total,
-      taken: taken.total,
-      inquiries_total: inquiries.total,
+      ...countStatus(mine.items),
+      inquiries_total: inquiries.total ?? inquiries.items.length,
       inquiries_unread: inquiries.items.filter((q) => q.status === "new")
         .length,
     },
@@ -39,11 +42,6 @@ async function loadDashboard() {
 }
 
 function DashboardHome({ user }) {
-  const { listingsData, getPosterListings } = useListings();
-  const { inquiriesData } = useInquiries();
-  useEffect(() => {
-    getPosterListings();
-  }, []);
   const { loading, data, error, retry, setData } = useLoad(loadDashboard);
   const [busyId, setBusyId] = useState(null);
   const [rowError, setRowError] = useState("");
@@ -103,7 +101,7 @@ function DashboardHome({ user }) {
         </Link>
       </div>
 
-      {(listingsData.loading || inquiriesData.loading) && (
+      {loading && (
         <div aria-busy="true" className="space-y-4">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[1, 2, 3, 4].map((n) => (
@@ -118,7 +116,7 @@ function DashboardHome({ user }) {
         </div>
       )}
 
-      {listingsData.error && <LoadError error={error} onRetry={retry} />}
+      {error && <LoadError error={error} onRetry={retry} />}
 
       {data && (
         <>
@@ -145,7 +143,7 @@ function DashboardHome({ user }) {
                 to={POSTER.listings}
                 className="text-sm font-medium text-primary hover:text-primary-dark"
               >
-                View all {listingsData.total}
+                View all {data.listings.total}
               </Link>
             </div>
             {rowError && (
@@ -156,7 +154,7 @@ function DashboardHome({ user }) {
                 {rowError}
               </p>
             )}
-            {listingsData.items.length === 0 ? (
+            {data.listings.items.length === 0 ? (
               <div className="space-y-3 p-8 pt-2 text-center">
                 <p className="text-text-muted">
                   You haven't posted any listings yet.
@@ -170,14 +168,14 @@ function DashboardHome({ user }) {
               </div>
             ) : (
               <ListingsTable
-                listings={listingsData.items}
+                listings={data.listings.items}
                 onToggle={toggleListing}
                 busyId={busyId}
               />
             )}
           </section>
 
-          <RecentInquiries inquiries={inquiriesData.items} />
+          <RecentInquiries inquiries={data.inquiries} />
         </>
       )}
     </>

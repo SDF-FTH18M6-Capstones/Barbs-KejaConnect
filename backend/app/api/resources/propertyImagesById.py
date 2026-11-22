@@ -1,40 +1,29 @@
 from flask_restful import Resource
-from flask import make_response, request
-from flask_jwt_extended import jwt_required, get_jwt
-from ...models import PropertyImage
-from ...schemas import PropertyImageSchema
-from ...config import db
-from ...services import UploadFilesService, VerificationDocsService
+from flask import make_response
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
+from ...services import UploadFilesService, ListingsService
 
 
 class PropertyImagesByIdResource(Resource):
-    def __init__(
-        self,
-        upload: UploadFilesService,
-    ):
+    def __init__(self, upload: UploadFilesService, listing_service: ListingsService):
         self.upload = upload
+        self.listing_service = listing_service
 
     @jwt_required()
     def delete(self, id, image_id):
         role = get_jwt().get("role")
-        if role not in ("manager", "owner"):
+        listing = self.listing_service.get_by_id(listing_id=id)
+        if role not in ("manager", "owner") or listing.poster_id != int(
+            get_jwt_identity()
+        ):
             return make_response(
                 {
                     "error": "Not allowed.",
-                    "message": f"User of type {role} can not perform that operation.",
+                    "message": "You can only remove photos from your own listings.",
                 },
                 403,
             )
 
-        deleted = self.upload.delete_property_image(listing_id=id, image_id=image_id)
-        if not deleted:
-            return make_response(
-                {"error": "Failed to delete", "message": f"The image was not deleted."}
-            )
+        self.upload.delete_property_image(listing_id=id, image_id=image_id)
 
-        return make_response(
-            {
-                "message": "FILE_DELETED",
-            },
-            203,
-        )
+        return make_response({"message": "FILE_DELETED"}, 200)

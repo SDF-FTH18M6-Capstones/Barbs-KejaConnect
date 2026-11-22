@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Field from "./Field";
+import PhotoPicker from "./PhotoPicker";
 import {
   COUNTIES,
   DESCRIPTION_MAX,
@@ -32,28 +33,27 @@ export default function ListingForm({
   submitLabel,
   savingLabel,
   onSave,
-  externalError = null,
-  isSubmitting = false,
+  existingPhotos = [],
+  onRemovePhoto,
 }) {
   const [values, setValues] = useState(initialValues);
-  const [areas, setAreas] = useState({
-    data: null,
-    loading: false,
-    error: null,
-  });
+  const [photos, setPhotos] = useState([]);
+  const [photoError, setPhotoError] = useState("");
+  const [removingId, setRemovingId] = useState(null);
+  const [areas, setAreas] = useState({ county: "", items: [] });
   const [errors, setErrors] = useState({});
   const [duplicate, setDuplicate] = useState(null);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const busy = saving || isSubmitting;
+  const busy = saving;
   const noBedroom = NO_BEDROOM_TYPES.includes(values.property_type);
   const commercial = values.property_type === "commercial";
   const isHouse = values.property_type === "house";
 
   function applyServerError(err) {
-    if (!err) return;
-    if (err.code === "DUPLICATE_LISTING") setDuplicate(err.details ?? {});
+    if (err.code === "DUPLICATE_LISTING" || err.status === 409)
+      setDuplicate(err.details ?? {});
     else if (err.code === "VALIDATION_ERROR" && err.details)
       setErrors(serverFieldErrors(err.details));
     else if (err.code === "ACCOUNT_NOT_APPROVED")
@@ -66,30 +66,20 @@ export default function ListingForm({
   }
 
   useEffect(() => {
-    applyServerError(externalError);
-  }, [externalError]);
-
-  useEffect(() => {
-    if (!values.county) {
-      setAreas({ data: null, loading: false, error: null });
-      return;
-    }
-
+    if (!values.county) return;
     let cancelled = false;
-    setAreas((prev) => ({ ...prev, loading: true, error: null }));
-
     getAreas({ county: values.county })
       .then((data) => {
-        if (!cancelled) setAreas({ data, loading: false, error: null });
+        if (!cancelled)
+          setAreas({ county: values.county, items: data.items ?? [] });
       })
-      .catch((error) => {
-        if (!cancelled) setAreas({ data: null, loading: false, error });
-      });
-
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, [values.county]);
+
+  const areaSuggestions = areas.county === values.county ? areas.items : [];
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -131,11 +121,22 @@ export default function ListingForm({
     }
     setSaving(true);
     try {
-      await onSave(toListingBody(values));
+      await onSave(toListingBody(values), photos);
     } catch (err) {
       applyServerError(err);
-    } finally {
       setSaving(false);
+    }
+  }
+
+  async function removeSaved(image) {
+    setPhotoError("");
+    setRemovingId(image.id);
+    try {
+      await onRemovePhoto(image);
+    } catch (err) {
+      setPhotoError(err.message || "Could not remove the photo. Try again.");
+    } finally {
+      setRemovingId(null);
     }
   }
 
@@ -236,32 +237,28 @@ export default function ListingForm({
           </Field>
           <Field
             label="Area"
-            error={
-              errors.area ||
-              (areas.error && "Could not load the areas. Reload the page.")
-            }
+            hint="Estate or neighbourhood, e.g. Kilimani"
+            error={errors.area}
           >
             {(props) => (
-              <select
-                {...props}
-                name="area"
-                value={values.area}
-                onChange={handleChange}
-                disabled={!values.county || areas.loading}
-              >
-                <option value="">
-                  {!values.county
-                    ? "Choose a county first"
-                    : areas.loading
-                      ? "Loading areas…"
-                      : "Choose an area"}
-                </option>
-                {areas.data?.items.map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
-                ))}
-              </select>
+              <>
+                <input
+                  {...props}
+                  name="area"
+                  list="area-suggestions"
+                  value={values.area}
+                  onChange={handleChange}
+                  disabled={!values.county}
+                  placeholder={
+                    values.county ? "Kilimani" : "Choose a county first"
+                  }
+                />
+                <datalist id="area-suggestions">
+                  {areaSuggestions.map((a) => (
+                    <option key={a} value={a} />
+                  ))}
+                </datalist>
+              </>
             )}
           </Field>
           <Field
@@ -336,6 +333,19 @@ export default function ListingForm({
             />
           )}
         </Field>
+      </Section>
+
+      <Section title="Photos">
+        <PhotoPicker
+          existing={existingPhotos}
+          files={photos}
+          onFilesChange={setPhotos}
+          onRemoveExisting={removeSaved}
+          removingId={removingId}
+          error={photoError}
+          onError={setPhotoError}
+          disabled={busy}
+        />
       </Section>
 
       {formError && (

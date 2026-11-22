@@ -3,8 +3,7 @@ from flask import make_response, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from ...models import Property
 from ...schemas import PropertySchema
-from ...config import db
-from ...services import ListingsService, VerificationDocsService
+from ...services import ListingsService
 
 
 class ListingByIdResource(Resource):
@@ -20,9 +19,9 @@ class ListingByIdResource(Resource):
 
     @jwt_required()
     def put(self, id):
-        data = request.get_json(silent=True)
+        data = request.get_json(silent=True) or {}
         l: Property = self.listing_service.get_by_id(listing_id=id)
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         claims = get_jwt()
         if l.poster_id != user_id or claims.get("role") not in (
             "owner",
@@ -31,7 +30,7 @@ class ListingByIdResource(Resource):
             return make_response(
                 {
                     "error": "Not allowed.",
-                    "message": f"You either not approved or allowed to perform that operation.",
+                    "message": "You either not approved or allowed to perform that operation.",
                 },
                 403,
             )
@@ -45,9 +44,9 @@ class ListingByIdResource(Resource):
 
     @jwt_required()
     def patch(self, id):
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         l: Property = self.listing_service.get_by_id(listing_id=id)
-        data = request.get_json(silent=True)
+        data = request.get_json(silent=True) or {}
         status = data.get("status", "")
 
         if not status or not isinstance(status, str):
@@ -56,14 +55,14 @@ class ListingByIdResource(Resource):
                     "error": "Bad request",
                     "message": "Invalid request object.",
                 },
-                403,
+                400,
             )
 
         if l.poster_id != user_id:
             return make_response(
                 {
                     "error": "Not allowed.",
-                    "message": f"You either not approved or allowed to perform that operation.",
+                    "message": "You either not approved or allowed to perform that operation.",
                 },
                 403,
             )

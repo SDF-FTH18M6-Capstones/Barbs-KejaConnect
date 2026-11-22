@@ -20,7 +20,7 @@ class InquiriesReceived(Resource):
 
         return make_response(
             {
-                "items": inquiries.items,
+                "items": InquirySchema(many=True).dump(inquiries.items),
                 "page": page,
                 "per_page": per_page,
                 "total": inquiries.total,
