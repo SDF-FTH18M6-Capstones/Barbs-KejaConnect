@@ -15,7 +15,10 @@ export default function ListingCard({ listing, index = 0 }) {
     property_images,
     poster,
   } = listing;
-  const cover_image_url = property_images[0].url;
+  const cover_image_url =
+    property_images?.find((img) => img.is_cover)?.url ??
+    property_images?.[0]?.url ??
+    listing.cover_image_url;
 
   return (
     <Link
