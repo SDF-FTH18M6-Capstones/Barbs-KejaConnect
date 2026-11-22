@@ -10,6 +10,7 @@ from ..exceptions import (
     AlreadyExists,
     FileUploadFailed,
     NotAllowedError,
+    ResourceNotFoundError,
 )
 
 
@@ -58,42 +59,38 @@ class UploadFilesService(UploadFilesInterface):
         return ver_doc
 
     def upload_property_images(self, files, listing_id):
-        user_id = get_jwt_identity()
+        existing = self.property_image_repo.count_for_listing(listing_id)
         property_images = []
-        count = 0
-        for file in files:
-            if file.filename:
-                count += 1
-                file_url, public_id = self.upload_file(file=file, type="property")
-                new_image = PropertyImageSchema().load(
-                    {
-                        "property_id": listing_id,
-                        "url": file_url,
-                        "cloudinary_public_id": public_id,
-                        "is_cover": count == 1,
-                        "position": count,
-                    }
-                )
-                image = self.property_image_repo.add_property_image(image=new_image)
-                property_images.append(image)
+        for count, file in enumerate(files, start=existing + 1):
+            file_url, public_id = self.upload_file(file=file, type="property")
+            new_image = PropertyImageSchema().load(
+                {
+                    "property_id": listing_id,
+                    "url": file_url,
+                    "cloudinary_public_id": public_id,
+                    "is_cover": count == 1,
+                    "position": count,
+                }
+            )
+            image = self.property_image_repo.create_property_image(image=new_image)
+            property_images.append(image)
 
         return property_images
 
     def delete_property_image(self, listing_id, image_id):
-        user_id = get_jwt_identity()
         image_data: PropertyImage = self.property_image_repo.get_image_by_id(image_id)
-        claims = get_jwt()
-        if claims.get("role") not in ("manager", "owner"):
-            raise NotAllowedError("You are not authorized to perform this operation.")
+        if not image_data or image_data.property_id != listing_id:
+            raise ResourceNotFoundError("Photo not found.")
 
         try:
-            result = cloudinary.uploader.destroy(image_data.cloudinary_public_id)
-            if result.get("result") == "ok":
-                self.property_image_repo.delete_image(image_data)
-                return True
-            raise Exception("Failed to delete image.")
+            cloudinary.uploader.destroy(image_data.cloudinary_public_id)
         except Exception as e:
-            raise FileUploadFailed("Something wen wrong when uploading your file.")
+            print("CLOUDINARY ERROR:", repr(e))
+
+        self.property_image_repo.delete_image(image_data)
+        if image_data.is_cover:
+            self.property_image_repo.set_first_as_cover(listing_id)
+        return True
 
 
 # todo:make cover image make_cover(listing_id,image_id)
