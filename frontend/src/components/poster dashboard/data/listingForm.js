@@ -93,7 +93,7 @@ export const validateListing = (v) => {
   }
 
   if (!v.county) errors.county = "Choose the county";
-  if (!v.area) errors.area = "Choose the area";
+  if (!v.area.trim()) errors.area = "Enter the area, e.g. Kilimani";
 
   if (isHouse) {
     if (!v.street_address.trim()) {
@@ -117,9 +117,12 @@ export const validateListing = (v) => {
 
 const numberOrNull = (v) => (String(v).trim() === "" ? null : Number(v));
 
+const withoutEmpty = (body) =>
+  Object.fromEntries(Object.entries(body).filter(([, v]) => v !== null));
+
 export function toListingBody(v) {
   const noBedroom = NO_BEDROOM_TYPES.includes(v.property_type);
-  return {
+  return withoutEmpty({
     title: v.title.trim(),
     description: v.description.trim(),
     property_type: v.property_type,
@@ -127,12 +130,12 @@ export function toListingBody(v) {
     bedrooms: noBedroom ? 0 : numberOrNull(v.bedrooms),
     bathrooms: numberOrNull(v.bathrooms),
     county: v.county,
-    area: v.area,
+    area: v.area.trim(),
     building_name: v.building_name.trim() || null,
     street_address: v.street_address.trim() || null,
     unit_number: v.unit_number.trim(),
     lr_number: v.lr_number.trim() || null,
-  };
+  });
 }
 
 export function serverFieldErrors(details = {}) {
@@ -150,4 +153,18 @@ export function fromListing(listing) {
   return Object.fromEntries(
     Object.keys(EMPTY_LISTING).map((key) => [key, asText(listing[key])]),
   );
+}
+
+export const MAX_PHOTOS = 10;
+export const MAX_PHOTO_MB = 5;
+const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+export function checkPhoto(file) {
+  if (!PHOTO_TYPES.includes(file.type)) {
+    return `${file.name} is not a JPG, PNG or WEBP photo`;
+  }
+  if (file.size > MAX_PHOTO_MB * 1024 * 1024) {
+    return `${file.name} is larger than ${MAX_PHOTO_MB} MB`;
+  }
+  return "";
 }
