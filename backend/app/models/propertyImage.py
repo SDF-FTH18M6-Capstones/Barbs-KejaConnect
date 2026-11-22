@@ -12,7 +12,7 @@ class PropertyImage(db.Model):
     url = db.Column(db.String, nullable=False)
     cloudinary_public_id = db.Column(db.String(255), nullable=False)
     is_cover = db.Column(db.Boolean, nullable=False)
-    position = db.Column(db.Integer, nullable=False, unique=True)
+    position = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     property = db.relationship("Property", back_populates="property_images")
