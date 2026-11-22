@@ -13,7 +13,7 @@ class PropertyImgRepository(PropertyImgRepoInterface):
     def create_property_image(self, image):
         try:
             db.session.add(image)
-            db.session.commit(image)
+            db.session.commit()
             db.session.refresh(image)
             return image
         except IntegrityError as e:
@@ -24,6 +24,19 @@ class PropertyImgRepository(PropertyImgRepoInterface):
         except SQLAlchemyError as e:
             db.session.rollback()
             raise DatabasePersistenceError(f"Failed to upload image.:{e}")
+
+    def count_for_listing(self, listing_id):
+        return PropertyImage.query.filter_by(property_id=listing_id).count()
+
+    def set_first_as_cover(self, listing_id):
+        first = (
+            PropertyImage.query.filter_by(property_id=listing_id)
+            .order_by(PropertyImage.position)
+            .first()
+        )
+        if first:
+            first.is_cover = True
+            db.session.commit()
 
     def delete_image(self, image):
         try:
