@@ -11,6 +11,11 @@ import MyListings from "./pages/PosterDashboard/MyListings";
 import NewListing from "./pages/PosterDashboard/NewListing";
 import PosterInquiries from "./pages/PosterDashboard/PosterInquiries";
 import Verification from "./pages/PosterDashboard/Verification";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminApprovalQueue from "./pages/admin/AdminApprovalQueue";
+import PosterReview from "./pages/admin/PosterReview";
+import { ADMIN } from "./paths";
+import AdminNewListing from "./pages/admin/AdminNewListing";
 
 
 export const router = createBrowserRouter([
@@ -32,4 +37,11 @@ export const router = createBrowserRouter([
   { path: "/listings/new", element: <NewListing /> },
   { path: "/dashboard/inquiries", element: <PosterInquiries /> },
   { path: "/dashboard/verification", element: <Verification /> },
+  { path: ADMIN.home, element: <AdminDashboard /> },
+  { path: ADMIN.approvalQueue, element: <AdminApprovalQueue /> },
+  { path: ADMIN.posterReview, element: <PosterReview /> },
+  { path: ADMIN.newListing, element: <AdminNewListing /> },
+  // placeholders until these pages are built
+  { path: ADMIN.stats, element: <AdminDashboard /> },
+  { path: ADMIN.reports, element: <AdminDashboard /> },
 ]);
