@@ -85,8 +85,6 @@ export async function getListings({
 
 export async function getAreas({ county } = {}) {
   await delay(100);
-  // If mockAreas is an object keyed by county (e.g. { Nairobi: [...], Mombasa: [...] }),
-  // return mockAreas[county] ?? []; otherwise return mockAreas for Nairobi / default.
   if (Array.isArray(mockAreas)) {
     return { items: !county || county === "Nairobi" ? mockAreas : [] };
   }
@@ -94,6 +92,14 @@ export async function getAreas({ county } = {}) {
     items: county ? (mockAreas[county] ?? []) : Object.values(mockAreas).flat(),
   };
 }
+
+const placeholderImages = (l) =>
+  Array.from({ length: 6 }, (_, i) => ({
+    id: l.id * 100 + i,
+    url: null,
+    is_cover: i === 0,
+    position: i,
+  }));
 
 function toDetail(l) {
   return {
@@ -105,16 +111,15 @@ function toDetail(l) {
     street_address: l.street_address ?? null,
     unit_number: l.unit_number ?? unitFor(l),
     lr_number: l.lr_number ?? null,
-    images: Array.from({ length: 6 }, (_, i) => ({
-      id: l.id * 100 + i,
-      url: null,
-      is_cover: i === 0,
-      position: i,
-    })),
+    images: placeholderImages(l),
+    property_images: l.property_images?.length
+      ? l.property_images
+      : placeholderImages(l),
     poster: { ...l.poster, role: l.id % 2 ? "manager" : "owner" },
     updated_at: l.updated_at ?? l.created_at,
   };
 }
+
 export async function getListing(id) {
   await delay();
   const l = findListing(id);
@@ -235,6 +240,7 @@ export async function setListingStatus(id, status) {
   save();
   return { listing: { ...l } };
 }
+
 const normalizePart = (s) =>
   String(s ?? "")
     .trim()
@@ -393,7 +399,7 @@ export async function getMyDocuments({ page = 1, per_page = 20 } = {}) {
 
 export async function uploadDocument(formData) {
   await delay(600);
-  const file = formData.get("file");
+  const file = formData.get("files");
   if (
     !file ||
     !/\.(jpe?g|png|pdf)$/i.test(file.name) ||
@@ -416,4 +422,52 @@ export async function uploadDocument(formData) {
   };
   (mockDocuments[posterId()] ??= []).push(document);
   return { document };
+}
+
+function ownListing(id) {
+  const l = findListing(id);
+  if (!l) throw new ApiError(404, "NOT_FOUND", "Listing not found");
+  if (l.poster.id !== posterId())
+    throw new ApiError(403, "FORBIDDEN", "This is not your listing");
+  return l;
+}
+
+export async function uploadListingImages(id, formData) {
+  await delay(600);
+  const l = ownListing(id);
+  const files = formData.getAll("files");
+  const bad = files.find(
+    (f) => !/^image\/(jpeg|png|webp)$/.test(f.type) || f.size > 5 * 1024 * 1024,
+  );
+  if (bad) {
+    throw new ApiError(
+      400,
+      "INVALID_FILE",
+      "Upload JPG, PNG or WEBP photos of 5 MB or less",
+    );
+  }
+  l.property_images ??= [];
+  const added = files.map((file, i) => ({
+    id: Date.now() + i,
+    property_id: l.id,
+    url: URL.createObjectURL(file),
+    is_cover: l.property_images.length === 0 && i === 0,
+    position: l.property_images.length + i + 1,
+    created_at: new Date().toISOString(),
+  }));
+  l.property_images.push(...added);
+  save();
+  return { message: "FILES_UPLOADED", property_images: added };
+}
+
+export async function deleteListingImage(id, imageId) {
+  await delay(300);
+  const l = ownListing(id);
+  const images = l.property_images ?? [];
+  const index = images.findIndex((img) => img.id === Number(imageId));
+  if (index === -1) throw new ApiError(404, "NOT_FOUND", "Photo not found");
+  const [removed] = images.splice(index, 1);
+  if (removed.is_cover && images[0]) images[0].is_cover = true;
+  save();
+  return { message: "FILE_DELETED" };
 }
