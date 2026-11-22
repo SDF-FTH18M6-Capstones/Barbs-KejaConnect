@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import PosterGate from "../../components/poster dashboard/PosterGate";
 import ListingsTable from "../../components/poster dashboard/ListingsTable";
@@ -7,7 +7,9 @@ import Pager from "../../components/poster dashboard/Pager";
 import useLoad from "../../components/poster dashboard/useLoad";
 import { getMyListings, setListingStatus } from "../../api/listings";
 import { POSTER } from "../../paths";
-import { useListings } from "../../providers/ListingsProvider";
+
+const PER_PAGE = 10;
+const loadMine = () => getMyListings({ per_page: 100 });
 
 const FILTERS = [
   { value: "", label: "All" },
@@ -24,11 +26,15 @@ function MyListingsContent() {
   const [busyId, setBusyId] = useState(null);
   const [rowError, setRowError] = useState("");
 
-  const { listingsData, setPage, getPosterListings } = useListings();
+  const [page, setPage] = useState(1);
+  const { loading, data, error, retry, setData } = useLoad(loadMine);
 
-  useEffect(() => {
-    getPosterListings();
-  }, []);
+  const shown = (data?.items ?? []).filter(
+    (l) => !filter || l.status === filter,
+  );
+  const pages = Math.max(1, Math.ceil(shown.length / PER_PAGE));
+  const current = Math.min(page, pages);
+  const pageItems = shown.slice((current - 1) * PER_PAGE, current * PER_PAGE);
 
   function changeFilter(value) {
     setFilter(value);
@@ -114,10 +120,9 @@ function MyListingsContent() {
               {f.label}
             </button>
           ))}
-          {listingsData && (
+          {data && (
             <span className="ml-auto self-center text-sm text-text-muted">
-              {listingsData.total}{" "}
-              {listingsData.total === 1 ? "listing" : "listings"}
+              {shown.length} {shown.length === 1 ? "listing" : "listings"}
             </span>
           )}
         </div>
@@ -131,7 +136,7 @@ function MyListingsContent() {
           </p>
         )}
 
-        {listingsData.loading && (
+        {loading && (
           <div aria-busy="true" className="space-y-2 p-5 pt-0">
             {[1, 2, 3].map((n) => (
               <div
@@ -143,18 +148,13 @@ function MyListingsContent() {
           </div>
         )}
 
-        {listingsData.error && (
+        {error && (
           <div className="p-5 pt-0">
-            <LoadError
-              error={listingsData.error}
-              onRetry={() => {
-                getPosterListings();
-              }}
-            />
+            <LoadError error={error} onRetry={retry} />
           </div>
         )}
 
-        {listingsData && listingsData.items.length === 0 && (
+        {data && shown.length === 0 && (
           <div className="space-y-3 p-8 pt-2 text-center">
             <p className="text-text-muted">
               {filter
@@ -172,18 +172,14 @@ function MyListingsContent() {
           </div>
         )}
 
-        {listingsData && listingsData.items.length > 0 && (
+        {data && shown.length > 0 && (
           <>
             <ListingsTable
-              listings={listingsData.items}
+              listings={pageItems}
               onToggle={toggleListing}
               busyId={busyId}
             />
-            <Pager
-              page={listingsData.page}
-              pages={listingsData.pages}
-              onPage={setPage}
-            />
+            <Pager page={current} pages={pages} onPage={setPage} />
           </>
         )}
       </section>
