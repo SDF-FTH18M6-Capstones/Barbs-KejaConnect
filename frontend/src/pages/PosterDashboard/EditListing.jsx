@@ -1,11 +1,18 @@
 import { useCallback } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import PosterGate from "../../components/poster dashboard/PosterGate";
 import ListingForm from "../../components/poster dashboard/ListingForm";
 import LoadError from "../../components/poster dashboard/LoadError";
 import useLoad from "../../components/poster dashboard/useLoad";
 import { fromListing } from "../../components/poster dashboard/data/listingForm";
-import { getListing, updateListing } from "../../api/listings";
+import {
+  deleteListingImage,
+  getListing,
+  isMine,
+  listingImages,
+  updateListing,
+  uploadListingImages,
+} from "../../api/listings";
 import { POSTER } from "../../paths";
 
 function Notice({ title, text }) {
@@ -26,13 +33,36 @@ function Notice({ title, text }) {
 function EditListingContent({ user }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const photosFailed = useLocation().state?.photosFailed;
 
   const load = useCallback(() => getListing(id), [id]);
-  const { loading, data, error, retry } = useLoad(load);
+  const { loading, data, error, retry, setData } = useLoad(load);
 
-  async function save(body) {
+  async function save(body, photos) {
     const { listing } = await updateListing(id, body);
+    if (photos.length > 0) {
+      try {
+        await uploadListingImages(id, photos);
+      } catch {
+        throw new Error(
+          "Your changes are saved, but the photos didn't upload. Try adding them again.",
+        );
+      }
+    }
     navigate(POSTER.listings, { state: { updated: listing.title } });
+  }
+
+  async function removePhoto(image) {
+    await deleteListingImage(id, image.id);
+    setData((d) => ({
+      ...d,
+      listing: {
+        ...d.listing,
+        property_images: listingImages(d.listing).filter(
+          (img) => img.id !== image.id,
+        ),
+      },
+    }));
   }
 
   if (loading) {
@@ -60,7 +90,7 @@ function EditListingContent({ user }) {
 
   const listing = data.listing;
 
-  if (listing.poster?.id !== user.id) {
+  if (!isMine(listing, user)) {
     return (
       <Notice
         title="You can't edit this listing"
@@ -70,15 +100,28 @@ function EditListingContent({ user }) {
   }
 
   return (
-    <ListingForm
-      key={listing.id}
-      initialValues={fromListing(listing)}
-      heading="Edit listing"
-      intro="Changes show to tenants straight away. If you change the area, building or unit number, it's checked again so the unit isn't listed twice."
-      submitLabel="Save changes"
-      savingLabel="Saving…"
-      onSave={save}
-    />
+    <>
+      {photosFailed && (
+        <p
+          role="alert"
+          className="max-w-3xl rounded-lg bg-error/10 p-3 text-sm text-error"
+        >
+          “{photosFailed}” is live, but the photos didn't upload. Add them again
+          below and save.
+        </p>
+      )}
+      <ListingForm
+        key={listing.id}
+        initialValues={fromListing(listing)}
+        heading="Edit listing"
+        intro="Changes show to tenants straight away. If you change the area, building or unit number, it's checked again so the unit isn't listed twice."
+        submitLabel="Save changes"
+        savingLabel="Saving…"
+        onSave={save}
+        existingPhotos={listingImages(listing)}
+        onRemovePhoto={removePhoto}
+      />
+    </>
   );
 }
 
