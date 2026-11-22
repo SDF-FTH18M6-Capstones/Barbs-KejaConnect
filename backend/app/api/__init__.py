@@ -13,7 +13,6 @@ from .resources.listingById import ListingByIdResource
 from .resources.propertyImages import PropertyImagesResource
 from .resources.propertyImagesById import PropertyImagesByIdResource
 from .resources.inquiiresByListing import InquiriesByListing
-from .resources.inquiiresByListing import InquiriesByListing
 from .resources.inquiriesReceived import InquiriesReceived
 from .resources.inquiriesSent import InquiriesSent
 from .resources.adminStats import AdminStats
@@ -106,22 +105,23 @@ api.add_resource(
     "/listings/<int:id>/status",
     resource_class_kwargs={"listing_service": listing_service},
 )
+
 # listing images
 api.add_resource(
     PropertyImagesResource,
-    "/listings/:id/images",
-    resource_class_kwargs={"upload": upload_service},
+    "/listings/<int:id>/images",
+    resource_class_kwargs={"upload": upload_service, "listing_service": listing_service},
 )
 api.add_resource(
     PropertyImagesByIdResource,
-    "/listings/:id/images/:image_id",
-    resource_class_kwargs={"upload": upload_service},
+    "/listings/<int:id>/images/<int:image_id>",
+    resource_class_kwargs={"upload": upload_service, "listing_service": listing_service},
 )
 
 # inquiries
 api.add_resource(
     InquiriesByListing,
-    "/listings/:id/inquiries",
+    "/listings/<int:id>/inquiries",
     resource_class_kwargs={"inquiry_service": inquiry_service},
 )
 api.add_resource(
