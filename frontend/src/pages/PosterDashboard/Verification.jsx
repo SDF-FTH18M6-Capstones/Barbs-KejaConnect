@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import PosterGate from "../../components/poster dashboard/PosterGate";
 import Field from "../../components/poster dashboard/Field";
 import LoadError from "../../components/poster dashboard/LoadError";
@@ -12,7 +12,6 @@ import {
 } from "../../components/poster dashboard/data/documents";
 import { getMyDocuments, uploadDocument } from "../../api/verification";
 import { formatDate } from "../../components/inquiries/data/formart";
-import { useDocuments } from "../../providers/DocumentsProvider";
 
 const BANNERS = {
   approved: {
@@ -58,13 +57,11 @@ function Badge({ status }) {
   );
 }
 
+const loadDocuments = () => getMyDocuments({ per_page: 20 });
+
 function VerificationContent({ user }) {
   const fileInput = useRef(null);
-
-  const { uploadData, documentsData, uploadDocument, getDocuments } =
-    useDocuments();
-
-  const docs = documentsData;
+  const docs = useLoad(loadDocuments);
 
   const required = REQUIRED_DOCS[user.role] ?? ["national_id"];
   const [docType, setDocType] = useState(required[0]);
@@ -76,11 +73,8 @@ function VerificationContent({ user }) {
 
   const status = justUploaded ? "pending" : user.approval_status;
   const banner = BANNERS[status] ?? BANNERS.not_required;
-  const latest = latestByType(docs?.items);
+  const latest = latestByType(docs.data?.items);
 
-  useEffect(() => {
-    getDocuments();
-  }, [uploadData.data]);
   function chooseFile(e) {
     const chosen = e.target.files?.[0] ?? null;
     setFile(chosen);
@@ -102,8 +96,8 @@ function VerificationContent({ user }) {
       setJustUploaded(true);
       setFile(null);
       if (fileInput.current) fileInput.current.value = "";
+      docs.retry();
     } catch (err) {
-      console.log(err);
       setFileError(
         err.code === "INVALID_FILE"
           ? `Upload a JPG, PNG or PDF of ${MAX_FILE_MB} MB or less`
@@ -142,7 +136,7 @@ function VerificationContent({ user }) {
       )}
       {docs.error && <LoadError error={docs.error} onRetry={docs.retry} />}
 
-      {docs.items && (
+      {docs.data && (
         <section className="space-y-3 rounded-2xl border border-border bg-surface p-5">
           <h2 className="text-lg font-semibold">Documents you need</h2>
           <ul className="divide-y divide-border">
@@ -238,10 +232,10 @@ function VerificationContent({ user }) {
 
         <button
           type="submit"
-          disabled={uploadData.loading}
+          disabled={uploading}
           className="rounded-lg bg-primary px-6 py-3 font-medium text-text-on-primary hover:bg-primary-dark disabled:opacity-60"
         >
-          {uploadData.loading ? "Uploading…" : "Upload"}
+          {uploading ? "Uploading…" : "Upload"}
         </button>
       </form>
     </>
