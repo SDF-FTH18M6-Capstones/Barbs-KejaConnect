@@ -30,7 +30,39 @@ export async function getReceivedInquiries({ listing_id, ...params } = {}) {
   return { ...res, items: mine, total: mine.length, pages: 1 };
 }
 
-export const getSentInquiries = (params) =>
-  USE_MOCKS
-    ? mock.getSentInquiries(params)
-    : api("/inquiries/sent", { params, auth: true });
+const toSent = (q) => {
+  const p = q.property ?? { id: q.property_id, title: "Listing removed" };
+  const images = p.property_images ?? [];
+  return {
+    ...q,
+    property: {
+      ...p,
+      poster_name: p.poster_name ?? p.user?.full_name,
+      cover_image_url:
+        p.cover_image_url ??
+        images.find((img) => img.is_cover)?.url ??
+        images[0]?.url ??
+        null,
+    },
+  };
+};
+
+export async function getSentInquiries({ page = 1, per_page = 10 } = {}) {
+  if (USE_MOCKS) return mock.getSentInquiries({ page, per_page });
+  const res = await api("/inquiries/sent", {
+    params: { page, per_page },
+    auth: true,
+  });
+  if (res.items) return { ...res, items: res.items.map(toSent) };
+
+  const all = (res.inquiries ?? [])
+    .map(toSent)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return {
+    items: all.slice((page - 1) * per_page, page * per_page),
+    page,
+    per_page,
+    total: all.length,
+    pages: Math.max(1, Math.ceil(all.length / per_page)),
+  };
+}
