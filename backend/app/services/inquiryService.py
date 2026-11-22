@@ -19,10 +19,12 @@ class InquiryService(InquiryInterface):
         self.user_repo = user_repo
 
     def make_inquiry(self, message, id):
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
+        if get_jwt().get("role") != "tenant":
+            raise NotAllowedError("Only tenants can send inquiries.")
         user: User = self.user_repo.get_by_id(user_id)
         property: Property = self.listing_repo.get_by_id(id)
-        owner: User = UserSchema().load(property.user)
+        owner: User = property.user
         new_inquiry: Inquiry = InquirySchema().load(
             {"property_id": id, "tenant_id": user_id, "message": message}
         )
@@ -38,7 +40,7 @@ class InquiryService(InquiryInterface):
                 inquiry_url="",
             )
             sent = send_email(
-                email_to=property,
+                email_to=owner.email,
                 subject="PROPERTY LISTING INQUIRY",
                 html_content=INQUIRY_EMAIL,
             )
