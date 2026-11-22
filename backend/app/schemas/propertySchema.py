@@ -24,7 +24,9 @@ class PropertySchema(Schema):
     created_at = fields.DateTime(dump_default=True)
     updated_at = fields.DateTime(dump_only=True)
 
-    inquiries = fields.Nested("InquirySchema", many=True, exclude=("property",))
+    inquiries = fields.Nested(
+        "InquirySchema", many=True, exclude=("property",), load_only=True
+    )
     property_images = fields.Nested(
         "PropertyImageSchema", exclude=("property",), many=True
     )
