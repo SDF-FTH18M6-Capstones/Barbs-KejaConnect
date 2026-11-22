@@ -1,4 +1,5 @@
 from flask import jsonify, make_response
+from marshmallow import ValidationError
 from app.exceptions import (
     EmailNotVerified,
     UserNotFoundError,
@@ -26,7 +27,7 @@ def register_error_handlers(app):
     @app.errorhandler(ResourceNotFoundError)
     def handle_resource_not_found(error):
         return make_response(
-            {"error": "Resource not found", "message": str(error)}, 401
+            {"error": "Resource not found", "message": str(error)}, 404
         )
 
     @app.errorhandler(EmailNotVerified)
@@ -47,12 +48,23 @@ def register_error_handlers(app):
 
     @app.errorhandler(DatabasePersistenceError)
     def handle_persistence_error(error):
-        return make_response({"error": "Peristence Error", "message": str(error)})
+        return make_response({"error": "Peristence Error", "message": str(error)}, 500)
 
     @app.errorhandler(FileUploadFailed)
     def handle_file_upload_failed(error):
-        return make_response({"error": "Upload Error", "message": str(error)})
+        return make_response({"error": "Upload Error", "message": str(error)}, 502)
 
     @app.errorhandler(NotAllowedError)
     def handle_not_allowed(error):
-        return make_response({"error": "Permission Error", "message": str(error)})
+        return make_response({"error": "Permission Error", "message": str(error)}, 403)
+
+    @app.errorhandler(ValidationError)
+    def handle_validation_error(error):
+        return make_response(
+            {
+                "error": "Validation error",
+                "code": "VALIDATION_ERROR",
+                "details": error.messages,
+            },
+            400,
+        )
