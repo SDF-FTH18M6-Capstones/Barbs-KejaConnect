@@ -14,3 +14,12 @@ export const ADMIN = {
   reports: "/admin_dashboard/reports",
   newListing: "/admin_dashboard/new_listing",
 };
+
+export const POSTER = {
+  home: "/poster_dashboard",
+  listings: "/poster_dashboard/listings",
+  newListing: "/poster_dashboard/listings/new",
+  editListing: (id) => `/poster_dashboard/listings/${id}/edit`,
+  inquiries: "/poster_dashboard/inquiries",
+  verification: "/poster_dashboard/verification",
+};
