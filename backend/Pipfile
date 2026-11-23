@@ -18,6 +18,7 @@ pycopg = "*"
 sendgrid = "*"
 cloudinary = "*"
 faker = "*"
+psycopg = {extras = ["binary"], version = "*"}
 
 [dev-packages]
 pytest = "*"
