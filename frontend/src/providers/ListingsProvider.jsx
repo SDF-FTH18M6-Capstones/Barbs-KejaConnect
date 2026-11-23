@@ -114,7 +114,7 @@ export function ListingsProvider({ children }) {
   }, [listingsData.page, listingsData.per_page]);
 
   async function getAllListings() {
-    await get_listings("/api/v1/listings");
+    await get_listings("/api/v1/listings", false);
   }
 
   async function getPosterListings() {
@@ -139,10 +139,10 @@ export function ListingsProvider({ children }) {
     }
   }
 
-  async function get_listings(url) {
+  async function get_listings(url, useToken = true) {
     listingsDispatch({ type: "LOADING" });
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (!token && useToken) {
       throw new Error("Unauthorized user.");
     }
     try {
