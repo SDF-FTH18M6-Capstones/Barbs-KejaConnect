@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AdminLayout from "../../components/admin/AdminLayout";
+// import AdminLayout from "../../components/admin/AdminLayout";
 import StatCard from "../../components/admin/StatCard";
 import ApprovalPreview from "../../components/admin/ApprovalPreview";
 import ListingsByArea from "../../components/admin/ListingsByArea";
@@ -69,7 +69,7 @@ function AdminDashboard() {
   });
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-4">
         <div className="mb-2">
           <h1 className="text-3xl font-semibold text-[#16211C]">
@@ -110,7 +110,7 @@ function AdminDashboard() {
           <RecentDecisions decisions={decisions} />
         </div>
       </div>
-    </AdminLayout>
+    </>
   );
 }
 
