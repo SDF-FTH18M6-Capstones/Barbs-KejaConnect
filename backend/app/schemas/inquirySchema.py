@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, pre_load
+from marshmallow import Schema, fields, validate, post_load
 
 from ..models import Inquiry
 from ..utils import INQUIRY_STATUS
@@ -15,6 +15,6 @@ class InquirySchema(Schema):
     user = fields.Nested("UserSchema", exclude=("inquiries",))
     property = fields.Nested("PropertySchema", exclude=("inquiries",))
 
-    @pre_load
+    @post_load
     def to_inquiry(self, data, **kwargs):
         return Inquiry(**data)

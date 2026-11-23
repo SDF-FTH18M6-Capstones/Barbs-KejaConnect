@@ -1,7 +1,6 @@
 import os
-from flask_jwt_extended import create_access_token, get_jwt_identity
-from sendgrid.helpers.mail import Mail
-from datetime import datetime, timezone
+from flask_jwt_extended import create_access_token
+from datetime import timedelta
 from .interface.authInterface import AuthInterface
 from ..repository import UserRepo, EmailVerificationRepo
 from ..models import User, EmailVerificationToken
@@ -10,10 +9,9 @@ from ..exceptions import (
     InvalidCredentialsError,
     EmailNotVerified,
     AlreadyExists,
-    EmailVerificationNotSentError,
 )
 from ..config import sg
-from ..utils import verification_email
+from ..utils import verification_email, send_email
 
 BACKEND_URL = os.getenv("BACKEND_URL", "")
 FROM_EMAIL = os.getenv("FROM_EMAIL", "")
@@ -34,14 +32,25 @@ class AuthService(AuthInterface):
         if not user or not user.authenticate(password=password):
             raise InvalidCredentialsError("Invalid email or password.")
 
+        verification_sent = False
+
         if not user.email_verified:
+            verification_sent = self.send_verification_email(user=user)
+
             raise EmailNotVerified("Please verify your email before login.")
 
-        token = create_access_token(identity=str(user.id))
+        token = create_access_token(
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role,
+                "approval_status": user.approval_status,
+            },
+            expires_delta=timedelta(days=1),
+        )
 
-        return token, user
+        return token, user, verification_sent
 
-    def signup(self, email, phone, role, full_name, password):
+    def signup(self, email, phone, role, full_name, password, approval_status):
         if not email or not phone or not role or not full_name or not password:
             raise InvalidCredentialsError("Missing credentials.")
 
@@ -56,6 +65,7 @@ class AuthService(AuthInterface):
                 "phone": phone.strip().lower(),
                 "role": role.strip().lower(),
                 "full_name": full_name.strip().lower(),
+                "approval_status": approval_status,
             }
         )
         new_user.password_hash = password
@@ -64,7 +74,13 @@ class AuthService(AuthInterface):
 
         verification_sent = self.send_verification_email(user=saved_user)
 
-        return saved_user
+        return saved_user, verification_sent
+
+    def get_user(self, user_id):
+        if not user_id:
+            return
+        user: User = self.user_repo.get_by_id(user_id)
+        return user
 
     def verify_email(self, token):
         if not token:
@@ -81,10 +97,16 @@ class AuthService(AuthInterface):
         user: User = self.user_repo.update_user(
             user_id=email_ver_token.user_id, update_data={"email_verified": True}
         )
+        create_access_token(
+            identity=str(user.id),
+            additional_claims={
+                "role": user.role,
+                "approval_status": user.approval_status,
+            },
+        )
         user_res = UserSchema().dump(user)
-        token = create_access_token(identity=user.id)
 
-        return token, user_res
+        return user_res
 
     def send_verification_email(self, user: User):
         email_ver_token: EmailVerificationToken = self.email_ver_repo.set_token(
@@ -93,19 +115,9 @@ class AuthService(AuthInterface):
         print(email_ver_token.id)
         url = f"{BACKEND_URL}/api/v1/auth/verify-email/{email_ver_token.raw_token}.{email_ver_token.id}"
         VERIFICATION_EMAIL = verification_email(verification_url=url)
-        message = Mail(
-            from_email=FROM_EMAIL,
-            to_emails=user.email,
-            subject="KejaConnect email verification.",
+
+        return send_email(
+            email_to=user.email,
+            subject="KEJACONNECT EMAIL VERIFICATION",
             html_content=VERIFICATION_EMAIL,
         )
-
-        try:
-            res = sg.send(message)
-            if res.status_code not in (200, 201, 202):
-                raise EmailVerificationNotSentError(
-                    "Failed to send email verification."
-                )
-            return True
-        except Exception as e:
-            raise EmailVerificationNotSentError(e)

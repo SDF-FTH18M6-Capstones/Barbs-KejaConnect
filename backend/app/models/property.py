@@ -5,30 +5,33 @@ from ..utils import PROPERTY_TYPE, PROPERTY_STATUS, COUNTIES
 
 
 def create_dedupe_key(context):
-    property_type = context.get_current_parameters().get("property_type")
-    area = "_".join(context.get_current_parameters().get("area").lower().split())
-    street_address = "_".join(
-        context.get_current_parameters().get("street_address").lower().split()
-    )
-    unit_number = context.get_current_parameters().get("unit_number").lower()
-    building_name = context.get_current_parameters().get("building_name")
+    params = context.get_current_parameters()
+    property_type = params.get("property_type")
+    area = "_".join((params.get("area") or "").lower().split())
+    unit_number = (params.get("unit_number") or "").strip().lower()
+    street_address = "_".join((params.get("street_address") or "").lower().split())
+    building_name = "_".join((params.get("building_name") or "").lower().split())
 
-    if property_type == "house" and street_address != None:
-        st_address = "_".join(street_address.lower().split())
-        return "|".join([area, st_address, unit_number])
+    if not area or not unit_number:
+        raise ValueError(
+            "Error creating a dedupe key: area and unit_number are required."
+        )
 
-    if building_name != None:
-        b_num = "_".join(building_name.lower().split())
-        return "|".join([area, b_num, unit_number])
+    if property_type == "house" and street_address:
+        return "|".join([area, street_address, unit_number])
+    if building_name:
+        return "|".join([area, building_name, unit_number])
 
-    raise ValueError("Error creating a dedupe key,Check your inputs.")
+    raise ValueError("Error creating a dedupe key. Check your inputs.")
 
 
 class Property(db.Model):
     __tablename__ = "properties"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    poster_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    poster_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String(250), nullable=False)
     property_type = db.Column(db.String, nullable=False)
@@ -59,6 +62,8 @@ class Property(db.Model):
     saved_listings = db.relationship(
         "SavedListing", back_populates="property", cascade="all,delete"
     )
+
+    user = db.relationship("User")
 
     @validates("property_type")
     def val_property_type(self, key, value):

@@ -16,7 +16,10 @@ class EmailVerificationToken(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(
-        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
     )
     _token_hash = db.Column(db.String, nullable=False)
     created_at = db.Column(
@@ -49,7 +52,7 @@ class EmailVerificationToken(db.Model):
     def validate(self, token):
         if self.used_at is not None:
             return False
-        if datetime.now(timezone.utc) > self.expires_at.replace(tzinfo=timezone.utc):
+        if self.expired():
             return False
 
         validated = bcrypt.check_password_hash(self._token_hash, token)
@@ -58,6 +61,9 @@ class EmailVerificationToken(db.Model):
             return True
 
         return False
+
+    def expired(self):
+        return datetime.now(timezone.utc) > self.expires_at.replace(tzinfo=timezone.utc)
 
     def __repr__(self):
         return f"<EmailVerficationToken {self.created_at} {self.used_at} >"

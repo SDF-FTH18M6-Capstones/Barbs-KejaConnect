@@ -1,12 +1,14 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Brand from "../Brand";
+import { POSTER } from "../../paths";
+import { useAuth } from "../../providers/AuthProvider";
 
 const LINKS = [
-  { to: "/dashboard", label: "Dashboard", end: true },
-  { to: "/dashboard/listings", label: "My Listings" },
-  { to: "/listings/new", label: "New listing" },
-  { to: "/dashboard/inquiries", label: "Inquiries", badge: true },
-  { to: "/dashboard/verification", label: "Verification" },
+  { to: POSTER.home, label: "Dashboard", end: true },
+  { to: POSTER.listings, label: "My Listings", end: true },
+  { to: POSTER.newListing, label: "New listing" },
+  { to: POSTER.inquiries, label: "Inquiries" },
+  { to: POSTER.verification, label: "Verification" },
 ];
 
 const initials = (name = "") =>
@@ -18,12 +20,11 @@ const initials = (name = "") =>
     .toUpperCase();
 
 export default function PosterLayout({ user, unread = 0, children }) {
-  const navigate = useNavigate();
+  const { logout: authLogout } = useAuth();
 
   function logout() {
-    localStorage.removeItem("user");
-    localStorage.removeItem("access_token");
-    navigate("/");
+    localStorage.removeItem("dev_user");
+    authLogout();
   }
 
   return (

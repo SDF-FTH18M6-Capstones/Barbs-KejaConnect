@@ -8,6 +8,7 @@ import LoadError from "../../components/poster dashboard/LoadError";
 import useLoad from "../../components/poster dashboard/useLoad";
 import { getMyListings, setListingStatus } from "../../api/listings";
 import { getReceivedInquiries } from "../../api/inquiries";
+import { POSTER } from "../../paths";
 
 function greeting(hour = new Date().getHours()) {
   if (hour < 12) return "Good morning";
@@ -15,19 +16,24 @@ function greeting(hour = new Date().getHours()) {
   return "Good evening";
 }
 
+const countStatus = (items) => ({
+  available: items.filter((l) => l.status === "available").length,
+  taken: items.filter((l) => l.status === "taken").length,
+});
+
 async function loadDashboard() {
-  const [recent, available, taken, inquiries] = await Promise.all([
-    getMyListings({ per_page: 5 }),
-    getMyListings({ status: "available", per_page: 1 }),
-    getMyListings({ status: "taken", per_page: 1 }),
-    getReceivedInquiries({ per_page: 50 }),
+  const [mine, inquiries] = await Promise.all([
+    getMyListings({ per_page: 100 }),
+    getReceivedInquiries({ per_page: 50 }).catch(() => ({
+      items: [],
+      total: 0,
+    })),
   ]);
   return {
-    listings: recent,
+    listings: { ...mine, items: mine.items.slice(0, 5) },
     summary: {
-      available: available.total,
-      taken: taken.total,
-      inquiries_total: inquiries.total,
+      ...countStatus(mine.items),
+      inquiries_total: inquiries.total ?? inquiries.items.length,
       inquiries_unread: inquiries.items.filter((q) => q.status === "new")
         .length,
     },
@@ -88,7 +94,7 @@ function DashboardHome({ user }) {
           </h1>
         </div>
         <Link
-          to="/listings/new"
+          to={POSTER.newListing}
           className="rounded-lg bg-primary px-5 py-3 font-medium text-text-on-primary hover:bg-primary-dark"
         >
           + New listing
@@ -134,7 +140,7 @@ function DashboardHome({ user }) {
             <div className="flex flex-wrap items-center justify-between gap-3 p-5">
               <h2 className="text-lg font-semibold">My listings</h2>
               <Link
-                to="/dashboard/listings"
+                to={POSTER.listings}
                 className="text-sm font-medium text-primary hover:text-primary-dark"
               >
                 View all {data.listings.total}
@@ -154,7 +160,7 @@ function DashboardHome({ user }) {
                   You haven't posted any listings yet.
                 </p>
                 <Link
-                  to="/listings/new"
+                  to={POSTER.newListing}
                   className="font-medium text-primary hover:text-primary-dark"
                 >
                   Create your first listing

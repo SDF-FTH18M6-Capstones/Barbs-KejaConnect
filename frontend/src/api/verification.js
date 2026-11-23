@@ -13,7 +13,7 @@ export const getMyDocuments = (params) =>
 export function uploadDocument(docType, file) {
   const form = new FormData();
   form.append("doc_type", docType);
-  form.append("file", file);
+  form.append("files", file);
   return USE_MOCKS
     ? mock.uploadDocument(form)
     : api("/verification/documents", {

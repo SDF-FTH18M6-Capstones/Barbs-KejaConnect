@@ -57,9 +57,11 @@ function Badge({ status }) {
   );
 }
 
+const loadDocuments = () => getMyDocuments({ per_page: 20 });
+
 function VerificationContent({ user }) {
-  const docs = useLoad(getMyDocuments);
   const fileInput = useRef(null);
+  const docs = useLoad(loadDocuments);
 
   const required = REQUIRED_DOCS[user.role] ?? ["national_id"];
   const [docType, setDocType] = useState(required[0]);
@@ -88,16 +90,13 @@ function VerificationContent({ user }) {
 
     setUploading(true);
     try {
-      const { document } = await uploadDocument(docType, file);
-      docs.setData((d) => ({
-        ...d,
-        items: [document, ...d.items],
-        total: d.total + 1,
-      }));
+      await uploadDocument(docType, file);
+
       setUploaded(`${DOC_LABELS[docType]} uploaded. An admin will review it.`);
       setJustUploaded(true);
       setFile(null);
       if (fileInput.current) fileInput.current.value = "";
+      docs.retry();
     } catch (err) {
       setFileError(
         err.code === "INVALID_FILE"
