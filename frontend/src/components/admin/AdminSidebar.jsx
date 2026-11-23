@@ -1,83 +1,85 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { ADMIN, ROUTES } from "../../paths";
+import { mockPendingApprovals } from "../../data/mockAdminData";
 
-const navigationItems = [
-  {
-    label: "Overview",
-    path: "/admin",
-    icon: "▦",
-    end: true,
-  },
-  {
-    label: "Approval queue",
-    path: "/admin/verifications",
-    icon: "✓",
-  },
-  {
-    label: "Platform stats",
-    path: "/admin/stats",
-    icon: "▥",
-  },
-  {
-    label: "Reports",
-    path: "/admin/reports",
-    icon: "▤",
-  },
-];
+const REPORTS_COUNT = 3; // placeholder
+
 function AdminSidebar() {
+  const navigate = useNavigate();
+
+  const navigationItems = [
+    { label: "Overview", path: ADMIN.home, end: true },
+    {
+      label: "Approval queue",
+      path: ADMIN.approvalQueue,
+      badge: mockPendingApprovals.length,
+    },
+    { label: "Platform stats", path: ADMIN.stats },
+    { label: "Reports", path: ADMIN.reports, badge: REPORTS_COUNT },
+  ];
+
+  const linkBase =
+    "flex items-center justify-between rounded-md px-3 py-2 text-[13px] transition";
+
   return (
-    <aside className="flex min-h-screen w-64 flex-col bg-[#16211C] px-5 py-6 text-white">
+    <aside className="sticky top-0 flex h-screen w-56 shrink-0 flex-col bg-[#16211C] px-4 py-5 text-white">
       {/* Brand */}
-      <div className="mb-10">
-        <h1 className="text-2xl font-bold">KejaConnect</h1>
-        <span className="mt-2 inline-block rounded-full bg-[#0E6B4E] px-3 py-1 text-xs">
+      <div className="mb-6 flex items-center gap-2 px-1">
+        <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#E7F2EC] text-sm font-bold text-[#16211C]">
+          K
+        </span>
+        <span className="text-[15px] font-semibold">KejaConnect</span>
+        <span className="rounded-full bg-[#F6E3B4] px-2 py-0.5 text-[10px] font-medium text-[#6B4405]">
           Admin
         </span>
       </div>
-      {/* Navigation */}
-      <nav className="flex-1 space-y-2">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-          Menu
-        </p>
 
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1">
         {navigationItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             end={item.end}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition ${
+              `${linkBase} ${
                 isActive
-                  ? "bg-[#0E6B4E] font-semibold text-white"
-                  : "text-gray-300 hover:bg-white/10 hover:text-white"
+                  ? "bg-white/10 font-semibold text-white"
+                  : "text-[#7FD1B0] hover:bg-white/5 hover:text-white"
               }`
             }
           >
-            <span>{item.icon}</span>
-            {item.label}
+            <span>{item.label}</span>
+            {item.badge > 0 && (
+              <span className="rounded-full bg-[#F6E3B4] px-2 py-0.5 text-[11px] font-medium leading-none text-[#6B4405]">
+                {item.badge}
+              </span>
+            )}
           </NavLink>
         ))}
-        <div className="pt-5">
-          <Link
-            to="/"
-            className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-300 hover:bg-white/10 hover:text-white"
-          >
-            <span>↗</span>
-            View site
-          </Link>
-        </div>
+
+        <Link
+          to={ROUTES.home}
+          className={`${linkBase} text-[#7FD1B0] hover:bg-white/5 hover:text-white`}
+        >
+          View site
+        </Link>
       </nav>
 
       {/* Admin profile */}
-      <div className="border-t border-white/15 pt-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0E6B4E] font-semibold">
-            A
-          </div>
-
-          <div>
-            <p className="text-sm font-semibold">Admin</p>
-            <p className="text-xs text-gray-400">Platform administrator</p>
-          </div>
+      <div className="flex items-center gap-3 border-t border-white/15 px-1 pt-4">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#CFEBDD] text-xs font-semibold text-[#16211C]">
+          KA
+        </div>
+        <div>
+          <p className="text-xs font-semibold">KejaConnect Admin</p>
+          <button
+            type="button"
+            onClick={() => navigate(ROUTES.home)}
+            className="text-xs text-[#7FD1B0] underline hover:text-white"
+          >
+            Log out
+          </button>
         </div>
       </div>
     </aside>

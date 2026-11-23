@@ -14,11 +14,9 @@ import Verification from "./pages/PosterDashboard/Verification";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminApprovalQueue from "./pages/admin/AdminApprovalQueue";
 import PosterReview from "./pages/admin/PosterReview";
-import { POSTER } from "./paths";
-import EditListing from "./pages/PosterDashboard/EditListing";
-import RootLayout from "./layouts/RootLayout";
-import DocumentsLayout from "./layouts/DocumentsLayout";
-import AdminLayout from "./layouts/AdminLayout";
+import { ADMIN } from "./paths";
+import AdminNewListing from "./pages/admin/AdminNewListing";
+
 
 export const router = createBrowserRouter([
   {
@@ -53,15 +51,13 @@ export const router = createBrowserRouter([
           {
             element: <AdminLayout />,
             children: [
-              { path: "/admin_dashboard", element: <AdminDashboard /> },
-              {
-                path: "/admin_dashboard/approval_queue",
-                element: <AdminApprovalQueue />,
-              },
-              {
-                path: "/admin_dashboard/poster_review",
-                element: <PosterReview />,
-              },
+                { path: ADMIN.home, element: <AdminDashboard /> },
+  { path: ADMIN.approvalQueue, element: <AdminApprovalQueue /> },
+  { path: ADMIN.posterReview, element: <PosterReview /> },
+  { path: ADMIN.newListing, element: <AdminNewListing /> },
+  // placeholders until these pages are built
+  { path: ADMIN.stats, element: <AdminDashboard /> },
+  { path: ADMIN.reports, element: <AdminDashboard /> },
             ],
           },
         ],
