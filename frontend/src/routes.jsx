@@ -9,13 +9,18 @@ import ListingDetail from "./pages/ListingDetail";
 import PosterDashboard from "./pages/PosterDashboard/PosterDashboard";
 import MyListings from "./pages/PosterDashboard/MyListings";
 import NewListing from "./pages/PosterDashboard/NewListing";
+import EditListing from "./pages/PosterDashboard/EditListing";
+
 import PosterInquiries from "./pages/PosterDashboard/PosterInquiries";
 import Verification from "./pages/PosterDashboard/Verification";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminApprovalQueue from "./pages/admin/AdminApprovalQueue";
 import PosterReview from "./pages/admin/PosterReview";
-import { ADMIN } from "./paths";
+import { ADMIN, POSTER } from "./paths";
 import AdminNewListing from "./pages/admin/AdminNewListing";
+import RootLayout from "./layouts/RootLayout";
+import DocumentsLayout from "./layouts/DocumentsLayout";
+import AdminLayout from "./components/admin/AdminLayout";
 
 export const router = createBrowserRouter([
   {
