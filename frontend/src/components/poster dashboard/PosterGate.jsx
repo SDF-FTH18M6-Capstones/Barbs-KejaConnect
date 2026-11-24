@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import PosterLayout from "./PosterLayout";
 import useLoad from "./useLoad";
 import { getReceivedInquiries } from "../../api/inquiries";
-import { getCurrentUser } from "../inquiries/data/currentUser";
+import { useCurrentUser } from "../inquiries/data/currentUser";
+import { POSTER } from "../../paths";
 
 const isPoster = (user) => user?.role === "manager" || user?.role === "owner";
 
@@ -18,7 +19,15 @@ function Notice({ title, children }) {
 }
 
 export default function PosterGate({ needsApproval = false, children }) {
-  const user = getCurrentUser();
+  const { user, loading } = useCurrentUser();
+
+  if (loading) {
+    return (
+      <Notice title="Checking your account…">
+        <p className="text-text-muted">This takes a moment.</p>
+      </Notice>
+    );
+  }
 
   if (!isPoster(user)) {
     return (
@@ -53,7 +62,7 @@ export default function PosterGate({ needsApproval = false, children }) {
             You can create and manage listings once an admin has approved your
             documents.
           </p>
-          <Link to="/dashboard/verification" className="font-medium underline">
+          <Link to={POSTER.verification} className="font-medium underline">
             Go to verification
           </Link>
         </div>
@@ -66,7 +75,8 @@ export default function PosterGate({ needsApproval = false, children }) {
   );
 }
 
-const loadInquiries = () => getReceivedInquiries({ per_page: 50 });
+const loadInquiries = () =>
+  getReceivedInquiries({ per_page: 50 }).catch(() => ({ items: [] }));
 
 function PosterShell({ user, children }) {
   const { data } = useLoad(loadInquiries);

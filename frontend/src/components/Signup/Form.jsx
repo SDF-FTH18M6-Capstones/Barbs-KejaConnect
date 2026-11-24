@@ -1,17 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Field from "./Field";
 import PasswordRules from "./PasswordRules";
-import { ROLES, AREAS } from "../../components/Signup/data/signupRoles";
+import { ROLES } from "../../components/Signup/data/signupRoles";
 import { validateSignup } from "../../components/Signup/data/signupValidation";
-import { registerUser } from "../../components/Signup/data/signupApi";
+import { toSignupBody } from "../../components/Signup/data/signupApi";
+import { useAuth } from "../../providers/AuthProvider";
 
 const EMPTY = {
   fullName: "",
   phone: "",
   email: "",
-  company: "",
-  area: "",
   password: "",
   confirm: "",
   agree: false,
@@ -19,11 +17,10 @@ const EMPTY = {
 
 export default function Form({ roleId }) {
   const role = ROLES[roleId];
-  const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { userData, signupUser } = useAuth();
+  const { loading, error } = userData;
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -33,21 +30,11 @@ export default function Form({ roleId }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const found = validateSignup(form, role);
+    const found = validateSignup(form);
     setErrors(found);
     if (Object.keys(found).length) return;
 
-    setLoading(true);
-    setServerError("");
-    try {
-      await registerUser(form, roleId);
-      // The email verification page (task A2) reads this with useLocation().state?.email
-      navigate("/verify-email", { state: { email: form.email } });
-    } catch (err) {
-      setServerError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    signupUser(toSignupBody(form, roleId));
   }
 
   // Shared props for each input
@@ -66,12 +53,12 @@ export default function Form({ roleId }) {
     >
       <h2 className="text-xl font-semibold text-text">Your details</h2>
 
-      {serverError && (
+      {error && (
         <p
           role="alert"
           className="rounded-lg bg-error/10 p-3 text-sm text-error"
         >
-          {serverError}
+          {error}
         </p>
       )}
 
@@ -94,28 +81,6 @@ export default function Form({ roleId }) {
         hint="We'll send a confirmation link here."
         {...field("email")}
       />
-
-      {(role.showCompany || role.areaLabel) && (
-        <div
-          className={`grid gap-4 ${role.showCompany ? "sm:grid-cols-2" : ""}`}
-        >
-          {role.showCompany && (
-            <Field
-              label="Company or agency name (optional)"
-              autoComplete="organization"
-              {...field("company")}
-            />
-          )}
-          {role.areaLabel && (
-            <Field
-              label={role.areaLabel}
-              options={AREAS}
-              hint={role.areaHint}
-              {...field("area")}
-            />
-          )}
-        </div>
-      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field

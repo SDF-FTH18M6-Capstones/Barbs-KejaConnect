@@ -8,8 +8,12 @@ class Inquiry(db.Model):
     __tablename__ = "inquiries"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    property_id = db.Column(db.Integer, db.ForeignKey("properties.id"), nullable=False)
-    tenant_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    property_id = db.Column(
+        db.Integer, db.ForeignKey("properties.id", ondelete="CASCADE"), nullable=False
+    )
+    tenant_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     message = db.Column(db.String, nullable=False)
     status = db.Column(db.String, default="new", nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

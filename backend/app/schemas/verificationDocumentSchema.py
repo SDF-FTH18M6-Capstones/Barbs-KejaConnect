@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, pre_load
+from marshmallow import Schema, fields, validate, post_load
 
 from ..models import VerificationDocument
 from ..utils import DOC_TYPE, APPROVAL_STATUS
@@ -21,6 +21,6 @@ class VerificationDocumentSchema(Schema):
 
     user = fields.Nested("UserSchema", exclude=("verification_documents",))
 
-    @pre_load
+    @post_load
     def verification_documents(self, data, **kwargs):
         return VerificationDocument(**data)

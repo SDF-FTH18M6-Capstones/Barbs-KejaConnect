@@ -12,13 +12,17 @@ export default function ListingCard({ listing, index = 0 }) {
     building_name,
     price_monthly,
     created_at,
-    cover_image_url,
+    property_images,
     poster,
   } = listing;
+  const cover_image_url =
+    property_images?.find((img) => img.is_cover)?.url ??
+    property_images?.[0]?.url ??
+    listing.cover_image_url;
 
   return (
     <Link
-      to="/"
+      to={`/listings/${id}`}
       className="flex flex-col overflow-hidden rounded-[14px] border border-line bg-white text-ink no-underline transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
     >
       <div

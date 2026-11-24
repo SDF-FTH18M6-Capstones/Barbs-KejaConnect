@@ -2,37 +2,28 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ButtonAlternate from "../ButtonAlternate";
 import ButtonPrimary from "../ButtonPrimary";
 import Brand from "../Brand";
-import { getCurrentUser } from "../inquiries/data/currentUser";
+import { POSTER, ROUTES } from "../../paths";
+import { useAuth } from "../../providers/AuthProvider";
+import { useCurrentUser } from "../inquiries/data/currentUser";
 
-// "Faith Njeri" -> "FN"
-const initials = (name) =>
+const initials = (name = "") =>
   name
-    .split(" ")
-    .map((w) => w[0])
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0]?.toUpperCase())
     .slice(0, 2)
-    .join("")
-    .toUpperCase(); // ← added
+    .join("");
 
 export default function Header() {
-  //check if user exists to display varied status bar
+  const { logout } = useAuth();
+  const { user } = useCurrentUser();
   const navigate = useNavigate();
-  const user = getCurrentUser(); // ← added: { full_name, role } or null
-  const isPoster = user?.role === "manager" || user?.role === "owner"; // ← added
+  const isPoster = user?.role === "manager" || user?.role === "owner";
 
-  const handleButtonClick = (type) => {
-    console.log(type);
-    if (type == "login") {
-      navigate("/login");
-    } else {
-      navigate("/signup");
-    }
-  };
-
-  // ← added: clears the saved user and goes to the home page
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("access_token");
-    navigate("/");
+    localStorage.removeItem("dev_user");
+    logout();
   };
 
   return (
@@ -40,20 +31,17 @@ export default function Header() {
       <Brand />
       <div className="flex justify-between gap-3">
         <div className="actions flex items-center gap-4">
-          <NavLink to="/" className="text-text hover:text-primary">
+          <NavLink to={ROUTES.home} className="text-text hover:text-primary">
             Browse
           </NavLink>
-          {isPoster && ( // ← only posters can create listings
-            <NavLink
-              to="/poster_dashboard"
-              className="text-text hover:text-primary"
-            >
+          {isPoster && (
+            <NavLink to={POSTER.home} className="text-text hover:text-primary">
               Dashboard
             </NavLink>
           )}
-          {user?.role === "tenant" && ( // ← only tenants send inquiries
+          {user?.role === "tenant" && (
             <NavLink
-              to="/my-inquiries"
+              to={ROUTES.myInquiries}
               className="text-text hover:text-primary"
             >
               My Inquiries
@@ -62,7 +50,6 @@ export default function Header() {
         </div>
         <div className="auth flex items-center gap-3">
           {user ? (
-            // ← added: logged in shows initials, name and Log out
             <>
               <span className="flex items-center gap-2">
                 <span className="grid size-9 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary-dark">
@@ -70,17 +57,16 @@ export default function Header() {
                 </span>
                 <span className="text-sm text-text">{user.full_name}</span>
               </span>
-              <ButtonAlternate onClick={handleLogout} text="Log out" />
+              <ButtonAlternate onclick={handleLogout} text="Log out" />
             </>
           ) : (
-            // unchanged: visitors see Log in / Sign Up
             <>
               <ButtonAlternate
-                onclick={() => handleButtonClick("login")}
+                onclick={() => navigate(ROUTES.login)}
                 text="Log in"
               />
               <ButtonPrimary
-                onclick={() => handleButtonClick("")}
+                onclick={() => navigate(ROUTES.register)}
                 text="Sign Up"
               />
             </>

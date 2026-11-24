@@ -3,12 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import InquiryCard from "../../components/inquiries/InquiryCard";
 import EmptyInquiries from "../../components/inquiries/EmptyInquiries";
 import Pager from "../../components/inquiries/Pager";
-import { getMyInquiries } from "../../components/inquiries/data/inquiryApi";
-import { getCurrentUser } from "../../components/inquiries/data/currentUser";
-import Header from "../../components/nav/Header";
+import { getSentInquiries } from "../../api/inquiries";
+import { useCurrentUser } from "../../components/inquiries/data/currentUser";
 
 export default function MyInquiries() {
-  const user = getCurrentUser();
+  const { user, loading: checkingUser } = useCurrentUser();
   const location = useLocation();
   const isTenant = user?.role === "tenant";
 
@@ -21,8 +20,7 @@ export default function MyInquiries() {
   useEffect(() => {
     if (!isTenant) return;
     let ignore = false;
-    setStatus("loading");
-    getMyInquiries(page)
+    getSentInquiries({ page, per_page: 10 })
       .then((result) => {
         if (ignore) return;
         setData(result);
@@ -39,6 +37,7 @@ export default function MyInquiries() {
   }, [page, attempt, isTenant]);
 
   function goToPage(newPage) {
+    setStatus("loading");
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -59,7 +58,11 @@ export default function MyInquiries() {
           )}
         </div>
 
-        {!user && (
+        {checkingUser && (
+          <p className="text-text-muted">Checking your account…</p>
+        )}
+
+        {!checkingUser && !user && (
           <div className="space-y-3 rounded-2xl border border-border bg-surface p-6 text-center">
             <p>Log in to see the inquiries you've sent.</p>
             <Link
@@ -98,7 +101,10 @@ export default function MyInquiries() {
           >
             <p>{error}</p>
             <button
-              onClick={() => setAttempt(attempt + 1)}
+              onClick={() => {
+                setStatus("loading");
+                setAttempt(attempt + 1);
+              }}
               className="rounded-lg bg-surface px-4 py-2 font-medium text-text"
             >
               Try again

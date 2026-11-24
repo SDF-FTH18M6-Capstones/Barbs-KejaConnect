@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, pre_load
+from marshmallow import Schema, fields, post_load
 
 from ..models import PropertyImage
 
@@ -14,6 +14,6 @@ class PropertyImageSchema(Schema):
 
     property = fields.Nested("PropertySchema", exclude=("property_images",), many=False)
 
-    @pre_load
+    @post_load
     def to_propety_image(self, data, **kwargs):
         return PropertyImage(**data)

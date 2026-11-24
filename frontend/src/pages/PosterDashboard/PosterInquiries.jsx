@@ -18,7 +18,7 @@ function InquiriesContent() {
     [listingId, page],
   );
   const { loading, data, error, retry } = useLoad(load);
-  const listings = useLoad(loadListings); // for the "Listing" dropdown
+  const listings = useLoad(loadListings);
 
   return (
     <>
@@ -40,7 +40,7 @@ function InquiriesContent() {
             className="min-h-11 rounded-lg border border-border bg-surface px-3 font-normal"
           >
             <option value="">All listings</option>
-            {listings.data?.items.map((l) => (
+            {(listings.data?.items ?? []).map((l) => (
               <option key={l.id} value={l.id}>
                 {l.title} · {l.building_name}
               </option>
@@ -76,7 +76,7 @@ function InquiriesContent() {
           {data.items.map((q) => (
             <ReceivedInquiry key={q.id} inquiry={q} />
           ))}
-          <Pager page={data.page} pages={data.pages} onPage={setPage} />
+          <Pager page={page} pages={data.pages} onPage={setPage} />
         </section>
       )}
     </>

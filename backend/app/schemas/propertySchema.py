@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, pre_load
+from marshmallow import Schema, fields, validate, post_load
 
 from ..models import Property
 from ..utils import PROPERTY_TYPE, PROPERTY_STATUS, COUNTIES
@@ -24,7 +24,9 @@ class PropertySchema(Schema):
     created_at = fields.DateTime(dump_default=True)
     updated_at = fields.DateTime(dump_only=True)
 
-    inquiries = fields.Nested("InquirySchema", many=True, exclude=("property",))
+    inquiries = fields.Nested(
+        "InquirySchema", many=True, exclude=("property",), load_only=True
+    )
     property_images = fields.Nested(
         "PropertyImageSchema", exclude=("property",), many=True
     )
@@ -32,6 +34,17 @@ class PropertySchema(Schema):
         "SavedListingSchema", many=True, exclude=("property",)
     )
 
-    @pre_load
+    user = fields.Nested(
+        "UserSchema",
+        many=False,
+        exclude=(
+            "email_verification_token",
+            "verification_documents",
+            "inquiries",
+            "saved_listings",
+        ),
+    )
+
+    @post_load
     def to_property(self, data, **kwargs):
         return Property(**data)

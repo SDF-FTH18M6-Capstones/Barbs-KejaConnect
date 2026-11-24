@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import PosterGate from "../../components/poster dashboard/PosterGate";
 import ListingsTable from "../../components/poster dashboard/ListingsTable";
@@ -6,6 +6,10 @@ import LoadError from "../../components/poster dashboard/LoadError";
 import Pager from "../../components/poster dashboard/Pager";
 import useLoad from "../../components/poster dashboard/useLoad";
 import { getMyListings, setListingStatus } from "../../api/listings";
+import { POSTER } from "../../paths";
+
+const PER_PAGE = 10;
+const loadMine = () => getMyListings({ per_page: 100 });
 
 const FILTERS = [
   { value: "", label: "All" },
@@ -16,17 +20,21 @@ const FILTERS = [
 function MyListingsContent() {
   const location = useLocation();
   const created = location.state?.created;
+  const updated = location.state?.updated;
 
   const [filter, setFilter] = useState("");
-  const [page, setPage] = useState(1);
   const [busyId, setBusyId] = useState(null);
   const [rowError, setRowError] = useState("");
 
-  const load = useCallback(
-    () => getMyListings({ status: filter, page, per_page: 10 }),
-    [filter, page],
+  const [page, setPage] = useState(1);
+  const { loading, data, error, retry, setData } = useLoad(loadMine);
+
+  const shown = (data?.items ?? []).filter(
+    (l) => !filter || l.status === filter,
   );
-  const { loading, error, data, retry, setData } = useLoad(load);
+  const pages = Math.max(1, Math.ceil(shown.length / PER_PAGE));
+  const current = Math.min(page, pages);
+  const pageItems = shown.slice((current - 1) * PER_PAGE, current * PER_PAGE);
 
   function changeFilter(value) {
     setFilter(value);
@@ -54,6 +62,7 @@ function MyListingsContent() {
       setBusyId(null);
     }
   }
+
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -65,7 +74,7 @@ function MyListingsContent() {
           </p>
         </div>
         <Link
-          to="/listings/new"
+          to={POSTER.newListing}
           className="rounded-lg bg-primary px-5 py-3 font-medium text-text-on-primary hover:bg-primary-dark"
         >
           + New listing
@@ -78,6 +87,15 @@ function MyListingsContent() {
           className="rounded-lg bg-success/10 p-3 text-sm font-medium text-success"
         >
           “{created}” is now live.
+        </p>
+      )}
+
+      {updated && (
+        <p
+          role="status"
+          className="rounded-lg bg-success/10 p-3 text-sm font-medium text-success"
+        >
+          Changes to “{updated}” saved.
         </p>
       )}
 
@@ -104,7 +122,7 @@ function MyListingsContent() {
           ))}
           {data && (
             <span className="ml-auto self-center text-sm text-text-muted">
-              {data.total} {data.total === 1 ? "listing" : "listings"}
+              {shown.length} {shown.length === 1 ? "listing" : "listings"}
             </span>
           )}
         </div>
@@ -136,7 +154,7 @@ function MyListingsContent() {
           </div>
         )}
 
-        {data && data.items.length === 0 && (
+        {data && shown.length === 0 && (
           <div className="space-y-3 p-8 pt-2 text-center">
             <p className="text-text-muted">
               {filter
@@ -145,7 +163,7 @@ function MyListingsContent() {
             </p>
             {!filter && (
               <Link
-                to="/listings/new"
+                to={POSTER.newListing}
                 className="font-medium text-primary hover:text-primary-dark"
               >
                 Create your first listing
@@ -154,14 +172,14 @@ function MyListingsContent() {
           </div>
         )}
 
-        {data && data.items.length > 0 && (
+        {data && shown.length > 0 && (
           <>
             <ListingsTable
-              listings={data.items}
+              listings={pageItems}
               onToggle={toggleListing}
               busyId={busyId}
             />
-            <Pager page={data.page} pages={data.pages} onPage={setPage} />
+            <Pager page={current} pages={pages} onPage={setPage} />
           </>
         )}
       </section>

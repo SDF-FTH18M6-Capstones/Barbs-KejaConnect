@@ -8,7 +8,9 @@ class VerificationDocument(db.Model):
     __tablename__ = "verification_documents"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     doc_type = db.Column(db.String, nullable=False)
     file_url = db.Column(db.String, nullable=False)
     cloudinary_public_id = db.Column(db.String, nullable=False)

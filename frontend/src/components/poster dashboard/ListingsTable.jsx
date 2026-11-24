@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { formatDate } from "../inquiries/data/formart";
+import { POSTER } from "../../paths";
+import { listingImages } from "../../api/listings";
 
 export default function ListingsTable({ listings, onToggle, busyId }) {
   const button =
@@ -21,16 +23,37 @@ export default function ListingsTable({ listings, onToggle, busyId }) {
         <tbody>
           {listings.map((l) => {
             const taken = l.status === "taken";
+            const cover = listingImages(l)[0];
             return (
               <tr key={l.id} className="border-b border-border/60 text-sm">
                 <td className="px-4 py-3">
-                  <Link
-                    to={`/listings/${l.id}`}
-                    className="font-medium text-text hover:text-primary"
-                  >
-                    {l.title}
-                  </Link>
-                  <div className="text-[13px] text-text-muted">{l.area}</div>
+                  <div className="flex items-center gap-3">
+                    {cover ? (
+                      <img
+                        src={cover.url}
+                        alt=""
+                        className="size-12 shrink-0 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <span
+                        aria-hidden="true"
+                        className="grid size-12 shrink-0 place-items-center rounded-lg bg-bg text-[11px] text-text-muted"
+                      >
+                        No photo
+                      </span>
+                    )}
+                    <div>
+                      <Link
+                        to={`/listings/${l.id}`}
+                        className="font-medium text-text hover:text-primary"
+                      >
+                        {l.title}
+                      </Link>
+                      <div className="text-[13px] text-text-muted">
+                        {l.area}
+                      </div>
+                    </div>
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   {l.building_name} {l.unit_number ?? ""}
@@ -56,7 +79,7 @@ export default function ListingsTable({ listings, onToggle, busyId }) {
                 </td>
                 <td className="space-x-2 whitespace-nowrap px-4 py-3 text-right">
                   <Link
-                    to={`/listings/${l.id}/edit`}
+                    to={POSTER.editListing(l.id)}
                     className={`${button} inline-flex items-center`}
                   >
                     Edit

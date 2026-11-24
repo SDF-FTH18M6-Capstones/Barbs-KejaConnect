@@ -1,17 +1,28 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import AuthLayout from "../../components/auth/AuthLayout";
 import FormInput from "../../components/auth/FormInput";
 import PasswordInput from "../../components/auth/PasswordInput";
+import { useAuth } from "../../providers/AuthProvider";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [errors, setErrors] = useState({});
-  const [message, setMessage] = useState("");
+
+  const { userData, loginUser } = useAuth();
+
+  const { data, loading, error } = userData;
+
+  useEffect(() => {
+    if (data) {
+      navigate("/");
+    }
+  }, [data, navigate]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -24,8 +35,6 @@ export default function Login() {
       ...errors,
       [name]: "",
     });
-
-    setMessage("");
   }
   function handleSubmit(event) {
     event.preventDefault();
@@ -47,9 +56,8 @@ export default function Login() {
     if (Object.keys(newErrors).length > 0) {
       return;
     }
-    setMessage(
-      "Frontend validation successful! Backend login is not connected yet.",
-    );
+
+    loginUser(formData);
   }
 
   return (
@@ -64,39 +72,47 @@ export default function Login() {
           </p>
         </div>
         {/* Login form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <FormInput
-            label="Email address"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="you@example.com"
-            error={errors.email}
-          />
+        {loading ? (
           <div>
-            <PasswordInput
-              value={formData.password}
-              onChange={handleChange}
-              error={errors.password}
-            />
-
-            <div className="mt-2 text-right">
-              <span className="text-sm text-text-muted">Forgot password?</span>
-            </div>
+            <h2 className="text-3xl font-bold">Trying to log you in...</h2>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <FormInput
+              label="Email address"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="you@example.com"
+              error={errors.email}
+            />
+            <div>
+              <PasswordInput
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+              />
 
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
-          >
-            Log in
-          </button>
-        </form>
+              <div className="mt-2 text-right">
+                <span className="text-sm text-text-muted">
+                  Forgot password?
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
+            >
+              Log in
+            </button>
+          </form>
+        )}
         {/* Mock response */}
-        {message && (
-          <p className="rounded-lg bg-green-50 p-3 text-sm text-success">
-            {message}
+        {error && (
+          <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            {error}
           </p>
         )}
         {/* Signup link */}
