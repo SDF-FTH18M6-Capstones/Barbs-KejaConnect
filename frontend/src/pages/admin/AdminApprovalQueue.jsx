@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AdminLayout from "../../components/admin/AdminLayout";
+// import AdminLayout from "../../components/admin/AdminLayout";
 import AdminHeader from "../../components/admin/AdminHeader";
 import ApprovalTable from "../../components/admin/ApprovalTable";
 import { mockAdminApplications } from "../../data/mockAdminData";
@@ -20,7 +20,7 @@ function AdminApprovalQueue() {
   ).length;
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-6">
         <AdminHeader
           title="Approval queue"
@@ -51,7 +51,7 @@ function AdminApprovalQueue() {
           setApplications={setApplications}
         />
       </div>
-    </AdminLayout>
+    </>
   );
 }
 
