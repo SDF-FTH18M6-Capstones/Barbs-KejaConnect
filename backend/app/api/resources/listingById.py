@@ -17,23 +17,11 @@ class ListingByIdResource(Resource):
             200,
         )
 
-    @jwt_required()
     def put(self, id):
         data = request.get_json(silent=True) or {}
         l: Property = self.listing_service.get_by_id(listing_id=id)
         user_id = int(get_jwt_identity())
         claims = get_jwt()
-        if l.poster_id != user_id or claims.get("role") not in (
-            "owner",
-            "manager",
-        ):
-            return make_response(
-                {
-                    "error": "Not allowed.",
-                    "message": "You either not approved or allowed to perform that operation.",
-                },
-                403,
-            )
 
         listing = self.listing_service.update_listing(listing_id=id, update_data=data)
 
