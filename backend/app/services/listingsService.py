@@ -1,0 +1,30 @@
+from flask_jwt_extended import get_jwt_identity
+from ..repository import ListingsRepository, UserRepo
+from .interface.listingInterface import ListingsInterface
+
+
+class ListingsService(ListingsInterface):
+    def __init__(self, listing_repo: ListingsRepository, user_repo: UserRepo):
+        self.listing_repo = listing_repo
+        self.user_repo = user_repo
+
+    def get_all_listings(self, page, per_page):
+        return self.listing_repo.get_all(page=page, per_page=per_page)
+
+    def get_poster_listings(self, page, per_page):
+        user_id = int(get_jwt_identity())
+        print("This is the id:", user_id)
+        return self.listing_repo.get_poster_listings(
+            poster_id=user_id, page=page, per_page=per_page
+        )
+
+    def get_by_id(self, listing_id):
+        return self.listing_repo.get_by_id(listing_id=listing_id)
+
+    def create_listing(self, listing):
+        return self.listing_repo.create_listing(listing=listing)
+
+    def update_listing(self, listing_id, update_data):
+        return self.listing_repo.update_listing(
+            listing_id=listing_id, update_data=update_data
+        )

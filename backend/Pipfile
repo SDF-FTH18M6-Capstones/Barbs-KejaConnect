@@ -10,8 +10,18 @@ flask-cors = "*"
 marshmallow = "*"
 flask-migrate = "*"
 flask-jwt-extended = "*"
+python-dotenv = "*"
+psycopg2-binary = "*"
+flask-restful = "*"
+flask-bcrypt = "*"
+pycopg = "*"
+sendgrid = "*"
+cloudinary = "*"
+faker = "*"
+psycopg = {extras = ["binary"], version = "*"}
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.14"

@@ -1,0 +1,37 @@
+/* ==========================================================
+   House Hunting Platform - Shared Theme
+   Import once in your root (e.g. src/index.css or App.jsx):
+     import "./styles/theme.css";
+   Then use the variables everywhere. Do NOT hardcode hex codes.
+   Example:  background: var(--color-primary);
+   ========================================================== */
+
+:root {
+  /* Brand */
+  --color-primary: #0F766E;        /* deep green: buttons, links, navbar */
+  --color-primary-dark: #134E4A;   /* hover states, footer */
+  --color-accent: #F59E0B;         /* warm amber: key CTAs, highlights */
+
+  /* Surfaces */
+  --color-bg: #F8FAFC;             /* page background (off-white) */
+  --color-surface: #FFFFFF;        /* cards, modals, inputs */
+  --color-border: #E2E8F0;         /* dividers, input borders */
+
+  /* Text */
+  --color-text: #0F172A;           /* main text (slate) */
+  --color-text-muted: #64748B;     /* secondary text */
+  --color-text-on-primary: #FFFFFF;/* text on green backgrounds */
+  --color-text-on-accent: #0F172A; /* text on amber (dark, NOT white: white fails contrast) */
+
+  /* Status */
+  --color-success: #16A34A;        /* verified badge, success messages */
+  --color-error: #DC2626;          /* errors, report button */
+}
+
+/* ----------------------------------------------------------
+   Usage notes
+   - Primary button:  background var(--color-primary), text var(--color-text-on-primary)
+   - Accent button:   background var(--color-accent),  text var(--color-text-on-accent)
+   - Hover on primary: var(--color-primary-dark)
+   - Aim for WCAG AA contrast (4.5:1) on all text.
+   ---------------------------------------------------------- */
