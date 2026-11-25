@@ -50,7 +50,7 @@ class InquiryService(InquiryInterface):
     def received_inquiries(self, page, per_page):
         user_id = int(get_jwt_identity())
         claims = get_jwt()
-        if claims.get("role", "") not in ("manager", "owner"):
+        if claims.get("role", "") not in ("manager", "owner", "admin"):
             raise NotAllowedError(
                 f"User of type {claims.get('role','')} can not perform this operation."
             )
