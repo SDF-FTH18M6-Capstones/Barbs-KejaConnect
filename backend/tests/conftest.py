@@ -1,18 +1,19 @@
 import os
 import re
+import socket
 from types import SimpleNamespace
 
-# Must be set before create_app() runs, so the app never loads the dev/prod config.
 os.environ["APP_SETTINGS"] = "tests.settings.TestingConfig"
 
 import pytest
+from sendgrid import SendGridAPIClient
 
 from app import create_app
 from app.config import db
 
 
 class FakeSendGrid:
-    """Stands in for the SendGrid client: records emails, never touches the network."""
+    """Stands in for SendGrid: records emails, never touches the network."""
 
     def __init__(self):
         self.sent = []
@@ -31,6 +32,7 @@ class FakeSendGrid:
         assert match, "No verification link found in the email"
         return match.group(1).rstrip(".")
 
+
 def _route(app, resource_name):
     """Find a URL by its Flask-RESTful resource class, so tests don't hardcode paths."""
     wanted = resource_name.lower()
@@ -41,6 +43,17 @@ def _route(app, resource_name):
     )
     return rules[0].rule
 
+
+@pytest.fixture(autouse=True)
+def block_network(monkeypatch):
+    """No test may open a network connection. If one tries, it fails loudly."""
+
+    def refuse(*args, **kwargs):
+        raise RuntimeError("Network access is blocked in tests")
+
+    monkeypatch.setattr(socket.socket, "connect", refuse)
+
+
 @pytest.fixture(scope="session")
 def app():
     app = create_app()
@@ -48,6 +61,7 @@ def app():
         "Refusing to run tests against a non-SQLite database"
     )
     return app
+
 
 @pytest.fixture(scope="session")
 def urls(app):
@@ -58,14 +72,19 @@ def urls(app):
         me=_route(app, "WhoAmI"),
     )
 
+
 @pytest.fixture()
 def mailbox(monkeypatch):
     """Replaces SendGrid for the test, so no real email can ever be sent."""
     fake = FakeSendGrid()
-    monkeypatch.setattr("app.services.authService.sg", fake)
-    monkeypatch.setattr("app.services.authService.FROM_EMAIL", "noreply@kejaconnect.test")
-    monkeypatch.setattr("app.services.authService.BACKEND_URL", "http://localhost:5000")
+
+    def fake_send(client_self, message):
+        return fake.send(message)
+    monkeypatch.setattr(SendGridAPIClient, "send", fake_send)
+    monkeypatch.setattr("app.services.authService.FROM_EMAIL", "noreply@kejaconnect.test", raising=False)
+    monkeypatch.setattr("app.services.authService.BACKEND_URL", "http://localhost:5000", raising=False)
     return fake
+
 
 @pytest.fixture()
 def client(app, mailbox):
